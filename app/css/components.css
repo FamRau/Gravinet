@@ -31,6 +31,12 @@ tbody td{padding:12px 14px;vertical-align:middle}
 .badge-neutral{background:rgba(120,128,160,.15);color:var(--muted)}
 .badge-kritisch{background:rgba(247,79,79,.15);color:var(--danger)}
 
+/* SORTABLE HEADERS */
+.th-sort{cursor:pointer;user-select:none;white-space:nowrap}
+.th-sort:hover{color:var(--text)}
+.sort-icon{font-size:.6rem;opacity:.35;margin-left:3px;vertical-align:middle}
+.sort-icon.active{opacity:1;color:var(--accent)}
+
 /* SCORE BARS */
 .score-wrap{display:flex;align-items:center;gap:8px}
 .bar-track{width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}

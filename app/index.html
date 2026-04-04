@@ -111,8 +111,15 @@
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th>Name / Funktion</th><th>Gruppe</th><th>Einfluss</th><th>Interesse</th>
-        <th>Haltung</th><th>Strategie</th><th>Journal</th><th>Letzter Kontakt</th><th></th>
+        <th id="th-name"      class="th-sort" onclick="setSortCol('name')">Name / Funktion <span class="sort-icon">⇅</span></th>
+        <th id="th-gruppe"    class="th-sort" onclick="setSortCol('gruppe')">Gruppe <span class="sort-icon">⇅</span></th>
+        <th id="th-einfluss"  class="th-sort" onclick="setSortCol('einfluss')">Einfluss <span class="sort-icon">⇅</span></th>
+        <th id="th-interesse" class="th-sort" onclick="setSortCol('interesse')">Interesse <span class="sort-icon">⇅</span></th>
+        <th id="th-haltung"   class="th-sort" onclick="setSortCol('haltung')">Haltung <span class="sort-icon">⇅</span></th>
+        <th id="th-strategie" class="th-sort" onclick="setSortCol('strategie')">Strategie <span class="sort-icon">⇅</span></th>
+        <th id="th-journal"   class="th-sort" onclick="setSortCol('journal')">Journal <span class="sort-icon">⇅</span></th>
+        <th id="th-kontakt"   class="th-sort" onclick="setSortCol('kontakt')">Letzter Kontakt <span class="sort-icon">⇅</span></th>
+        <th></th>
       </tr></thead>
       <tbody id="table-body"></tbody>
     </table>

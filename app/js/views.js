@@ -29,6 +29,29 @@ function renderBirthdayAlerts() {
   }).join('');
 }
 
+// ── Table sort ────────────────────────────────────────────────────────────────
+
+function setSortCol(col) {
+  if (sortCol === col) {
+    sortDir = -sortDir;
+  } else {
+    sortCol = col;
+    sortDir = 1;
+  }
+  renderTable();
+}
+
+function _sortIndicator(col) {
+  if (sortCol !== col) return '<span class="sort-icon">⇅</span>';
+  return `<span class="sort-icon active">${sortDir === 1 ? '▲' : '▼'}</span>`;
+}
+
+function _lastContactTs(s) {
+  const j = s.journal || [];
+  if (!j.length) return 0;
+  return Math.max(...j.map(e => new Date(e.date).getTime()));
+}
+
 // ── Table ─────────────────────────────────────────────────────────────────────
 
 function renderTable() {
@@ -48,6 +71,35 @@ function renderTable() {
     if (fh && s.haltung  !== fh) return false;
     return true;
   });
+
+  const HALTUNG_ORDER = { supportiv: 0, neutral: 1, kritisch: 2 };
+
+  if (sortCol) {
+    filtered.sort((a, b) => {
+      let va, vb;
+      if      (sortCol === 'name')      { va = a.name.toLowerCase();       vb = b.name.toLowerCase(); }
+      else if (sortCol === 'gruppe')    { va = a.gruppe;                   vb = b.gruppe; }
+      else if (sortCol === 'einfluss')  { va = a.einfluss;                 vb = b.einfluss; }
+      else if (sortCol === 'interesse') { va = a.interesse;                vb = b.interesse; }
+      else if (sortCol === 'haltung')   { va = HALTUNG_ORDER[a.haltung] ?? 9; vb = HALTUNG_ORDER[b.haltung] ?? 9; }
+      else if (sortCol === 'strategie') { va = getStrategie(a);            vb = getStrategie(b); }
+      else if (sortCol === 'journal')   { va = (a.journal||[]).length;     vb = (b.journal||[]).length; }
+      else if (sortCol === 'kontakt')   { va = _lastContactTs(a);          vb = _lastContactTs(b); }
+      if (va < vb) return -sortDir;
+      if (va > vb) return  sortDir;
+      return 0;
+    });
+  }
+
+  // Update header indicators
+  document.getElementById('th-name').innerHTML      = `Name / Funktion ${_sortIndicator('name')}`;
+  document.getElementById('th-gruppe').innerHTML    = `Gruppe ${_sortIndicator('gruppe')}`;
+  document.getElementById('th-einfluss').innerHTML  = `Einfluss ${_sortIndicator('einfluss')}`;
+  document.getElementById('th-interesse').innerHTML = `Interesse ${_sortIndicator('interesse')}`;
+  document.getElementById('th-haltung').innerHTML   = `Haltung ${_sortIndicator('haltung')}`;
+  document.getElementById('th-strategie').innerHTML = `Strategie ${_sortIndicator('strategie')}`;
+  document.getElementById('th-journal').innerHTML   = `Journal ${_sortIndicator('journal')}`;
+  document.getElementById('th-kontakt').innerHTML   = `Letzter Kontakt ${_sortIndicator('kontakt')}`;
 
   document.getElementById('table-body').innerHTML = filtered.length === 0
     ? `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">Keine Stakeholder in diesem Projekt. <a href="#" onclick="openPickerOverlay();return false" style="color:var(--accent)">Hinzufügen →</a></td></tr>`

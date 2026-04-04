@@ -63,7 +63,7 @@ npm run build      # AppImage bauen → dist/Gravinet-1.0.0.AppImage
 
 ### Windows (.exe / NSIS-Installer)
 
-Das Windows-Build muss auf einem **Windows-Rechner** oder in einer Windows-VM durchgeführt werden. Cross-Compilation von Linux nach Windows wird von electron-builder nicht zuverlässig unterstützt.
+Das Windows-Build muss auf einem **Windows-Rechner** oder in einer Windows-VM durchgeführt werden.
 
 1. Repository auf einem Windows-Rechner klonen
 2. Node.js ≥ 18 installieren
@@ -95,7 +95,7 @@ Alternativ kann ein portables EXE ohne Installer gebaut werden:
 
 ### macOS (.dmg)
 
-Das macOS-Build muss auf einem **Mac** durchgeführt werden — Apple erlaubt keine Cross-Compilation für macOS auf anderen Plattformen.
+Das macOS-Build muss auf einem **Mac** durchgeführt werden.
 
 1. Repository auf einem Mac klonen
 2. Node.js ≥ 18 installieren (z.B. via [Homebrew](https://brew.sh): `brew install node`)

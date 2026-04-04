@@ -1,0 +1,45 @@
+{
+  "name": "Gravinet",
+  "version": "1.0.0",
+  "description": "Gravinet – Stakeholder-Management",
+  "main": "main.js",
+  "author": "Direktion 4 Logistik",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --linux AppImage",
+    "build-all": "electron-builder --linux AppImage deb"
+  },
+  "build": {
+    "appId": "at.gravinet.app",
+    "productName": "Gravinet",
+    "copyright": "Direktion 4 Logistik",
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "category": "Office",
+      "icon": "app/icons",
+      "desktop": {
+        "Name": "Gravinet",
+        "Comment": "Gravinet – Stakeholder-Management",
+        "Categories": "Office;ProjectManagement;",
+        "StartupWMClass": "gravinet"
+      }
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}

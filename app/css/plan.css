@@ -1,0 +1,38 @@
+/* PLAN */
+.plan-scroll-outer{position:relative}
+.plan-grid-wrap{overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.plan-grid-wrap::-webkit-scrollbar{display:none}
+.plan-grid{display:grid;grid-template-columns:repeat(5,minmax(320px,1fr));gap:16px;min-width:calc(5*320px + 4*16px);width:100%;padding-right:40px}
+.plan-year{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 18px;min-height:420px;display:flex;flex-direction:column;overflow:hidden}
+.plan-year-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.plan-year-header-text{flex:1}
+.year-badge{font-family:var(--font-mono);font-size:.7rem;background:rgba(79,142,247,.15);color:var(--accent);padding:3px 10px;border-radius:20px}
+.year-title{font-size:.75rem;color:var(--muted);font-family:var(--font-mono)}
+.plan-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(42,48,72,.4);font-size:.85rem}
+.plan-item:last-child{border-bottom:none}
+.plan-quarter{font-family:var(--font-mono);font-size:.7rem;color:var(--accent2);min-width:28px;padding-top:3px;flex-shrink:0}
+.plan-item-text{color:var(--text-soft);line-height:1.5;flex:1}
+.plan-item.done .plan-item-text{text-decoration:line-through;color:var(--muted)}
+.plan-item-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s;flex-shrink:0}
+.plan-item:hover .plan-item-actions{opacity:1}
+.plan-btn{padding:3px 8px;border-radius:5px;font-size:.7rem;font-family:var(--font-mono);cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all .15s}
+.plan-btn:hover{color:var(--accent);border-color:var(--accent)}
+.plan-btn.del:hover{color:var(--danger);border-color:var(--danger)}
+.plan-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;color:transparent;font-size:.65rem;padding:0}
+.plan-check:hover{border-color:var(--accent3)}
+.plan-item.done .plan-check{background:var(--accent3);border-color:var(--accent3);color:#0f1117}
+.plan-add-row{display:flex;flex-direction:column;gap:6px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)}
+.plan-add-inputs{display:flex;gap:6px;width:100%}
+.plan-add-q{width:60px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 6px;color:var(--text);font-family:var(--font-mono);font-size:.78rem;outline:none}
+.plan-add-q:focus{border-color:var(--accent)}
+.plan-add-text{flex:1;min-width:0;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 8px;color:var(--text);font-family:var(--font-body);font-size:.83rem;outline:none}
+.plan-add-text:focus{border-color:var(--accent)}
+.plan-add-text::placeholder{color:var(--muted)}
+.plan-header-btn{padding:4px 10px;border-radius:6px;font-size:.72rem;font-family:var(--font-mono);cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--muted);transition:all .15s}
+.plan-header-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+/* Jahr 5 Endziel highlight */
+.plan-year-final{border-color:rgba(212,160,23,.45)!important;background:linear-gradient(160deg,rgba(212,160,23,.1) 0%,var(--surface) 55%);box-shadow:0 0 0 1px rgba(212,160,23,.15),var(--shadow)}
+.plan-year-final .plan-year-header{border-bottom-color:rgba(212,160,23,.3)}
+.plan-year-final .year-badge{background:rgba(212,160,23,.18);color:var(--accent2);border:1px solid rgba(212,160,23,.3)}
+.plan-final-crown{font-size:.9rem;line-height:1;flex-shrink:0}

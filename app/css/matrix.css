@@ -1,0 +1,14 @@
+/* MATRIX */
+.matrix-container{position:relative;width:100%;aspect-ratio:1/.85;max-height:600px;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:visible}
+.matrix-axis-x{position:absolute;height:1px;background:var(--border)}
+.matrix-axis-y{position:absolute;width:1px;background:var(--border)}
+.axis-label{position:absolute;font-family:var(--font-mono);font-size:.7rem;color:var(--muted)}
+.axis-label.x{bottom:1%;right:1%}
+.axis-label.y{top:1%;left:.5%;writing-mode:vertical-rl;transform:rotate(180deg)}
+.quadrant-label{position:absolute;font-family:var(--font-mono);font-size:.68rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em}
+.matrix-dot{position:absolute;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.68rem;font-weight:600;cursor:pointer;transition:transform .15s;z-index:2}
+.matrix-dot:hover{transform:translate(-50%,-50%) scale(1.2);z-index:10}
+.dot-tooltip{display:none;position:absolute;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.75rem;white-space:nowrap;z-index:20;color:var(--text);font-family:var(--font-body);line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.dot-tooltip.tip-up{bottom:calc(100% + 8px)}
+.dot-tooltip.tip-down{top:calc(100% + 8px)}
+.matrix-dot:hover .dot-tooltip{display:block}

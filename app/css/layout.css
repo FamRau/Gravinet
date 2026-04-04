@@ -1,0 +1,53 @@
+/* HEADER */
+header{padding:24px 40px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;background:linear-gradient(180deg,rgba(79,142,247,.07) 0%,transparent 100%)}
+.header-center{flex:1;display:flex;justify-content:center;align-items:center;padding:0 24px}
+.header-left h1{font-family:var(--font-serif);font-size:2rem;letter-spacing:-.5px;line-height:1.1}
+.header-left h1 span{color:var(--accent);font-style:italic}
+.header-sub{font-size:.78rem;color:var(--muted);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-top:6px;display:flex;align-items:center;gap:7px}
+.org-edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;padding:0;opacity:0;transition:opacity .2s;line-height:1}
+.header-sub:hover .org-edit-btn{opacity:1}
+.org-name-input{background:var(--surface2);border:1px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-mono);font-size:.78rem;letter-spacing:.08em;padding:2px 8px;outline:none;width:280px}
+.org-save-btn{background:var(--accent);border:none;border-radius:4px;color:#fff;cursor:pointer;font-size:.75rem;padding:2px 8px;font-family:var(--font-mono)}
+.header-stats{display:flex;gap:24px}
+.stat{text-align:right}
+.stat-val{font-family:var(--font-serif);font-size:1.8rem;line-height:1}
+.stat-label{font-size:.72rem;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em}
+
+/* NAV */
+nav{display:flex;gap:4px;padding:12px 40px;border-bottom:1px solid var(--border);background:var(--surface);align-items:center;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:6px;font-size:.85rem;font-weight:500;cursor:pointer;border:1px solid transparent;color:var(--muted);transition:all .2s;background:none;font-family:var(--font-body);white-space:nowrap}
+.tab:hover{color:var(--text);border-color:var(--border)}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-divider{width:1px;height:20px;background:var(--border);margin:0 4px;flex-shrink:0}
+.nav-spacer{flex:1}
+.save-status{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.7rem;color:var(--muted)}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--accent3);flex-shrink:0}
+.save-dot.pending{background:var(--accent2);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* PROJECT SELECTOR */
+.nav-project{display:flex;align-items:center;gap:8px;padding:0 16px;position:absolute;left:50%;transform:translateX(-50%)}
+.nav-project-label{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+.nav-proj-dropdown{position:relative}
+.nav-project-name{font-family:var(--font-body);font-size:1.1rem;font-weight:400;color:var(--accent);letter-spacing:-.1px;white-space:nowrap;padding:4px 0;background:none;border:none;outline:none;cursor:pointer;user-select:none}
+.nav-proj-menu{display:none;position:absolute;top:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;min-width:200px;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.nav-proj-menu.open{display:block}
+.nav-proj-option{display:block;width:100%;text-align:left;padding:8px 12px;border-radius:8px;font-family:var(--font-body);font-size:.9rem;color:var(--text);background:none;border:none;cursor:pointer;transition:background .13s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-proj-option:hover{background:var(--surface2)}
+.nav-proj-option.active{color:var(--accent)}
+[data-theme="light"] .nav-project-name{background:none}
+
+/* MAIN */
+main{padding:32px 40px}
+.view{display:none}
+.view.active{display:block}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  header,nav,main{padding-left:16px;padding-right:16px}
+  .detail-grid{grid-template-columns:1fr 1fr}
+  .form-row,.form-row3{grid-template-columns:1fr}
+}

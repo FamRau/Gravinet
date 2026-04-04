@@ -1,6 +1,6 @@
 # Gravinet
 
-**Stakeholder-Management für GNOME Linux** — als Electron AppImage, vollständig offline, ohne Server oder Cloud.
+**Stakeholder-Management für Linux** — als Electron AppImage, vollständig offline, ohne Server oder Cloud.
 
 Gravinet hilft dabei, Stakeholder zu erfassen, nach Einfluss und Interesse zu kartieren, Beziehungen über ein Journal zu dokumentieren und einen mehrjährigen Maßnahmenplan zu führen.
 

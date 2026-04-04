@@ -31,6 +31,13 @@ tbody td{padding:12px 14px;vertical-align:middle}
 .badge-neutral{background:rgba(120,128,160,.15);color:var(--muted)}
 .badge-kritisch{background:rgba(247,79,79,.15);color:var(--danger)}
 
+/* CONTACT AGE CHIPS */
+.contact-date{font-family:var(--font-mono);font-size:.78rem;color:var(--muted)}
+.contact-age{display:inline-block;padding:1px 6px;border-radius:10px;font-family:var(--font-mono);font-size:.68rem;font-weight:600;margin-left:5px;vertical-align:middle}
+.contact-age.ok     {background:rgba(30,201,122,.15);color:var(--accent3)}
+.contact-age.warn   {background:rgba(212,160,23,.18);color:var(--accent2)}
+.contact-age.overdue{background:rgba(224,58,58,.15); color:var(--danger)}
+
 /* SORTABLE HEADERS */
 .th-sort{cursor:pointer;user-select:none;white-space:nowrap}
 .th-sort:hover{color:var(--text)}
@@ -66,6 +73,12 @@ tbody tr:hover .row-actions{opacity:1}
 .pill-menu-item:hover{background:var(--surface2)}
 .pill-menu-item.active-opt{color:var(--accent)}
 .pill-menu-item.active-opt::before{content:'✓';margin-right:2px;font-size:.75rem}
+.pill-menu-divider{height:1px;background:var(--border);margin:5px 4px}
+.pill-menu-section-title{font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:6px 12px 3px;opacity:.7}
+.pill-menu-section-body{padding:4px 8px 6px}
+.pill-menu-section-body--disabled{font-size:.82rem;color:var(--muted);opacity:.45;cursor:default;padding:4px 12px 6px}
+.pill-menu-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--font-body);font-size:.82rem;outline:none;cursor:pointer}
+.pill-menu-select:focus{border-color:var(--accent)}
 
 /* FORMS */
 .form-group{margin-bottom:14px}

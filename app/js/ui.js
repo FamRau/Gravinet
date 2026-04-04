@@ -114,3 +114,24 @@ function closePillMenus() {
 document.addEventListener('click', e => {
   if (!e.target.closest('.pill-wrap')) closePillMenus();
 });
+
+// ── Settings menu sync ────────────────────────────────────────────────────────
+
+function syncSettingsMenu() {
+  const sel = document.getElementById('inline-warning-days');
+  if (sel) {
+    const options = [...sel.options].map(o => parseInt(o.value));
+    const closest = options.reduce((a, b) =>
+      Math.abs(b - contactWarningDays) < Math.abs(a - contactWarningDays) ? b : a);
+    sel.value = closest;
+  }
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  document.getElementById('theme-opt-dark')?.classList.toggle('active-opt', isDark);
+  document.getElementById('theme-opt-light')?.classList.toggle('active-opt', !isDark);
+}
+
+function setWarningDays(val) {
+  contactWarningDays = parseInt(val);
+  saveNow();
+  renderTable();
+}

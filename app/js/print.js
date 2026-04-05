@@ -61,11 +61,11 @@ function printCSS() {
 
 function escP(t)       { return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 function fmtDateP(d)   { if (!d) return '–'; const [y, m, day] = d.split('-'); return `${day}.${m}.${y}`; }
-function fmtDateTimeP(d) { const dt = new Date(d); return dt.toLocaleDateString('de-AT') + ' ' + dt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' }); }
+function fmtDateTimeP(d) { const dt = new Date(d); const loc = appLang === 'en' ? 'en-US' : 'de-AT'; return dt.toLocaleDateString(loc) + ' ' + dt.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' }); }
 function initialsP(name) { return String(name || '').split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase(); }
 function getStrategieP(einfluss, interesse) {
-  const m = { hh: 'Aktiv einbinden', hn: 'Zufriedenstellen', nh: 'Informiert halten', nn: 'Beobachten' };
-  return m[(einfluss >= 5 ? 'h' : 'n') + (interesse >= 5 ? 'h' : 'n')] || '–';
+  const key = { hh: 'strat_engage', hn: 'strat_satisfy', nh: 'strat_inform', nn: 'strat_monitor' };
+  return t(key[(einfluss >= 5 ? 'h' : 'n') + (interesse >= 5 ? 'h' : 'n')] || 'strat_monitor');
 }
 
 // ── Print contacts ────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ function printContactsToggleAll() {
 async function doPrintContacts() {
   const boxes = document.querySelectorAll('#print-contacts-list input[type=checkbox]:checked');
   const ids   = [...boxes].map(b => parseInt(b.value));
-  if (!ids.length) { alert('Bitte mindestens einen Kontakt auswählen.'); return; }
+  if (!ids.length) { alert(t('alert_select_contact')); return; }
   closePanel('print-contacts-overlay');
 
   const pages = ids.map(id => {
@@ -109,7 +109,7 @@ async function doPrintContacts() {
         <div class="report-meta">${escP(sh.rolle)}${projContexts.length ? ' · ' + projContexts.map(p => escP(p.projName)).join(', ') : ''}</div>
       </div>
       <div class="section">
-        <h3>Grunddaten</h3>
+        <h3>${t('print_basic_data')}</h3>
         <div class="grid2">
           <div class="card"><div class="label">E-Mail</div><div class="val">${sh.email ? `<a href="mailto:${escP(sh.email)}" style="color:#2563eb">${escP(sh.email)}</a>` : '–'}</div></div>
           <div class="card"><div class="label">Telefon</div><div class="val">${escP(sh.tel) || '–'}</div></div>
@@ -119,24 +119,24 @@ async function doPrintContacts() {
       </div>
       ${projContexts.length ? `
       <div class="section">
-        <h3>Projektzuordnungen</h3>
+        <h3>${t('print_proj_assignments')}</h3>
         ${projContexts.map(item => `
           <div class="card" style="margin-bottom:8px">
             <div style="font-weight:600;font-size:10pt;margin-bottom:8px">${escP(item.projName)}</div>
             <div class="grid4">
-              <div><div class="label">Gruppe</div><div><span class="badge badge-${item.gruppe}">${item.gruppe.toUpperCase()}</span></div></div>
-              <div><div class="label">Haltung</div><div><span class="badge badge-${item.haltung}">${item.haltung.charAt(0).toUpperCase() + item.haltung.slice(1)}</span></div></div>
-              <div><div class="label">Einfluss</div><div class="val" style="color:#2563eb">${item.einfluss}/10</div><div class="bar-bg"><div class="bar-fill-blue" style="width:${item.einfluss * 10}%"></div></div></div>
-              <div><div class="label">Interesse</div><div class="val" style="color:#d97706">${item.interesse}/10</div><div class="bar-bg"><div class="bar-fill-amber" style="width:${item.interesse * 10}%"></div></div></div>
+              <div><div class="label">${t('print_col_group')}</div><div><span class="badge badge-${item.gruppe}">${t('badge_' + item.gruppe)}</span></div></div>
+              <div><div class="label">${t('print_col_attitude')}</div><div><span class="badge badge-${item.haltung}">${t('badge_' + item.haltung)}</span></div></div>
+              <div><div class="label">${t('print_col_influence')}</div><div class="val" style="color:#2563eb">${item.einfluss}/10</div><div class="bar-bg"><div class="bar-fill-blue" style="width:${item.einfluss * 10}%"></div></div></div>
+              <div><div class="label">${t('print_col_interest')}</div><div class="val" style="color:#d97706">${item.interesse}/10</div><div class="bar-bg"><div class="bar-fill-amber" style="width:${item.interesse * 10}%"></div></div></div>
             </div>
-            ${item.ziel ? `<div style="margin-top:6px"><div class="label">Strategisches Ziel</div><div style="font-size:9.5pt;margin-top:3px">${escP(item.ziel)}</div></div>` : ''}
-            ${(item.massnahmen || []).length ? `<div style="margin-top:8px"><div class="label">Maßnahmen</div>${item.massnahmen.map(m => `<div class="massnahmen-item"><span class="arrow">→</span>${escP(m)}</div>`).join('')}</div>` : ''}
+            ${item.ziel ? `<div style="margin-top:6px"><div class="label">${t('print_goal_label')}</div><div style="font-size:9.5pt;margin-top:3px">${escP(item.ziel)}</div></div>` : ''}
+            ${(item.massnahmen || []).length ? `<div style="margin-top:8px"><div class="label">${t('print_measures_label')}</div>${item.massnahmen.map(m => `<div class="massnahmen-item"><span class="arrow">→</span>${escP(m)}</div>`).join('')}</div>` : ''}
           </div>`).join('')}
       </div>` : ''}
       <div class="section">
-        <h3>Journal (${journal.length} Einträge)</h3>
+        <h3>${t('print_journal_section')} (${journal.length} ${t('print_journal_entries')})</h3>
         ${journal.length === 0
-          ? '<p style="color:#9ca3af;font-size:9pt">Keine Einträge vorhanden.</p>'
+          ? `<p style="color:#9ca3af;font-size:9pt">${t('print_no_journal')}</p>`
           : journal.map(e => `
             <div class="journal-entry">
               <div class="journal-date">${fmtDateTimeP(e.date)}</div>
@@ -146,13 +146,13 @@ async function doPrintContacts() {
     </div>`;
   }).join('');
 
-  const html = `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">${printCSS()}<title>Kontaktdatenblätter</title></head><body>${pages}</body></html>`;
+  const html = `<!DOCTYPE html><html lang="${appLang === 'en' ? 'en' : 'de'}"><head><meta charset="UTF-8">${printCSS()}<title>${t('nav_print_contacts')}</title></head><body>${pages}</body></html>`;
   const date = new Date().toISOString().slice(0, 10);
   const safeName = ids.length === 1
     ? stakeholders.find(s => s.id === ids[0])?.name.replace(/[^a-zA-Z0-9äöüÄÖÜß\s]/g, '').trim() || 'Kontakt'
     : `${ids.length}-Kontakte`;
   const result = await window.electronAPI.printPDF(html, `${safeName}-${date}.pdf`);
-  if (!result.ok) alert('Fehler beim PDF-Erstellen: ' + result.error);
+  if (!result.ok) alert(t('alert_pdf_error') + result.error);
 }
 
 // ── Print project report ──────────────────────────────────────────────────────
@@ -168,10 +168,10 @@ async function printProjectReport() {
   const tableRows = merged.map(s => `
     <tr>
       <td><strong>${escP(s.name)}</strong><br><span style="color:#6b748f;font-size:8pt">${escP(s.rolle)}</span></td>
-      <td><span class="badge badge-${s.gruppe}">${s.gruppe.toUpperCase()}</span></td>
+      <td><span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span></td>
       <td><div class="bar-wrap"><div class="bar-track"><div style="width:${s.einfluss * 10}%;height:4px;background:#2563eb;border-radius:2px"></div></div><span style="font-family:'DM Mono',monospace;font-size:8pt">${s.einfluss}</span></div></td>
       <td><div class="bar-wrap"><div class="bar-track"><div style="width:${s.interesse * 10}%;height:4px;background:#d97706;border-radius:2px"></div></div><span style="font-family:'DM Mono',monospace;font-size:8pt">${s.interesse}</span></div></td>
-      <td><span class="badge badge-${s.haltung}">${s.haltung.charAt(0).toUpperCase() + s.haltung.slice(1)}</span></td>
+      <td><span class="badge badge-${s.haltung}">${t('badge_' + s.haltung)}</span></td>
       <td style="font-size:8.5pt;color:#4b5563">${getStrategieP(s.einfluss, s.interesse)}</td>
     </tr>`).join('');
 
@@ -205,33 +205,33 @@ async function printProjectReport() {
   <div class="page">
     <div class="report-header">
       <h1>${escP(proj.name)}</h1>
-      <div class="report-meta">Projektbericht · Erstellt am ${fmtDateP(date)} · ${merged.length} Stakeholder</div>
+      <div class="report-meta">${t('print_report_created')} ${fmtDateP(date)} · ${merged.length} ${t('print_report_stakeholders')}</div>
     </div>
-    <h2 style="margin-bottom:10px">Stakeholder-Liste</h2>
+    <h2 style="margin-bottom:10px">${t('print_stakeholder_list')}</h2>
     <table>
-      <thead><tr><th>Name / Funktion</th><th>Gruppe</th><th>Einfluss</th><th>Interesse</th><th>Haltung</th><th>Strategie</th></tr></thead>
+      <thead><tr><th>${t('print_col_name')}</th><th>${t('print_col_group')}</th><th>${t('print_col_influence')}</th><th>${t('print_col_interest')}</th><th>${t('print_col_attitude')}</th><th>${t('print_col_strategy')}</th></tr></thead>
       <tbody>${tableRows}</tbody>
     </table>
     <div class="page-break"></div>
-    <div class="report-header" style="margin-top:0"><h2>Stakeholder-Matrix</h2></div>
+    <div class="report-header" style="margin-top:0"><h2>${t('print_matrix_section')}</h2></div>
     <div class="matrix-wrap">
       <div class="m-axis-x"></div>
       <div class="m-axis-y"></div>
-      <div class="m-alabel" style="bottom:10px;right:10px">Einfluss →</div>
-      <div class="m-alabel" style="top:10px;left:4px;writing-mode:vertical-rl;transform:rotate(180deg)">Interesse →</div>
-      <div class="m-qlabel" style="top:${pT + 1}%;left:${pL + 1}%;color:#d97706">Zufriedenstellen</div>
-      <div class="m-qlabel" style="top:${pT + 1}%;right:${pR + 1}%;text-align:right;color:#059669">Aktiv einbinden</div>
-      <div class="m-qlabel" style="bottom:${pB + 1}%;left:${pL + 1}%;color:#9ca3af">Beobachten</div>
-      <div class="m-qlabel" style="bottom:${pB + 1}%;right:${pR + 1}%;text-align:right;color:#9ca3af">Informiert halten</div>
+      <div class="m-alabel" style="bottom:10px;right:10px">${t('matrix_axis_influence')}</div>
+      <div class="m-alabel" style="top:10px;left:4px;writing-mode:vertical-rl;transform:rotate(180deg)">${t('matrix_axis_interest')}</div>
+      <div class="m-qlabel" style="top:${pT + 1}%;left:${pL + 1}%;color:#d97706">${t('matrix_satisfy')}</div>
+      <div class="m-qlabel" style="top:${pT + 1}%;right:${pR + 1}%;text-align:right;color:#059669">${t('matrix_engage')}</div>
+      <div class="m-qlabel" style="bottom:${pB + 1}%;left:${pL + 1}%;color:#9ca3af">${t('matrix_monitor')}</div>
+      <div class="m-qlabel" style="bottom:${pB + 1}%;right:${pR + 1}%;text-align:right;color:#9ca3af">${t('matrix_inform')}</div>
       ${dots}
     </div>
     <div class="page-break"></div>
-    <div class="report-header" style="margin-top:0"><h2>${proj.plan?.length || 0}-Jahres-Plan</h2></div>
+    <div class="report-header" style="margin-top:0"><h2>${t('tab_plan_label').replace('{n}', proj.plan?.length || 0)}</h2></div>
     ${planHTML}
   </div>
   </body></html>`;
 
   const fname  = `${proj.name.replace(/[^a-zA-Z0-9äöüÄÖÜß\s]/g, '').trim()}-${date}.pdf`;
   const result = await window.electronAPI.printPDF(html, fname);
-  if (!result.ok) alert('Fehler beim PDF-Erstellen: ' + result.error);
+  if (!result.ok) alert(t('alert_pdf_error') + result.error);
 }

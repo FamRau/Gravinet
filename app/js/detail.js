@@ -26,36 +26,36 @@ function renderDetailProfile(shId) {
       <div class="detail-avatar" style="background:${col}22;border:2px solid ${col}">${initials(s.name)}</div>
       <div class="detail-name">
         <h2>${esc(s.name)}</h2>
-        <div class="role">${esc(s.rolle)}${hasProjectData ? ` · <span class="badge badge-${s.gruppe}">${s.gruppe.toUpperCase()}</span>` : ''}</div>
+        <div class="role">${esc(s.rolle)}${hasProjectData ? ` · <span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span>` : ''}</div>
         ${chips ? `<div class="contact-row">${chips}</div>` : ''}
       </div>
     </div>
     ${hasProjectData ? `
     <div class="detail-grid">
       <div class="detail-card">
-        <div class="detail-card-label">Einfluss</div>
+        <div class="detail-card-label">${t('detail_influence')}</div>
         <div class="detail-card-val" style="color:var(--accent)">${s.einfluss}/10</div>
         <div class="bar-track bar-einfluss" style="margin-top:8px;width:100%"><div class="bar-fill" style="width:${s.einfluss * 10}%"></div></div>
       </div>
       <div class="detail-card">
-        <div class="detail-card-label">Interesse</div>
+        <div class="detail-card-label">${t('detail_interest')}</div>
         <div class="detail-card-val" style="color:var(--accent2)">${s.interesse}/10</div>
         <div class="bar-track bar-interesse" style="margin-top:8px;width:100%"><div class="bar-fill" style="width:${s.interesse * 10}%"></div></div>
       </div>
       <div class="detail-card">
-        <div class="detail-card-label">Haltung</div>
-        <div class="detail-card-val"><span class="badge badge-${s.haltung}">${s.haltung.charAt(0).toUpperCase() + s.haltung.slice(1)}</span></div>
+        <div class="detail-card-label">${t('detail_attitude')}</div>
+        <div class="detail-card-val"><span class="badge badge-${s.haltung}">${t('badge_' + s.haltung)}</span></div>
       </div>
       <div class="detail-card">
-        <div class="detail-card-label">Strategie</div>
+        <div class="detail-card-label">${t('detail_strategy')}</div>
         <div class="detail-card-val" style="font-size:.85rem">${getStrategie(s)}</div>
       </div>
     </div>
-    ${s.ziel ? `<div class="detail-section"><h3>Strategisches Ziel</h3><p>${esc(s.ziel)}</p></div>` : ''}
-    ${(s.massnahmen || []).length ? `<div class="detail-section"><h3>Maßnahmen</h3><ul class="massnahmen-list">${s.massnahmen.map(m => `<li>${esc(m)}</li>`).join('')}</ul></div>` : ''}
+    ${s.ziel ? `<div class="detail-section"><h3>${t('detail_goal')}</h3><p>${esc(s.ziel)}</p></div>` : ''}
+    ${(s.massnahmen || []).length ? `<div class="detail-section"><h3>${t('detail_measures')}</h3><ul class="massnahmen-list">${s.massnahmen.map(m => `<li>${esc(m)}</li>`).join('')}</ul></div>` : ''}
     ` : ''}
     <div style="display:flex;gap:12px;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-      <button class="btn btn-primary" style="flex:1" onclick="closePanel('detail-overlay');openEditModal(${s.id})">✏ Bearbeiten</button>
+      <button class="btn btn-primary" style="flex:1" onclick="closePanel('detail-overlay');openEditModal(${s.id})">${t('btn_edit_full')}</button>
     </div>`;
 }
 
@@ -63,7 +63,7 @@ function renderDetailJournal(shId) {
   const sh = stakeholders.find(x => x.id === shId); if (!sh) return;
   const j  = sh.journal || [];
   const entries = j.length === 0
-    ? `<div class="journal-empty">Noch keine Einträge.<br>Dokumentiere deine erste Interaktion!</div>`
+    ? `<div class="journal-empty">${t('journal_empty')}</div>`
     : `<div class="journal-list">${[...j].reverse().map((e, ri) => {
         const realIdx = j.length - 1 - ri;
         return `<div class="journal-entry">
@@ -76,14 +76,14 @@ function renderDetailJournal(shId) {
       }).join('')}</div>`;
   document.getElementById('dtab-journal').innerHTML = `
     <div style="margin-bottom:16px">
-      <h2 style="font-family:var(--font-serif);font-size:1.3rem;margin-bottom:4px">📓 Journal – ${esc(sh.name)}</h2>
-      <div style="font-size:.8rem;color:var(--muted)">${j.length} Einträge</div>
+      <h2 style="font-family:var(--font-serif);font-size:1.3rem;margin-bottom:4px">${t('detail_tab_journal')} – ${esc(sh.name)}</h2>
+      <div style="font-size:.8rem;color:var(--muted)">${j.length} ${t('journal_entries')}</div>
     </div>
     ${entries}
     <div class="journal-add-box">
-      <div class="journal-add-label">Neuer Eintrag</div>
-      <textarea class="journal-textarea" id="journal-input-${shId}" placeholder="Beschreibe die Interaktion, Themen, Stimmung, nächste Schritte…"></textarea>
-      <button class="btn btn-primary" onclick="addJournalEntry(${shId})">Eintrag speichern</button>
+      <div class="journal-add-label">${t('journal_new_entry')}</div>
+      <textarea class="journal-textarea" id="journal-input-${shId}" placeholder="${t('journal_placeholder')}"></textarea>
+      <button class="btn btn-primary" onclick="addJournalEntry(${shId})">${t('btn_save_entry')}</button>
     </div>`;
 }
 
@@ -97,7 +97,7 @@ function addJournalEntry(shId) {
 }
 
 function deleteJournalEntry(shId, idx) {
-  if (!confirm('Journaleintrag löschen?')) return;
+  if (!confirm(t('confirm_delete_journal'))) return;
   const sh = stakeholders.find(x => x.id === shId); if (!sh) return;
   sh.journal.splice(idx, 1);
   saveNow(); renderDetailJournal(shId); renderTable();

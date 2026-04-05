@@ -19,6 +19,8 @@ function _buildWorkspace() {
     nextStakeholderId,
     nextProjectId,
     nextPlanId,
+    contactWarningDays,
+    appLang,
     savedAt:            new Date().toISOString()
   };
 }
@@ -102,7 +104,7 @@ function importJSON(event) {
       renderAll();
       setSaveStatus('saved');
     } catch (err) {
-      alert('Importfehler: ' + err.message);
+      alert(t('alert_import_error') + err.message);
     }
   };
   reader.readAsText(file);
@@ -142,9 +144,11 @@ async function loadData() {
 
       activeProjectId   = ws.activeProjectId || projects[0]?.id || '';
       orgName           = ws.orgName || orgName;
-      nextStakeholderId = ws.nextStakeholderId || (Math.max(0, ...stakeholders.map(s => s.id)) + 1);
-      nextProjectId     = ws.nextProjectId || (projects.length + 2);
-      nextPlanId        = Math.max(ws.nextPlanId || 0, 6);
+      nextStakeholderId  = ws.nextStakeholderId || (Math.max(0, ...stakeholders.map(s => s.id)) + 1);
+      nextProjectId      = ws.nextProjectId || (projects.length + 2);
+      nextPlanId         = Math.max(ws.nextPlanId || 0, 6);
+      contactWarningDays = ws.contactWarningDays || 90;
+      appLang            = ws.appLang || 'de';
       return;
     }
 

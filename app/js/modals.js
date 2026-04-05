@@ -18,14 +18,14 @@ function renderPickerList() {
   );
   const el = document.getElementById('picker-list');
   el.innerHTML = available.length === 0
-    ? `<div class="picker-empty">Alle Kontakte sind bereits in diesem Projekt.<br>Lege einen neuen Stakeholder an.</div>`
+    ? `<div class="picker-empty">${t('picker_all_added')}</div>`
     : available.map(sh => `
       <div class="picker-item">
         <div class="picker-item-info">
           <div class="picker-item-name">${esc(sh.name)}</div>
           <div class="picker-item-rolle">${esc(sh.rolle)}</div>
         </div>
-        <button class="btn btn-primary" style="padding:6px 14px;font-size:.8rem" onclick="openLinkModal(${sh.id})">Hinzufügen</button>
+        <button class="btn btn-primary" style="padding:6px 14px;font-size:.8rem" onclick="openLinkModal(${sh.id})">${t('btn_picker_add')}</button>
       </div>`).join('');
 }
 
@@ -36,7 +36,7 @@ function openLinkModal(shId) {
   closePanel('picker-overlay');
   document.getElementById('link-shid').value              = shId;
   document.getElementById('link-title').textContent       = sh.name;
-  document.getElementById('link-subtitle').textContent    = sh.rolle + ' · Projektzuordnung festlegen';
+  document.getElementById('link-subtitle').textContent    = sh.rolle + ' ' + t('link_subtitle_suffix');
   document.getElementById('link-einfluss').value          = 5;
   document.getElementById('link-einfluss-val').textContent = 5;
   document.getElementById('link-interesse').value          = 5;
@@ -73,7 +73,7 @@ function openNewStakeholderModal() {
 
 function addNewStakeholder() {
   const name = document.getElementById('f-name').value.trim();
-  if (!name) { alert('Bitte Name eingeben.'); return; }
+  if (!name) { alert(t('alert_name_required')); return; }
   const shId = nextStakeholderId++;
   stakeholders.push({
     id:         shId,
@@ -132,7 +132,7 @@ function openEditModal(shId) {
 function saveEdit() {
   const shId = parseInt(document.getElementById('e-shid').value);
   const name = document.getElementById('e-name').value.trim();
-  if (!name) { alert('Bitte Name eingeben.'); return; }
+  if (!name) { alert(t('alert_name_required')); return; }
   const shIdx = stakeholders.findIndex(x => x.id === shId); if (shIdx === -1) return;
   stakeholders[shIdx] = {
     ...stakeholders[shIdx], name,
@@ -167,7 +167,7 @@ function removeFromProject() {
 function removeStakeholderFromProject(shId) {
   const proj = getActiveProject(); if (!proj) return;
   const sh   = stakeholders.find(x => x.id === shId);
-  if (!sh || !confirm(`„${sh.name}" aus diesem Projekt entfernen?`)) return;
+  if (!sh || !confirm(t('confirm_remove_sh').replace('{name}', sh.name))) return;
   proj.items = proj.items.filter(i => i.shId !== shId);
   saveNow(); renderTable(); renderMatrix(); renderBirthdayAlerts();
 }
@@ -180,7 +180,7 @@ function deleteFromEdit() {
 
 function deleteStakeholder(shId) {
   const sh = stakeholders.find(x => x.id === shId);
-  if (!sh || !confirm(`„${sh.name}" vollständig aus allen Projekten löschen?`)) return;
+  if (!sh || !confirm(t('confirm_delete_sh').replace('{name}', sh.name))) return;
   stakeholders = stakeholders.filter(x => x.id !== shId);
   projects.forEach(p => { p.items = p.items.filter(i => i.shId !== shId); });
   saveNow(); renderTable(); renderMatrix(); renderBirthdayAlerts(); renderKontakte();
@@ -210,7 +210,7 @@ function openKontaktEditModal(shId) {
 function saveKontakt() {
   const shId = parseInt(document.getElementById('ke-shid').value);
   const name = document.getElementById('ke-name').value.trim();
-  if (!name) { alert('Bitte Name eingeben.'); return; }
+  if (!name) { alert(t('alert_name_required')); return; }
   if (shId) {
     const idx = stakeholders.findIndex(x => x.id === shId); if (idx === -1) return;
     stakeholders[idx] = {
@@ -245,7 +245,7 @@ function deleteKontakt() {
 
 function openProjModal(id) {
   const isEdit = !!id;
-  document.getElementById('proj-modal-title').textContent = isEdit ? 'Projekt bearbeiten' : 'Neues Projekt';
+  document.getElementById('proj-modal-title').textContent = isEdit ? t('proj_modal_edit') : t('proj_modal_new');
   document.getElementById('pm-del-btn').style.display = isEdit ? '' : 'none';
   const proj = isEdit ? projects.find(p => p.id === id) : null;
   document.getElementById('pm-id').value   = id   || '';
@@ -258,7 +258,7 @@ async function saveProject() {
   const id   = document.getElementById('pm-id').value;
   const name = document.getElementById('pm-name').value.trim();
   const desc = document.getElementById('pm-desc').value.trim();
-  if (!name) { alert('Bitte Projektname eingeben.'); return; }
+  if (!name) { alert(t('alert_proj_name')); return; }
   if (id) {
     const p = projects.find(x => x.id === id);
     if (p) { p.name = name; p.desc = desc; }
@@ -276,7 +276,7 @@ async function saveProject() {
 
 async function deleteProjectById(id) {
   const p = projects.find(x => x.id === id);
-  if (!p || !confirm(`Projekt „${p.name}" löschen? Die Stakeholder-Kontakte bleiben erhalten.`)) return;
+  if (!p || !confirm(t('confirm_delete_proj').replace('{name}', p.name))) return;
   await deleteProjectFile(id);
   projects = projects.filter(x => x.id !== id);
   if (activeProjectId === id) activeProjectId = projects[0]?.id || '';

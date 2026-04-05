@@ -9,8 +9,7 @@ async function init() {
   await loadData();
 
   // Render initial state
-  renderAll();
-  updatePlanTabLabel();
+  applyTranslations();
 }
 
 // Start when DOM is ready

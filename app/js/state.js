@@ -13,3 +13,9 @@ let nextPlanId        = 6;
 // Table sort state
 let sortCol = '';   // 'name' | 'einfluss' | 'interesse' | 'kontakt'
 let sortDir = 1;    // 1 = aufsteigend, -1 = absteigend
+
+// Contact interval warning (days)
+let contactWarningDays = 90;
+
+// Language
+let appLang = 'de';   // 'de' | 'en'

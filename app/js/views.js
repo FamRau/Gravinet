@@ -25,7 +25,7 @@ function renderBirthdayAlerts() {
   el.innerHTML = soon.map(s => {
     const [, m, d] = s.geburtstag.split('-').map(Number);
     const isToday = m === mm && d === dd;
-    return `<div class="birthday-bar">🎂 <strong>${esc(s.name)}</strong> hat ${isToday ? '<strong>heute</strong>' : 'bald'} Geburtstag (${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.)</div>`;
+    return `<div class="birthday-bar">🎂 <strong>${esc(s.name)}</strong> ${isToday ? t('birthday_alert_today') : t('birthday_alert_soon')} (${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.)</div>`;
   }).join('');
 }
 
@@ -58,7 +58,7 @@ function renderTable() {
   const proj = getActiveProject();
   if (!proj) {
     document.getElementById('table-body').innerHTML =
-      '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">Kein Projekt ausgewählt.</td></tr>';
+      '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">' + t('table_no_project') + '</td></tr>';
     return;
   }
   const q  = (document.getElementById('search')?.value || '').toLowerCase();
@@ -92,43 +92,46 @@ function renderTable() {
   }
 
   // Update header indicators
-  document.getElementById('th-name').innerHTML      = `Name / Funktion ${_sortIndicator('name')}`;
-  document.getElementById('th-gruppe').innerHTML    = `Gruppe ${_sortIndicator('gruppe')}`;
-  document.getElementById('th-einfluss').innerHTML  = `Einfluss ${_sortIndicator('einfluss')}`;
-  document.getElementById('th-interesse').innerHTML = `Interesse ${_sortIndicator('interesse')}`;
-  document.getElementById('th-haltung').innerHTML   = `Haltung ${_sortIndicator('haltung')}`;
-  document.getElementById('th-strategie').innerHTML = `Strategie ${_sortIndicator('strategie')}`;
-  document.getElementById('th-journal').innerHTML   = `Journal ${_sortIndicator('journal')}`;
-  document.getElementById('th-kontakt').innerHTML   = `Letzter Kontakt ${_sortIndicator('kontakt')}`;
+  document.getElementById('th-name').innerHTML      = `${t('th_name')} ${_sortIndicator('name')}`;
+  document.getElementById('th-gruppe').innerHTML    = `${t('th_gruppe')} ${_sortIndicator('gruppe')}`;
+  document.getElementById('th-einfluss').innerHTML  = `${t('th_einfluss')} ${_sortIndicator('einfluss')}`;
+  document.getElementById('th-interesse').innerHTML = `${t('th_interesse')} ${_sortIndicator('interesse')}`;
+  document.getElementById('th-haltung').innerHTML   = `${t('th_haltung')} ${_sortIndicator('haltung')}`;
+  document.getElementById('th-strategie').innerHTML = `${t('th_strategie')} ${_sortIndicator('strategie')}`;
+  document.getElementById('th-journal').innerHTML   = `${t('th_journal')} ${_sortIndicator('journal')}`;
+  document.getElementById('th-kontakt').innerHTML   = `${t('th_kontakt')} ${_sortIndicator('kontakt')}`;
 
   document.getElementById('table-body').innerHTML = filtered.length === 0
-    ? `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">Keine Stakeholder in diesem Projekt. <a href="#" onclick="openPickerOverlay();return false" style="color:var(--accent)">Hinzufügen →</a></td></tr>`
+    ? `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">${t('table_empty')} <a href="#" onclick="openPickerOverlay();return false" style="color:var(--accent)">${t('table_add_link')}</a></td></tr>`
     : filtered.map(s => {
         const jc = (s.journal || []).length;
         const bd = daysUntilBirthday(s.geburtstag);
         const bdChip = bd !== null && bd <= 14
-          ? `<span class="bday-chip">${bd === 0 ? '🎂 heute' : bd === 1 ? '🎂 morgen' : '🎂 ' + bd + 'd'}</span>` : '';
+          ? `<span class="bday-chip">${bd === 0 ? '🎂 ' + t('birthday_today') : bd === 1 ? '🎂 ' + t('birthday_tomorrow') : '🎂 ' + bd + t('days_unit')}</span>` : '';
         const lastEntry = jc > 0 ? (s.journal || []).reduce((a, b) => a.date > b.date ? a : b) : null;
         const lastContactCell = (() => {
-          if (!lastEntry) return '<td></td>';
+          if (!lastEntry) return '<td><span style="color:var(--muted);font-family:var(--font-mono);font-size:.78rem">–</span></td>';
           const d = new Date(lastEntry.date);
-          const sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-          const old   = d < sixMonthsAgo;
-          const label = d.toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-          return `<td style="font-family:var(--font-mono);font-size:.78rem;color:${old ? 'var(--danger)' : 'var(--muted)'}">${label}</td>`;
+          const daysSince = Math.floor((Date.now() - d.getTime()) / 86400000);
+          const locale = appLang === 'en' ? 'en-US' : 'de-AT';
+          const label = d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const cls = daysSince > contactWarningDays        ? 'overdue'
+                    : daysSince > contactWarningDays * 0.6  ? 'warn'
+                    :                                         'ok';
+          return `<td><span class="contact-date">${label}</span> <span class="contact-age ${cls}">${daysSince}${t('days_unit')}</span></td>`;
         })();
         return `<tr onclick="openDetail(${s.id})">
           <td class="name-cell"><strong>${esc(s.name)}${bdChip}</strong><span>${esc(s.rolle)}</span></td>
-          <td><span class="badge badge-${s.gruppe}">${s.gruppe.toUpperCase()}</span></td>
+          <td><span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span></td>
           <td><div class="score-wrap"><div class="bar-track bar-einfluss"><div class="bar-fill" style="width:${s.einfluss * 10}%"></div></div><span class="score-num">${s.einfluss}</span></div></td>
           <td><div class="score-wrap"><div class="bar-track bar-interesse"><div class="bar-fill" style="width:${s.interesse * 10}%"></div></div><span class="score-num">${s.interesse}</span></div></td>
-          <td><span class="badge badge-${s.haltung}">${s.haltung.charAt(0).toUpperCase() + s.haltung.slice(1)}</span></td>
+          <td><span class="badge badge-${s.haltung}">${t('badge_' + s.haltung)}</span></td>
           <td style="font-size:.82rem;color:var(--muted)">${getStrategie(s)}</td>
           <td style="font-size:.8rem;color:var(--muted);font-family:var(--font-mono)">${jc > 0 ? `📓 ${jc}` : '–'}</td>
           ${lastContactCell}
           <td onclick="event.stopPropagation()">
             <div class="row-actions">
-              <button class="row-btn" onclick="openEditModal(${s.id})">✏ Bearbeiten</button>
+              <button class="row-btn" onclick="openEditModal(${s.id})">${t('btn_edit')}</button>
               <button class="row-btn del" onclick="removeStakeholderFromProject(${s.id})">✕</button>
             </div>
           </td>
@@ -159,18 +162,18 @@ function renderMatrix() {
     <div style="position:absolute;left:${midX}%;top:${pT}%;width:${plotW / 2}%;height:${plotH / 2}%;background:rgba(30,201,122,.09);border-bottom:1px dashed rgba(30,201,122,.28)"></div>
     <div style="position:absolute;left:${pL}%;top:${midY}%;width:${plotW / 2}%;height:${plotH / 2}%;background:rgba(120,128,160,.05);border-right:1px dashed rgba(120,128,160,.22)"></div>
     <div style="position:absolute;left:${midX}%;top:${midY}%;width:${plotW / 2}%;height:${plotH / 2}%;background:rgba(120,128,160,.05)"></div>
-    ${ql(pT, pL, plotW / 2, plotH / 2, 'var(--accent2)', 'Zufriedenstellen')}
-    ${ql(pT, midX, plotW / 2, plotH / 2, 'var(--accent3)', 'Aktiv einbinden')}
-    ${ql(midY, pL, plotW / 2, plotH / 2, 'var(--muted)', 'Beobachten')}
-    ${ql(midY, midX, plotW / 2, plotH / 2, 'var(--muted)', 'Informiert halten')}
+    ${ql(pT, pL, plotW / 2, plotH / 2, 'var(--accent2)', t('matrix_satisfy'))}
+    ${ql(pT, midX, plotW / 2, plotH / 2, 'var(--accent3)', t('matrix_engage'))}
+    ${ql(midY, pL, plotW / 2, plotH / 2, 'var(--muted)', t('matrix_monitor'))}
+    ${ql(midY, midX, plotW / 2, plotH / 2, 'var(--muted)', t('matrix_inform'))}
     <div class="matrix-axis-x" style="bottom:${pB}%;left:${pL}%;right:${pR}%"></div>
     <div class="matrix-axis-y" style="left:${pL}%;top:${pT}%;bottom:${pB}%"></div>
     ${[1,2,3,4,5,6,7,8,9,10].map(v => `
       <span style="position:absolute;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);bottom:${pB - 5.5}%;left:${pL + ((v - 1) / 9) * plotW}%;transform:translateX(-50%)">${v}</span>
       <span style="position:absolute;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);left:${pL - 3.5}%;top:${pT + ((9 - (v - 1)) / 9) * plotH}%;transform:translateY(-50%)">${v}</span>
     `).join('')}
-    <span class="axis-label x">Einfluss →</span>
-    <span class="axis-label y">Interesse →</span>`;
+    <span class="axis-label x">${t('matrix_axis_influence')}</span>
+    <span class="axis-label y">${t('matrix_axis_interest')}</span>`;
 
   proj.items.map(item => getMerged(item)).filter(Boolean).forEach(s => {
     const dot = document.createElement('div'); dot.className = 'matrix-dot';
@@ -182,7 +185,7 @@ function renderMatrix() {
     dot.style.borderColor = col;
     dot.style.color       = col;
     const tipDir = dotTopPct < 25 ? 'tip-down' : 'tip-up';
-    dot.innerHTML = `${initials(s.name)}<div class="dot-tooltip ${tipDir}"><strong>${esc(s.name)}</strong><br>${esc(s.rolle)}<br>Einfluss: ${s.einfluss} · Interesse: ${s.interesse}</div>`;
+    dot.innerHTML = `${initials(s.name)}<div class="dot-tooltip ${tipDir}"><strong>${esc(s.name)}</strong><br>${esc(s.rolle)}<br>${t('detail_influence')}: ${s.einfluss} · ${t('detail_interest')}: ${s.interesse}</div>`;
     dot.onclick = () => openDetail(s.id);
     c.appendChild(dot);
   });
@@ -195,13 +198,13 @@ function renderKontakte() {
   const list = stakeholders.filter(sh => !q || sh.name.toLowerCase().includes(q) || sh.rolle.toLowerCase().includes(q));
   const el   = document.getElementById('shdb-body'); if (!el) return;
   el.innerHTML = list.length === 0
-    ? `<tr><td colspan="6"><div class="shdb-empty">Noch keine Kontakte.<br>Lege deinen ersten Stakeholder an.</div></td></tr>`
+    ? `<tr><td colspan="6"><div class="shdb-empty">${t('contacts_empty')}</div></td></tr>`
     : list.map(sh => {
         const projTags = projects.filter(p => p.items.some(i => i.shId === sh.id))
           .map(p => `<span class="shdb-proj-tag">${esc(p.name)}</span>`).join('');
         const bd = daysUntilBirthday(sh.geburtstag);
         const bdChip = bd !== null && bd <= 14
-          ? `<span class="bday-chip">${bd === 0 ? '🎂 heute' : bd === 1 ? '🎂 morgen' : '🎂 ' + bd + 'd'}</span>` : '';
+          ? `<span class="bday-chip">${bd === 0 ? '🎂 ' + t('birthday_today') : bd === 1 ? '🎂 ' + t('birthday_tomorrow') : '🎂 ' + bd + t('days_unit')}</span>` : '';
         return `<tr>
           <td class="name-cell"><strong>${esc(sh.name)}${bdChip}</strong><span>${esc(sh.rolle)}</span></td>
           <td style="font-size:.83rem;color:var(--muted)">${sh.email ? `<a href="mailto:${esc(sh.email)}" style="color:inherit">${esc(sh.email)}</a>` : '-'}</td>
@@ -210,7 +213,7 @@ function renderKontakte() {
           <td>${projTags || '<span style="color:var(--muted);font-size:.75rem">–</span>'}</td>
           <td onclick="event.stopPropagation()">
             <div class="row-actions" style="opacity:1">
-              <button class="row-btn" onclick="openKontaktEditModal(${sh.id})">✏ Bearbeiten</button>
+              <button class="row-btn" onclick="openKontaktEditModal(${sh.id})">${t('btn_edit')}</button>
               <button class="row-btn del" onclick="deleteStakeholder(${sh.id})">✕</button>
             </div>
           </td>
@@ -224,20 +227,20 @@ function renderProjectsView() {
   const el = document.getElementById('proj-cards-container'); if (!el) return;
   el.innerHTML = projects.map(p => `
     <div class="proj-card${p.id === activeProjectId ? ' is-active' : ''}">
-      <div class="proj-card-name">${esc(p.name)}${p.id === activeProjectId ? '<span class="proj-card-badge">Aktiv</span>' : ''}</div>
-      <div class="proj-card-meta">${p.items.length} Stakeholder · ${p.plan?.reduce((n, y) => n + y.items.length, 0) || 0} Planmaßnahmen</div>
+      <div class="proj-card-name">${esc(p.name)}${p.id === activeProjectId ? `<span class="proj-card-badge">${t('proj_active_badge')}</span>` : ''}</div>
+      <div class="proj-card-meta">${p.items.length} Stakeholder · ${p.plan?.reduce((n, y) => n + y.items.length, 0) || 0} ${t('proj_plan_measures')}</div>
       ${p.desc ? `<div class="proj-card-desc">${esc(p.desc)}</div>` : '<div class="proj-card-desc"></div>'}
       <div class="proj-card-actions">
         ${p.id !== activeProjectId
-          ? `<button class="btn btn-primary" style="flex:1;padding:7px 14px;font-size:.82rem" onclick="switchProjectAndView('${p.id}')">Öffnen</button>`
-          : `<button class="btn btn-secondary" style="flex:1;padding:7px 14px;font-size:.82rem" onclick="switchTab(document.querySelector('nav .tab'),'liste')">Zur Liste</button>`}
+          ? `<button class="btn btn-primary" style="flex:1;padding:7px 14px;font-size:.82rem" onclick="switchProjectAndView('${p.id}')">${t('btn_open')}</button>`
+          : `<button class="btn btn-secondary" style="flex:1;padding:7px 14px;font-size:.82rem" onclick="switchTab(document.querySelector('nav .tab'),'liste')">${t('btn_to_list')}</button>`}
         <button class="btn btn-secondary" style="padding:7px 12px;font-size:.82rem" onclick="openProjModal('${p.id}')">✏</button>
         <button class="btn btn-danger"    style="padding:7px 12px;font-size:.82rem" onclick="deleteProjectById('${p.id}')">🗑</button>
       </div>
     </div>`).join('') +
     `<div class="proj-card proj-add-card" onclick="openProjModal()">
       <div class="proj-add-icon">+</div>
-      <div style="font-size:.85rem">Neues Projekt</div>
+      <div style="font-size:.85rem">${t('btn_new_project')}</div>
     </div>`;
 }
 

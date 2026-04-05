@@ -11,7 +11,8 @@ function getMerged(item) {
 }
 
 function getStrategie(s) {
-  return STRATEGIE_MAP[(s.einfluss >= 5 ? 'h' : 'n') + (s.interesse >= 5 ? 'h' : 'n')] || '–';
+  const key = STRATEGIE_MAP[(s.einfluss >= 5 ? 'h' : 'n') + (s.interesse >= 5 ? 'h' : 'n')];
+  return key ? t(key) : '–';
 }
 
 function initials(name) {
@@ -29,8 +30,9 @@ function fmtDate(d) {
 }
 
 function fmtDateTime(d) {
-  const dt = new Date(d);
-  return dt.toLocaleDateString('de-AT') + ' ' + dt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' });
+  const dt     = new Date(d);
+  const locale = appLang === 'en' ? 'en-US' : 'de-AT';
+  return dt.toLocaleDateString(locale) + ' ' + dt.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
 function daysUntilBirthday(geburtstag) {

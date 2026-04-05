@@ -8,10 +8,10 @@ const HALTUNG_COLORS = {
 };
 
 const STRATEGIE_MAP = {
-  hh: 'Aktiv einbinden',
-  hn: 'Zufriedenstellen',
-  nh: 'Informiert halten',
-  nn: 'Beobachten'
+  hh: 'strat_engage',
+  hn: 'strat_satisfy',
+  nh: 'strat_inform',
+  nn: 'strat_monitor'
 };
 
 const DEFAULT_PLAN = [

@@ -79,6 +79,7 @@ tbody tr:hover .row-actions{opacity:1}
 .pill-menu-section-body--disabled{font-size:.82rem;color:var(--muted);opacity:.45;cursor:default;padding:4px 12px 6px}
 .pill-menu-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--font-body);font-size:.82rem;outline:none;cursor:pointer}
 .pill-menu-select:focus{border-color:var(--accent)}
+.pill-menu-item.active-opt{color:var(--accent);font-weight:600}
 
 /* FORMS */
 .form-group{margin-bottom:14px}

@@ -6,9 +6,9 @@ function setSaveStatus(state) {
   const dot = document.getElementById('save-dot');
   const lbl = document.getElementById('save-label');
   if (!dot || !lbl) return;
-  if (state === 'saved')   { dot.className = 'save-dot'; lbl.textContent = 'Gespeichert'; }
-  else if (state === 'pending') { dot.className = 'save-dot pending'; lbl.textContent = 'Speichert…'; }
-  else { dot.className = 'save-dot'; dot.style.background = 'var(--danger)'; lbl.textContent = 'Fehler'; }
+  if (state === 'saved')        { dot.className = 'save-dot'; lbl.textContent = t('save_saved'); }
+  else if (state === 'pending') { dot.className = 'save-dot pending'; lbl.textContent = t('save_saving'); }
+  else { dot.className = 'save-dot'; dot.style.background = 'var(--danger)'; lbl.textContent = t('save_error'); }
 }
 
 // ── Org name ──────────────────────────────────────────────────────────────────
@@ -118,16 +118,20 @@ document.addEventListener('click', e => {
 // ── Settings menu sync ────────────────────────────────────────────────────────
 
 function syncSettingsMenu() {
+  // Sync interval select
   const sel = document.getElementById('inline-warning-days');
   if (sel) {
-    const options = [...sel.options].map(o => parseInt(o.value));
-    const closest = options.reduce((a, b) =>
-      Math.abs(b - contactWarningDays) < Math.abs(a - contactWarningDays) ? b : a);
-    sel.value = closest;
+    // Rebuild options with translated day label
+    const vals = [14, 30, 60, 90, 180, 365];
+    sel.innerHTML = vals.map(v => `<option value="${v}"${v === contactWarningDays ? ' selected' : ''}>${v} ${t('days_label')}</option>`).join('');
   }
+  // Theme active indicator
   const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
   document.getElementById('theme-opt-dark')?.classList.toggle('active-opt', isDark);
   document.getElementById('theme-opt-light')?.classList.toggle('active-opt', !isDark);
+  // Language active indicator
+  document.getElementById('lang-opt-de')?.classList.toggle('active-opt', appLang === 'de');
+  document.getElementById('lang-opt-en')?.classList.toggle('active-opt', appLang === 'en');
 }
 
 function setWarningDays(val) {

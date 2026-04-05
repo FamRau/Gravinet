@@ -7,7 +7,7 @@ function getPlan() {
 function updatePlanTabLabel() {
   const plan    = getActiveProject()?.plan || [];
   const planTab = document.getElementById('plan-tab');
-  if (planTab) planTab.textContent = `📅 ${plan.length}-Jahres-Plan`;
+  if (planTab) planTab.textContent = `📅 ${t('tab_plan_label').replace('{n}', plan.length)}`;
 }
 
 function renderPlan() {
@@ -99,7 +99,7 @@ function savePlanItem() {
 function openPlanYearModal(yearId) {
   const plan   = getPlan();
   const isEdit = !!yearId;
-  document.getElementById('plan-year-modal-title').textContent = isEdit ? 'Jahr bearbeiten' : 'Jahr hinzufügen';
+  document.getElementById('plan-year-modal-title').textContent = isEdit ? t('plan_year_edit') : t('plan_year_new');
   document.getElementById('py-del-btn').style.display = isEdit ? '' : 'none';
   if (isEdit) {
     const y = plan.find(p => p.id === yearId); if (!y) return;

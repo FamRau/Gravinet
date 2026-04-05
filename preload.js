@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  appVersion: require('./package.json').version,
   // PDF printing
   printPDF: (html, filename) => ipcRenderer.invoke('print-pdf', { html, filename }),
 

@@ -19,7 +19,9 @@
 
 <header>
   <div class="header-left">
-    <h1>Gravi<span>net</span></h1>
+    <div style="display:flex;align-items:baseline;gap:6px">
+      <h1>Gravi<span>net</span></h1><span id="app-version" style="font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.4);font-weight:400;letter-spacing:.04em"></span>
+    </div>
     <div class="header-sub" id="org-subtitle"><span id="org-name-display"></span><button class="org-edit-btn" onclick="startEditOrg()" data-i18n-title="tooltip_edit_org" title="Bezeichnung bearbeiten">✏</button></div>
   </div>
   <div class="header-center">

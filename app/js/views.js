@@ -390,11 +390,12 @@ function renderDashboard() {
   const recent = recentEntries.slice(0, 8);
 
   const col = s => `background:${HALTUNG_COLORS[s.haltung]}22;border-left:3px solid ${HALTUNG_COLORS[s.haltung]}`;
+  const overdueCol = s => `background:${HALTUNG_COLORS[s.haltung]}18`;
 
   const overdueHtml = overdue.length === 0
     ? `<div class="dash-empty">${t('dash_no_overdue')}</div>`
     : overdue.map(s => `
-      <div class="dash-card" style="${col(s)}" onclick="switchProject('${s.projId}');openDetail(${s.id})">
+      <div class="dash-card" style="${overdueCol(s)}" onclick="switchProject('${s.projId}');openDetail(${s.id})">
         <div class="dash-card-name">${esc(s.name)}</div>
         <div class="dash-card-meta">${esc(s.rolle)} · <span class="dash-proj-tag">${esc(s.projName)}</span></div>
         <div class="dash-card-age overdue">${s.daysSince === null ? t('dash_never') : s.daysSince + t('days_unit') + ' / ' + s.interval + t('days_unit')}</div>

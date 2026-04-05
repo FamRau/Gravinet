@@ -22,7 +22,6 @@
     <div style="display:flex;align-items:baseline;gap:6px">
       <h1>Gravi<span>net</span></h1><span id="app-version" style="font-family:var(--font-mono);font-size:.75rem;color:var(--muted);font-weight:400;letter-spacing:.04em;margin-left:10px"></span>
     </div>
-    <div class="header-sub" id="org-subtitle"><span id="org-name-display"></span><button class="org-edit-btn" onclick="startEditOrg()" data-i18n-title="tooltip_edit_org" title="Bezeichnung bearbeiten">✏</button></div>
   </div>
   <div class="header-center">
     <div class="nav-actions">
@@ -51,7 +50,7 @@
           <span data-i18n="nav_data">Daten</span><span class="pill-chevron">▾</span>
         </button>
         <div class="pill-menu" id="daten-menu">
-          <div class="pill-menu-section-title" data-i18n="nav_data_json">JSON</div>
+          <div class="pill-menu-section-title" data-i18n-html="nav_data_json">JSON</div>
           <button class="pill-menu-item" onclick="exportJSON();closePillMenus()">
             <svg viewBox="0 0 16 16"><path d="M8 10V2M4 6l4-4 4 4M2 13h12"/></svg>
             <span data-i18n="nav_data_export">Exportieren</span>
@@ -61,7 +60,7 @@
             <span data-i18n="nav_data_import">Importieren</span>
           </button>
           <div class="pill-menu-divider"></div>
-          <div class="pill-menu-section-title" data-i18n="nav_data_csv">CSV</div>
+          <div class="pill-menu-section-title" data-i18n-html="nav_data_csv">CSV</div>
           <button class="pill-menu-item" onclick="exportCSV();closePillMenus()">
             <svg viewBox="0 0 16 16"><path d="M8 10V2M4 6l4-4 4 4M2 13h12"/></svg>
             <span data-i18n="nav_data_export_csv">Stakeholder exportieren</span>
@@ -106,6 +105,13 @@
         </div>
       </div>
     </div>
+    <div class="header-project">
+      <span class="nav-project-label" data-i18n="tab_project">Projekt</span>
+      <div class="nav-proj-dropdown" id="nav-proj-dropdown">
+        <div class="nav-project-name" id="nav-project-name" onclick="toggleNavProjMenu()"></div>
+        <div class="nav-proj-menu" id="nav-proj-menu"></div>
+      </div>
+    </div>
   </div>
   <div class="header-stats">
     <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-label" data-i18n="stat_stakeholder">Stakeholder</div></div>
@@ -120,13 +126,6 @@
   <button class="tab" data-i18n="tab_matrix" onclick="switchTab(this,'matrix')">🎯 Matrix</button>
   <button class="tab" data-i18n="tab_journal_search" onclick="switchTab(this,'journalsuche')">🔍 Journal</button>
   <button class="tab" id="plan-tab" onclick="switchTab(this,'plan')">📅 5-Jahres-Plan</button>
-  <div class="nav-project">
-    <span class="nav-project-label" data-i18n="tab_project">Projekt</span>
-    <div class="nav-proj-dropdown" id="nav-proj-dropdown">
-      <div class="nav-project-name" id="nav-project-name" onclick="toggleNavProjMenu()"></div>
-      <div class="nav-proj-menu" id="nav-proj-menu"></div>
-    </div>
-  </div>
   <div class="nav-spacer"></div>
   <div class="save-status"><div class="save-dot" id="save-dot"></div><span id="save-label">Lädt…</span></div>
 </nav>

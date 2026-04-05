@@ -8,6 +8,26 @@
       <stop offset="0%" stop-color="#6fa8ff"/>
       <stop offset="100%" stop-color="#2a5ecc"/>
     </radialGradient>
+    <radialGradient id="sat1" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#5be8a8"/>
+      <stop offset="100%" stop-color="#1db87a"/>
+    </radialGradient>
+    <radialGradient id="sat2" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffb347"/>
+      <stop offset="100%" stop-color="#d4a017"/>
+    </radialGradient>
+    <radialGradient id="sat3" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </radialGradient>
+    <radialGradient id="sat4" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#be185d"/>
+    </radialGradient>
+    <radialGradient id="sat5" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </radialGradient>
     <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="10" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -15,25 +35,42 @@
   </defs>
 
   <!-- Background rounded square -->
-  <rect width="512" height="512" rx="96" fill="url(#bg)" stroke="rgba(255,255,255,0.28)" stroke-width="8"/>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- White border -->
+  <rect width="512" height="512" rx="96" fill="none" stroke="white" stroke-width="22"/>
 
-  <!-- Connection lines -->
-  <line x1="256" y1="256" x2="138" y2="152" stroke="#4f8ef7" stroke-width="9" stroke-opacity="0.3" stroke-linecap="round"/>
-  <line x1="256" y1="256" x2="374" y2="152" stroke="#4f8ef7" stroke-width="9" stroke-opacity="0.3" stroke-linecap="round"/>
-  <line x1="256" y1="256" x2="138" y2="370" stroke="#4f8ef7" stroke-width="9" stroke-opacity="0.3" stroke-linecap="round"/>
-  <line x1="256" y1="256" x2="374" y2="370" stroke="#4f8ef7" stroke-width="9" stroke-opacity="0.3" stroke-linecap="round"/>
+  <!-- Connection lines (asymmetric, varying distances) -->
+  <!-- Node 1: top-left, close -->
+  <line x1="256" y1="256" x2="118" y2="128" stroke="#5be8a8" stroke-width="7" stroke-opacity="0.45" stroke-linecap="round"/>
+  <!-- Node 2: top-right, far -->
+  <line x1="256" y1="256" x2="406" y2="88" stroke="#ffb347" stroke-width="7" stroke-opacity="0.45" stroke-linecap="round"/>
+  <!-- Node 3: right, medium -->
+  <line x1="256" y1="256" x2="420" y2="285" stroke="#a78bfa" stroke-width="7" stroke-opacity="0.45" stroke-linecap="round"/>
+  <!-- Node 4: bottom-left, far -->
+  <line x1="256" y1="256" x2="96" y2="400" stroke="#fb7185" stroke-width="7" stroke-opacity="0.45" stroke-linecap="round"/>
+  <!-- Node 5: bottom-right, close-medium -->
+  <line x1="256" y1="256" x2="340" y2="395" stroke="#67e8f9" stroke-width="7" stroke-opacity="0.45" stroke-linecap="round"/>
 
-  <!-- Satellite nodes -->
-  <circle cx="138" cy="152" r="40" fill="#181c27" stroke="#4f8ef7" stroke-width="2.5" stroke-opacity="0.6"/>
-  <circle cx="374" cy="152" r="40" fill="#181c27" stroke="#4f8ef7" stroke-width="2.5" stroke-opacity="0.6"/>
-  <circle cx="138" cy="370" r="40" fill="#181c27" stroke="#4f8ef7" stroke-width="2.5" stroke-opacity="0.6"/>
-  <circle cx="374" cy="370" r="40" fill="#181c27" stroke="#4f8ef7" stroke-width="2.5" stroke-opacity="0.6"/>
+  <!-- Satellite nodes (different sizes, asymmetric positions) -->
+  <!-- Node 1: top-left, small -->
+  <circle cx="118" cy="128" r="30" fill="#0f1117" stroke="#5be8a8" stroke-width="2.5" stroke-opacity="0.7"/>
+  <circle cx="118" cy="128" r="13" fill="url(#sat1)" fill-opacity="0.85"/>
 
-  <!-- Satellite inner dots -->
-  <circle cx="138" cy="152" r="17" fill="#4f8ef7" fill-opacity="0.75"/>
-  <circle cx="374" cy="152" r="17" fill="#4f8ef7" fill-opacity="0.75"/>
-  <circle cx="138" cy="370" r="17" fill="#4f8ef7" fill-opacity="0.75"/>
-  <circle cx="374" cy="370" r="17" fill="#4f8ef7" fill-opacity="0.75"/>
+  <!-- Node 2: top-right, large -->
+  <circle cx="406" cy="88" r="42" fill="#0f1117" stroke="#ffb347" stroke-width="2.5" stroke-opacity="0.7"/>
+  <circle cx="406" cy="88" r="19" fill="url(#sat2)" fill-opacity="0.85"/>
+
+  <!-- Node 3: right, medium -->
+  <circle cx="420" cy="285" r="34" fill="#0f1117" stroke="#a78bfa" stroke-width="2.5" stroke-opacity="0.7"/>
+  <circle cx="420" cy="285" r="15" fill="url(#sat3)" fill-opacity="0.85"/>
+
+  <!-- Node 4: bottom-left, medium-large -->
+  <circle cx="96" cy="400" r="38" fill="#0f1117" stroke="#fb7185" stroke-width="2.5" stroke-opacity="0.7"/>
+  <circle cx="96" cy="400" r="17" fill="url(#sat4)" fill-opacity="0.85"/>
+
+  <!-- Node 5: bottom-right, small -->
+  <circle cx="340" cy="395" r="26" fill="#0f1117" stroke="#67e8f9" stroke-width="2.5" stroke-opacity="0.7"/>
+  <circle cx="340" cy="395" r="11" fill="url(#sat5)" fill-opacity="0.85"/>
 
   <!-- Central hub with glow -->
   <circle cx="256" cy="256" r="78" fill="url(#center)" filter="url(#glow)"/>

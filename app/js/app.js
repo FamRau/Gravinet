@@ -8,7 +8,7 @@ async function init() {
   // Show version (major.minor only) — async IPC call, reliable in packaged AppImage
   window.electronAPI?.getVersion().then(ver => {
     const vEl = document.getElementById('app-version');
-    if (vEl && ver) vEl.textContent = 'v' + ver.split('.').slice(0, 2).join('.');
+    if (vEl && ver) vEl.textContent = 'v' + ver;
   });
 
   // Load data from files (async IPC)

@@ -48,12 +48,12 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 
 ### AppImage (recommended)
 
-1. [Download the latest release](../../releases/latest) → `Gravinet-1.7.0.AppImage`
+1. [Download the latest release](../../releases/latest) → `Gravinet-2.0.6.AppImage`
 2. Make it executable and run it:
 
 ```bash
-chmod +x Gravinet-1.7.0.AppImage
-./Gravinet-1.7.0.AppImage
+chmod +x Gravinet-2.0.6.AppImage
+./Gravinet-2.0.6.AppImage
 ```
 
 Optional: Integrate into GNOME as a desktop app (Nautilus → Properties → Allow executing as program).
@@ -69,38 +69,23 @@ git clone https://github.com/famrau/gravinet.git
 cd gravinet
 npm install
 npm start          # Development mode
-npm run build      # Build AppImage → dist/Gravinet-1.7.0.AppImage
+npm run build      # Build AppImage (Linux)
+npm run build-win  # Build .exe installer (Windows, requires Wine on Linux)
+npm run build-mac  # Build .dmg (macOS only)
 ```
 
 ### Windows (.exe / NSIS installer)
 
-The Windows build must be performed on a **Windows machine** or in a Windows VM.
-
-1. Clone the repository on a Windows machine
-2. Install Node.js ≥ 18
-3. Extend the `build` block in `package.json` with a Windows target:
-
-```json
-"win": {
-  "target": [{ "target": "nsis", "arch": ["x64"] }],
-  "icon": "app/icons/icon-512.png"
-}
-```
-
-4. Run the build:
+The Windows build must be performed on a **Windows machine** (or with Wine on Linux).
 
 ```bash
 npm install
-npx electron-builder --win
+npm run build-win
 ```
 
-Result: `dist/Gravinet Setup 1.7.0.exe` (NSIS installer)
+Result: `dist/Gravinet Setup 2.0.6.exe` (NSIS installer with optional install directory selection)
 
-Alternatively, build a portable EXE without installer:
-
-```json
-"target": [{ "target": "portable", "arch": ["x64"] }]
-```
+> On Linux, install Wine first: `sudo dnf install wine`
 
 ---
 
@@ -108,28 +93,14 @@ Alternatively, build a portable EXE without installer:
 
 The macOS build must be performed on a **Mac**.
 
-1. Clone the repository on a Mac
-2. Install Node.js ≥ 18 (e.g. via [Homebrew](https://brew.sh): `brew install node`)
-3. Extend the `build` block in `package.json` with a macOS target:
-
-```json
-"mac": {
-  "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
-  "icon": "app/icons/icon-512.png",
-  "category": "public.app-category.productivity"
-}
-```
-
-4. Run the build:
-
 ```bash
 npm install
-npx electron-builder --mac
+npm run build-mac
 ```
 
-Result: `dist/Gravinet-1.7.0.dmg` (for Intel and Apple Silicon)
+Result: `dist/Gravinet-2.0.6.dmg` (universal: Intel x64 + Apple Silicon arm64)
 
-> **Note:** A signed and notarized macOS app requires a paid Apple Developer account. Without signing, a security warning appears on first launch, which can be bypassed via System Settings → Privacy & Security → "Open Anyway".
+> **Note:** A signed and notarized macOS app requires a paid Apple Developer account. Without signing, bypass the security warning via System Settings → Privacy & Security → "Open Anyway".
 
 ---
 
@@ -218,6 +189,35 @@ All data is stored as JSON files in the Electron user-data directory:
 ---
 
 ## Changelog
+
+### v2.0.6 — Code Quality
+- All confirm/alert dialogs in the plan view are now fully translated (DE/EN)
+- `fmtDate()` handles malformed date strings gracefully instead of returning `undefined.undefined.`
+- Inline journal entries (added from the table) now include a `type` field (defaults to `other`) for consistency with detail-panel entries
+- `beziehung` (relationship strength) is now clamped to the valid range 1–5 in all three modals
+- `Math.max` on stakeholder IDs is now safe when the stakeholder list is empty
+
+### v2.0.5
+- Project selector in header now shows "Alle Projekte" on the Dashboard and "Projekt: [Name]" on project-specific tabs (Stakeholder, Matrix, Journal, Plan)
+- Project label highlighted with light-blue background and rounded corners
+- Journal search restricted to stakeholders of the active project
+
+### v2.0.4
+- Journal search restricted to stakeholders of the active project (previously searched across all projects)
+- Header project label text changed to "Alle Projekte" / "All Projects"
+
+### v2.0.3
+- Project name moved to header centre below pill buttons, centred under the menu bar
+- Dashboard overdue cards: attitude colour as subtle background, left border removed
+- Print menu entry renamed to "Dashboard"
+- Settings section renamed to "Standard Kontakt-Intervall"
+- Data menu sections renamed to "Daten json" / "Stakeholder csv" with smaller suffix
+- CSV import/export entries shortened (prefix "Stakeholder" removed)
+
+### v2.0.2
+- Project selector moved to header-centre, centred below the pill-button bar
+- Dashboard overdue contacts: attitude colour as background (reduced opacity), left border removed
+- Build targets added: Windows (.exe via NSIS) and macOS (.dmg); icons generated for both platforms
 
 ### v2.0.0
 - Relationship strength and notes columns added to the printed project report

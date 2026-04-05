@@ -62,7 +62,7 @@ function confirmLink() {
     haltung:         document.getElementById('link-haltung').value,
     einfluss:        parseInt(document.getElementById('link-einfluss').value),
     interesse:       parseInt(document.getElementById('link-interesse').value),
-    beziehung:       parseInt(document.getElementById('link-beziehung').value) || 3,
+    beziehung:       Math.min(5, Math.max(1, parseInt(document.getElementById('link-beziehung').value) || 3)),
     contactInterval: ciVal || null,
     ziel:            document.getElementById('link-ziel').value,
     massnahmen:      document.getElementById('link-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
@@ -100,7 +100,7 @@ function addNewStakeholder() {
       haltung:         document.getElementById('f-haltung').value,
       einfluss:        parseInt(document.getElementById('f-einfluss').value),
       interesse:       parseInt(document.getElementById('f-interesse').value),
-      beziehung:       parseInt(document.getElementById('f-beziehung').value) || 3,
+      beziehung:       Math.min(5, Math.max(1, parseInt(document.getElementById('f-beziehung').value) || 3)),
       contactInterval: fCi || null,
       ziel:            document.getElementById('f-ziel').value,
       massnahmen:      document.getElementById('f-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
@@ -169,7 +169,7 @@ function saveEdit() {
       haltung:         document.getElementById('e-haltung').value,
       einfluss:        parseInt(document.getElementById('e-einfluss').value),
       interesse:       parseInt(document.getElementById('e-interesse').value),
-      beziehung:       parseInt(document.getElementById('e-beziehung').value) || 3,
+      beziehung:       Math.min(5, Math.max(1, parseInt(document.getElementById('e-beziehung').value) || 3)),
       contactInterval: eCi || null,
       ziel:            document.getElementById('e-ziel').value,
       massnahmen:      document.getElementById('e-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)

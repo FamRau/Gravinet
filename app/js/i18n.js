@@ -16,7 +16,7 @@ const TRANSLATIONS = {
     // Stats
     stat_stakeholder: 'Stakeholder', stat_supportive: 'Supportiv', stat_critical: 'Kritisch',
     // Tabs
-    tab_list: '📋 Stakeholder', tab_matrix: '🎯 Matrix', tab_project: 'Projekt',
+    tab_list: '📋 Stakeholder', tab_matrix: '🎯 Matrix', tab_project: 'Alle Projekte', label_current_project: 'Projekt:',
     tab_plan_label: '{n}-Jahres-Plan',
     // Save
     save_loading: 'Lädt…', save_saved: 'Gespeichert', save_saving: 'Speichert…', save_error: 'Fehler',
@@ -121,6 +121,9 @@ const TRANSLATIONS = {
     alert_name_required: 'Bitte Name eingeben.', alert_proj_name: 'Bitte Projektname eingeben.',
     alert_select_contact: 'Bitte mindestens einen Kontakt auswählen.',
     alert_pdf_error: 'Fehler beim PDF-Erstellen: ', alert_import_error: 'Importfehler: ',
+    alert_plan_label_required: 'Bitte Bezeichnung eingeben.',
+    confirm_delete_plan_item: 'Maßnahme löschen?',
+    confirm_delete_plan_year: 'Jahr „{label}" und alle Maßnahmen löschen?',
     confirm_delete_sh: '„{name}" vollständig aus allen Projekten löschen?',
     confirm_remove_sh: '„{name}" aus diesem Projekt entfernen?',
     confirm_delete_proj: 'Projekt „{name}" löschen? Die Stakeholder-Kontakte bleiben erhalten.',
@@ -178,7 +181,7 @@ const TRANSLATIONS = {
     // Stats
     stat_stakeholder: 'Stakeholders', stat_supportive: 'Supportive', stat_critical: 'Critical',
     // Tabs
-    tab_list: '📋 Stakeholders', tab_matrix: '🎯 Matrix', tab_project: 'Project',
+    tab_list: '📋 Stakeholders', tab_matrix: '🎯 Matrix', tab_project: 'All Projects', label_current_project: 'Project:',
     tab_plan_label: '{n}-Year Plan',
     // Save
     save_loading: 'Loading…', save_saved: 'Saved', save_saving: 'Saving…', save_error: 'Error',
@@ -283,6 +286,9 @@ const TRANSLATIONS = {
     alert_name_required: 'Please enter a name.', alert_proj_name: 'Please enter a project name.',
     alert_select_contact: 'Please select at least one contact.',
     alert_pdf_error: 'Error creating PDF: ', alert_import_error: 'Import error: ',
+    alert_plan_label_required: 'Please enter a label.',
+    confirm_delete_plan_item: 'Delete measure?',
+    confirm_delete_plan_year: 'Delete year "{label}" and all measures?',
     confirm_delete_sh: 'Delete "{name}" from all projects?',
     confirm_remove_sh: 'Remove "{name}" from this project?',
     confirm_delete_proj: 'Delete project "{name}"? Stakeholder contacts will be preserved.',

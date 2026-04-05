@@ -55,7 +55,7 @@ function saveInlineJournal(shId) {
   const text = el?.value.trim(); if (!text) return;
   const sh = stakeholders.find(x => x.id === shId); if (!sh) return;
   if (!sh.journal) sh.journal = [];
-  sh.journal.push({ date: new Date().toISOString(), text });
+  sh.journal.push({ date: new Date().toISOString(), text, type: 'other' });
   saveNow(); renderTable();
 }
 
@@ -512,8 +512,9 @@ function renderJournalSearch() {
   const q    = (document.getElementById('js-query')?.value || '').toLowerCase();
   const type = document.getElementById('js-type')?.value || '';
 
+  const projItemIds = new Set((getActiveProject()?.items || []).map(i => i.shId));
   const all = [];
-  stakeholders.forEach(sh => {
+  stakeholders.filter(sh => projItemIds.has(sh.id)).forEach(sh => {
     (sh.journal || []).forEach((e, idx) => {
       if (type && e.type !== type) return;
       if (q && !e.text.toLowerCase().includes(q) && !sh.name.toLowerCase().includes(q)) return;

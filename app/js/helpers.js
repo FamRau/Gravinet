@@ -31,7 +31,9 @@ function esc(t) {
 
 function fmtDate(d) {
   if (!d) return '';
-  const [, m, day] = d.split('-');
+  const parts = d.split('-');
+  if (parts.length < 3) return d;
+  const [, m, day] = parts;
   return `${day}.${m}.`;
 }
 

@@ -1,13 +1,14 @@
 {
   "name": "Gravinet",
-  "version": "2.0.3",
+  "version": "2.0.6",
   "description": "Gravinet – Stakeholder-Management",
   "main": "main.js",
   "author": "Direktion 4 Logistik",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder --linux AppImage",
-    "build-all": "electron-builder --linux AppImage deb"
+    "build-win": "electron-builder --win nsis",
+    "build-mac": "electron-builder --mac dmg"
   },
   "build": {
     "appId": "at.gravinet.app",
@@ -28,6 +29,29 @@
         "Categories": "Office;ProjectManagement;",
         "StartupWMClass": "gravinet"
       }
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "app/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "app/icons/icon.icns",
+      "category": "public.app-category.productivity"
     },
     "files": [
       "main.js",

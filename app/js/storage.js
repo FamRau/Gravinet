@@ -247,7 +247,7 @@ async function loadData() {
 
       activeProjectId   = ws.activeProjectId || projects[0]?.id || '';
       orgName           = ws.orgName || orgName;
-      nextStakeholderId  = ws.nextStakeholderId || (Math.max(0, ...stakeholders.map(s => s.id)) + 1);
+      nextStakeholderId  = ws.nextStakeholderId || (Math.max(0, ...(stakeholders.length ? stakeholders.map(s => s.id) : [0])) + 1);
       nextProjectId      = ws.nextProjectId || (projects.length + 2);
       nextPlanId         = Math.max(ws.nextPlanId || 0, 6);
       contactWarningDays = ws.contactWarningDays || 90;
@@ -320,7 +320,7 @@ function _applyParsedData(p) {
     if (!projects.length) _initDefaultProject();
     activeProjectId   = p.activeProjectId || projects[0]?.id || '';
     orgName           = p.orgName || orgName;
-    nextStakeholderId = p.nextStakeholderId || (Math.max(0, ...stakeholders.map(s => s.id)) + 1);
+    nextStakeholderId = p.nextStakeholderId || (Math.max(0, ...(stakeholders.length ? stakeholders.map(s => s.id) : [0])) + 1);
     nextProjectId     = p.nextProjectId || (projects.length + 2);
     nextPlanId        = Math.max(p.nextPlanId || 0, 6);
   } else {
@@ -347,7 +347,7 @@ function _applyParsedData(p) {
     projects          = [{ id: 'proj1', name: 'Stakeholder-Management', desc: '', items, plan }];
     activeProjectId   = 'proj1';
     orgName           = p.orgName || orgName;
-    nextStakeholderId = p.nextId || (Math.max(0, ...stakeholders.map(s => s.id)) + 1);
+    nextStakeholderId = p.nextId || (Math.max(0, ...(stakeholders.length ? stakeholders.map(s => s.id) : [0])) + 1);
     nextProjectId     = 2;
     nextPlanId        = 6;
   }

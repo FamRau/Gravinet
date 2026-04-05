@@ -63,7 +63,7 @@ function addPlanItem(yearId) {
 
 function deletePlanItem(yearId, idx) {
   const y = getPlan().find(p => p.id === yearId); if (!y) return;
-  if (!confirm('Maßnahme löschen?')) return;
+  if (!confirm(t('confirm_delete_plan_item'))) return;
   y.items.splice(idx, 1);
   saveNow(); renderPlan();
 }
@@ -122,7 +122,7 @@ function savePlanYear() {
   const label = document.getElementById('py-label').value.trim();
   const year  = document.getElementById('py-year').value.trim();
   const title = document.getElementById('py-title').value.trim();
-  if (!label) { alert('Bitte Bezeichnung eingeben.'); return; }
+  if (!label) { alert(t('alert_plan_label_required')); return; }
   if (id) {
     const y = proj.plan.find(p => p.id === id); if (!y) return;
     y.label = label; y.year = year; y.title = title;
@@ -136,7 +136,7 @@ function deletePlanYear() {
   const proj = getActiveProject(); if (!proj) return;
   const id   = document.getElementById('py-id').value;
   const y    = proj.plan.find(p => p.id === id); if (!y) return;
-  if (!confirm(`Jahr „${y.label}" und alle Maßnahmen löschen?`)) return;
+  if (!confirm(t('confirm_delete_plan_year').replace('{label}', y.label))) return;
   proj.plan = proj.plan.filter(p => p.id !== id);
   saveNow(); closePanel('plan-year-overlay'); renderPlan();
 }

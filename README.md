@@ -29,6 +29,8 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 
 | Dark | Light | 
 | -----| ------| 
+| ![List](docs/screenshots/overview.png) | ![List Light](docs/screenshots/overview_light.png) |
+| -----| ------| 
 | ![List](docs/screenshots/list.png) | ![List Light](docs/screenshots/list_light.png) |
 |------|--------|
 | ![Matrix](docs/screenshots/matrix.png) | ![Matrix Light](docs/screenshots/matrix_light.png) |

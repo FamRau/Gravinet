@@ -410,6 +410,12 @@ function renderDashboard() {
       </div>`).join('');
 
   el.innerHTML = `
+    <div class="dash-search-wrap">
+      <input class="dash-search-input" id="dash-search" type="text"
+        placeholder="${t('dash_search_placeholder')}"
+        oninput="renderDashboardSearch(this.value)">
+      <div id="dash-search-results" class="dash-search-results" style="display:none"></div>
+    </div>
     <div class="dash-cols">
       <div class="dash-col">
         <div class="dash-section-title overdue">${t('dash_overdue')} <span class="dash-count">${overdue.length}</span></div>
@@ -428,6 +434,55 @@ function renderDashboard() {
         <div class="dash-list">${recentHtml}</div>
       </div>
     </div>`;
+}
+
+function renderDashboardSearch(q) {
+  const resultsEl = document.getElementById('dash-search-results'); if (!resultsEl) return;
+  q = q.trim().toLowerCase();
+  if (!q) { resultsEl.style.display = 'none'; resultsEl.innerHTML = ''; return; }
+
+  const now = Date.now();
+  const matches = [];
+  stakeholders.forEach(sh => {
+    if (!sh.name.toLowerCase().includes(q) && !sh.rolle.toLowerCase().includes(q)) return;
+    const projContexts = projects.map(p => {
+      const item = p.items.find(i => i.shId === sh.id); if (!item) return null;
+      const s = { ...sh, ...item };
+      const interval = getContactInterval(s);
+      const j = sh.journal || [];
+      const lastEntry = j.length ? j.reduce((a, b) => a.date > b.date ? a : b) : null;
+      const daysSince = lastEntry ? Math.floor((now - new Date(lastEntry.date).getTime()) / 86400000) : null;
+      const cls = daysSince === null || daysSince > interval ? 'overdue'
+                : daysSince > interval * 0.6 ? 'warn' : 'ok';
+      return { projName: p.name, projId: p.id, item, daysSince, cls, interval };
+    }).filter(Boolean);
+    matches.push({ sh, projContexts });
+  });
+
+  if (matches.length === 0) {
+    resultsEl.innerHTML = `<div class="dash-search-empty">${t('dash_search_empty')}</div>`;
+    resultsEl.style.display = 'block';
+    return;
+  }
+
+  resultsEl.innerHTML = matches.map(({ sh, projContexts }) => {
+    const projTags = projContexts.map(ctx => {
+      const ageLabel = ctx.daysSince === null
+        ? `<span class="contact-age overdue">${t('dash_never')}</span>`
+        : `<span class="contact-age ${ctx.cls}">${ctx.daysSince}${t('days_unit')}</span>`;
+      return `<span class="dash-search-proj" onclick="switchProject('${ctx.projId}');openDetail(${sh.id})">
+        <span class="dash-proj-tag">${esc(ctx.projName)}</span>${ageLabel}
+      </span>`;
+    }).join('');
+    const bd = daysUntilBirthday(sh.geburtstag);
+    const bdChip = bd !== null && bd <= 14
+      ? `<span class="bday-chip">${bd === 0 ? '🎂 ' + t('birthday_today') : bd === 1 ? '🎂 ' + t('birthday_tomorrow') : '🎂 ' + bd + t('days_unit')}</span>` : '';
+    return `<div class="dash-search-row" onclick="openDetail(${sh.id})">
+      <div class="dash-search-name">${esc(sh.name)}${bdChip} <span class="dash-search-rolle">${esc(sh.rolle)}</span></div>
+      <div class="dash-search-projs">${projTags || '<span style="color:var(--muted);font-size:.75rem">–</span>'}</div>
+    </div>`;
+  }).join('');
+  resultsEl.style.display = 'block';
 }
 
 function switchProjectAndView(id) {

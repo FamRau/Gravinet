@@ -137,6 +137,8 @@ const TRANSLATIONS = {
     dash_no_birthdays: 'Keine Geburtstage in den nächsten 30 Tagen.',
     dash_no_recent: 'Noch keine Journal-Einträge.',
     dash_never: 'Nie',
+    dash_search_placeholder: 'Stakeholder suchen…',
+    dash_search_empty: 'Keine Ergebnisse.',
     // Relationship
     label_beziehung: 'Beziehungsstärke (1–5)',
     detail_beziehung: 'Beziehungsstärke',
@@ -280,6 +282,8 @@ const TRANSLATIONS = {
     dash_no_birthdays: 'No birthdays in the next 30 days.',
     dash_no_recent: 'No journal entries yet.',
     dash_never: 'Never',
+    dash_search_placeholder: 'Search stakeholders…',
+    dash_search_empty: 'No results.',
     // Relationship
     label_beziehung: 'Relationship Strength (1–5)',
     detail_beziehung: 'Relationship',

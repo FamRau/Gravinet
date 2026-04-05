@@ -73,6 +73,13 @@ function renderDetailProfile(shId) {
     </div>`;
 }
 
+const JOURNAL_TYPES = ['meeting','email','call','talk','other'];
+
+function journalTypeBadge(type) {
+  if (!type) return '';
+  return `<span class="journal-type-badge jtype-${type}">${t('jtype_' + type)}</span>`;
+}
+
 function renderDetailJournal(shId) {
   const sh = stakeholders.find(x => x.id === shId); if (!sh) return;
   const j  = sh.journal || [];
@@ -83,6 +90,7 @@ function renderDetailJournal(shId) {
         return `<div class="journal-entry">
           <div class="journal-entry-meta">
             <span class="journal-date">${fmtDateTime(e.date)}</span>
+            ${journalTypeBadge(e.type)}
             <button class="journal-del" onclick="deleteJournalEntry(${shId},${realIdx})" title="Löschen">🗑</button>
           </div>
           <div class="journal-text">${esc(e.text)}</div>
@@ -96,17 +104,29 @@ function renderDetailJournal(shId) {
     ${entries}
     <div class="journal-add-box">
       <div class="journal-add-label">${t('journal_new_entry')}</div>
+      <div class="journal-type-row">
+        ${JOURNAL_TYPES.map(type => `
+          <button class="journal-type-btn" data-type="${type}" onclick="selectJournalType(this,'${shId}')">${t('jtype_' + type)}</button>
+        `).join('')}
+      </div>
       <textarea class="journal-textarea" id="journal-input-${shId}" placeholder="${t('journal_placeholder')}"></textarea>
       <button class="btn btn-primary" onclick="addJournalEntry(${shId})">${t('btn_save_entry')}</button>
     </div>`;
+}
+
+function selectJournalType(btn, shId) {
+  document.querySelectorAll(`#dtab-journal .journal-type-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 function addJournalEntry(shId) {
   const el   = document.getElementById('journal-input-' + shId);
   const text = el.value.trim(); if (!text) return;
   const sh   = stakeholders.find(x => x.id === shId); if (!sh) return;
+  const activeType = document.querySelector('#dtab-journal .journal-type-btn.active');
+  const type = activeType ? activeType.dataset.type : null;
   if (!sh.journal) sh.journal = [];
-  sh.journal.push({ date: new Date().toISOString(), text });
+  sh.journal.push({ date: new Date().toISOString(), text, type });
   saveNow(); renderDetailJournal(shId); renderTable();
 }
 

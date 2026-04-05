@@ -485,6 +485,42 @@ function renderDashboardSearch(q) {
   resultsEl.style.display = 'block';
 }
 
+// ── Journal Search ────────────────────────────────────────────────────────────
+
+function renderJournalSearch() {
+  const el = document.getElementById('journal-search-body'); if (!el) return;
+  const q    = (document.getElementById('js-query')?.value || '').toLowerCase();
+  const type = document.getElementById('js-type')?.value || '';
+
+  const all = [];
+  stakeholders.forEach(sh => {
+    (sh.journal || []).forEach((e, idx) => {
+      if (type && e.type !== type) return;
+      if (q && !e.text.toLowerCase().includes(q) && !sh.name.toLowerCase().includes(q)) return;
+      all.push({ sh, e, idx });
+    });
+  });
+  all.sort((a, b) => new Date(b.e.date) - new Date(a.e.date));
+
+  if (all.length === 0) {
+    el.innerHTML = `<div style="color:var(--muted);padding:30px 0;text-align:center">${t('journal_search_empty')}</div>`;
+    return;
+  }
+
+  el.innerHTML = all.map(({ sh, e, idx }) => {
+    const hi = s => q ? s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), m => `<mark class="js-hi">${m}</mark>`) : s;
+    return `<div class="js-row" onclick="openDetailJournal(${sh.id})">
+      <div class="js-row-head">
+        <span class="js-row-name">${esc(sh.name)}</span>
+        <span class="js-row-date">${fmtDateTime(e.date)}</span>
+        ${e.type ? `<span class="journal-type-badge jtype-${e.type}">${t('jtype_' + e.type)}</span>` : ''}
+      </div>
+      <div class="js-row-rolle">${esc(sh.rolle)}</div>
+      <div class="js-row-text">${hi(esc(e.text))}</div>
+    </div>`;
+  }).join('');
+}
+
 function switchProjectAndView(id) {
   activeProjectId = id;
   saveNow();

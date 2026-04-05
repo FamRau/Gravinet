@@ -77,11 +77,12 @@ function switchTab(btn, name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
-  if (name === 'matrix')    renderMatrix();
-  if (name === 'dashboard') renderDashboard();
-  if (name === 'plan')      renderPlan();
-  if (name === 'projekte')  renderProjectsView();
-  if (name === 'kontakte')  renderKontakte();
+  if (name === 'matrix')        renderMatrix();
+  if (name === 'dashboard')     renderDashboard();
+  if (name === 'plan')          renderPlan();
+  if (name === 'projekte')      renderProjectsView();
+  if (name === 'kontakte')      renderKontakte();
+  if (name === 'journalsuche')  renderJournalSearch();
 }
 
 // ── Panel helpers ─────────────────────────────────────────────────────────────

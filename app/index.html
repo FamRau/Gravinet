@@ -117,6 +117,7 @@
   <button class="tab active" data-i18n="tab_dashboard" onclick="switchTab(this,'dashboard')">📊 Dashboard</button>
   <button class="tab" data-i18n="tab_list" onclick="switchTab(this,'liste')">📋 Stakeholder</button>
   <button class="tab" data-i18n="tab_matrix" onclick="switchTab(this,'matrix')">🎯 Matrix</button>
+  <button class="tab" data-i18n="tab_journal_search" onclick="switchTab(this,'journalsuche')">🔍 Journal</button>
   <button class="tab" id="plan-tab" onclick="switchTab(this,'plan')">📅 5-Jahres-Plan</button>
   <div class="nav-project">
     <span class="nav-project-label" data-i18n="tab_project">Projekt</span>
@@ -180,6 +181,22 @@
 <!-- DASHBOARD VIEW -->
 <div class="view" id="view-dashboard">
   <div id="dash-body"></div>
+</div>
+
+<!-- JOURNAL SEARCH VIEW -->
+<div class="view" id="view-journalsuche">
+  <div class="js-toolbar">
+    <input class="search-box" id="js-query" type="text" data-i18n-ph="journal_search_placeholder" placeholder="Journaleinträge durchsuchen…" oninput="renderJournalSearch()">
+    <select class="filter" id="js-type" onchange="renderJournalSearch()">
+      <option value="" data-i18n="journal_search_all_types">Alle Typen</option>
+      <option value="meeting" data-i18n="jtype_meeting">📅 Meeting</option>
+      <option value="email"   data-i18n="jtype_email">✉ E-Mail</option>
+      <option value="call"    data-i18n="jtype_call">📞 Telefonat</option>
+      <option value="talk"    data-i18n="jtype_talk">💬 Gespräch</option>
+      <option value="other"   data-i18n="jtype_other">📝 Sonstiges</option>
+    </select>
+  </div>
+  <div id="journal-search-body"></div>
 </div>
 
 <!-- PLAN VIEW -->

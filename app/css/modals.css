@@ -46,3 +46,14 @@
 .journal-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:var(--font-body);font-size:.88rem;resize:vertical;min-height:80px;outline:none;margin-bottom:10px}
 .journal-textarea:focus{border-color:var(--accent)}
 .journal-empty{text-align:center;color:var(--muted);font-size:.85rem;padding:24px;line-height:1.7}
+/* Journal type badges */
+.journal-type-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.journal-type-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.75rem;cursor:pointer;color:var(--muted);transition:all .15s}
+.journal-type-btn:hover{border-color:var(--accent);color:var(--accent)}
+.journal-type-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.journal-type-badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.68rem;font-family:var(--font-mono);font-weight:600;margin-left:6px}
+.jtype-meeting{background:rgba(79,142,247,.15);color:var(--accent)}
+.jtype-email{background:rgba(30,201,122,.15);color:var(--accent3)}
+.jtype-call{background:rgba(212,160,23,.15);color:var(--accent2)}
+.jtype-talk{background:rgba(167,139,250,.15);color:#a78bfa}
+.jtype-other{background:rgba(120,128,160,.15);color:var(--muted)}

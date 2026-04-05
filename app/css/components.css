@@ -176,6 +176,16 @@ tbody tr:hover .row-actions{opacity:1}
 .dash-search-projs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .dash-search-proj{display:flex;align-items:center;gap:4px;cursor:pointer}
 .dash-search-empty{padding:14px 16px;color:var(--muted);font-size:.85rem}
+/* Journal Search View */
+.js-toolbar{display:flex;gap:12px;margin-bottom:18px;align-items:center}
+.js-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:background .13s}
+.js-row:hover{background:var(--surface2)}
+.js-row-head{display:flex;align-items:center;gap:10px;margin-bottom:3px}
+.js-row-name{font-weight:600;font-size:.9rem}
+.js-row-date{font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-left:auto}
+.js-row-rolle{font-size:.75rem;color:var(--muted);margin-bottom:6px}
+.js-row-text{font-size:.85rem;color:var(--text-soft);line-height:1.6;white-space:pre-wrap}
+mark.js-hi{background:rgba(212,160,23,.35);color:inherit;border-radius:2px;padding:0 1px}
 .dash-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
 @media(max-width:1200px){.dash-cols{grid-template-columns:repeat(2,1fr)}}
 .dash-col{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;min-height:120px}

@@ -128,7 +128,11 @@ function renderTable() {
         const journalCell = jc > 0
           ? `<td onclick="event.stopPropagation();openDetailJournal(${s.id})" style="cursor:pointer;text-align:center" title="${jc} ${t('th_journal')}"><span style="font-size:1rem">📄</span></td>`
           : '<td><span style="color:var(--muted);font-size:.8rem">–</span></td>';
-        return `<tr onclick="openDetail(${s.id})">
+        const rowCol = HALTUNG_COLORS[s.haltung];
+        const rowStyle = s.haltung === 'neutral'
+          ? ''
+          : `background:${rowCol}0d;border-left:3px solid ${rowCol}88;`;
+        return `<tr onclick="openDetail(${s.id})" style="${rowStyle}">
           <td class="name-cell"><strong>${esc(s.name)}${bdChip}</strong><span>${esc(s.rolle)}</span></td>
           <td><span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span></td>
           <td><div class="score-wrap"><div class="bar-track bar-einfluss"><div class="bar-fill" style="width:${s.einfluss * 10}%"></div></div><span class="score-num">${s.einfluss}</span></div></td>

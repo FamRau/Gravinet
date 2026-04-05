@@ -141,3 +141,47 @@ function setWarningDays(val) {
   saveNow();
   renderTable();
 }
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  // Esc: close any open overlay/panel
+  if (e.key === 'Escape') {
+    const open = document.querySelector('.overlay.open');
+    if (open) { closePanel(open.id); return; }
+    closePillMenus();
+  }
+  // Ctrl+F: focus the active view's search box
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+    const activeView = document.querySelector('.view.active');
+    if (!activeView) return;
+    const input = activeView.querySelector('input[type=text]');
+    if (input) { e.preventDefault(); input.focus(); input.select(); }
+  }
+});
+
+// ── Undo toast ────────────────────────────────────────────────────────────────
+
+let _undoAction = null;
+let _undoTimer  = null;
+
+function showUndoToast(message, undoFn) {
+  _undoAction = undoFn;
+  clearTimeout(_undoTimer);
+  let toast = document.getElementById('undo-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'undo-toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<span>${esc(message)}</span><button onclick="triggerUndo()">${t('btn_undo')}</button>`;
+  toast.classList.add('show');
+  _undoTimer = setTimeout(() => { toast.classList.remove('show'); _undoAction = null; }, 5000);
+}
+
+function triggerUndo() {
+  if (_undoAction) { _undoAction(); _undoAction = null; }
+  clearTimeout(_undoTimer);
+  const toast = document.getElementById('undo-toast');
+  if (toast) toast.classList.remove('show');
+}

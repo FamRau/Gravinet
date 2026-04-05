@@ -219,6 +219,18 @@ All data is stored as JSON files in the Electron user-data directory:
 
 ## Changelog
 
+### v2.0.0
+- Relationship strength and notes columns added to the printed project report
+- Dashboard PDF export (Print → Export dashboard): overdue contacts, due-soon contacts, birthdays
+- Keyboard shortcuts: `Esc` closes any open modal/panel, `Ctrl+F` focuses the search box of the active view
+- Undo toast for stakeholder deletion and project removal — 5-second window with "Undo" button
+- Onboarding screen for empty projects: welcome message with 3 guided steps
+- Journal types per entry: Meeting, E-Mail, Call, Conversation, Other — colour-coded badge per entry
+- Global journal search tab (🔍 Journal): full-text search across all entries, filterable by type, search terms highlighted
+- Dashboard stakeholder search: real-time search across all projects with contact-age colour coding
+- Desktop notifications for overdue contacts: on startup + every 4 hours
+- CSV import/export for stakeholders (Data → CSV)
+
 ### v1.8.1
 - "Liste" tab renamed to "Stakeholder" (DE: Stakeholder, EN: Stakeholders)
 - Dashboard column headers coloured by category (red, amber, blue, green); coloured top border removed

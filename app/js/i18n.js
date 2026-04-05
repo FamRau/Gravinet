@@ -126,6 +126,13 @@ const TRANSLATIONS = {
     confirm_delete_proj: 'Projekt „{name}" löschen? Die Stakeholder-Kontakte bleiben erhalten.',
     // Misc
     tooltip_edit_org: 'Bezeichnung bearbeiten', days_unit: 'T', days_label: 'Tage',
+    btn_undo: 'Rückgängig',
+    onboard_title: 'Willkommen im Projekt!',
+    onboard_text: 'Dieses Projekt hat noch keine Stakeholder. Lege los und füge deinen ersten hinzu.',
+    onboard_step1: 'Stakeholder hinzufügen — über „+ Hinzufügen" oder neu anlegen',
+    onboard_step2: 'Einfluss, Interesse und Haltung festlegen',
+    onboard_step3: 'Kontakte im Journal dokumentieren und in der Matrix verfolgen',
+    nav_print_dashboard: 'Dashboard exportieren',
     // Print PDF
     print_basic_data: 'Grunddaten', print_proj_assignments: 'Projektzuordnungen',
     print_journal_section: 'Journal', print_no_journal: 'Keine Einträge vorhanden.',
@@ -281,6 +288,13 @@ const TRANSLATIONS = {
     confirm_delete_proj: 'Delete project "{name}"? Stakeholder contacts will be preserved.',
     // Misc
     tooltip_edit_org: 'Edit name', days_unit: 'd', days_label: 'days',
+    btn_undo: 'Undo',
+    onboard_title: 'Welcome to your project!',
+    onboard_text: 'This project has no stakeholders yet. Add your first one to get started.',
+    onboard_step1: 'Add stakeholders — via "+ Add" or create a new one',
+    onboard_step2: 'Set influence, interest, and attitude',
+    onboard_step3: 'Document contacts in the journal and track them in the matrix',
+    nav_print_dashboard: 'Export dashboard',
     // Print PDF
     print_basic_data: 'Basic Data', print_proj_assignments: 'Project Assignments',
     print_journal_section: 'Journal', print_no_journal: 'No entries available.',

@@ -133,6 +133,25 @@ function renderTable() {
   document.getElementById('th-kontakt').innerHTML    = `${t('th_kontakt')} ${_sortIndicator('kontakt')}`;
   document.getElementById('th-journal').innerHTML    = `${t('th_journal')} ${_sortIndicator('journal')}`;
 
+  const proj2 = getActiveProject();
+  const isEmpty = proj2 && proj2.items.length === 0 && !q && !fg && !fh;
+  if (isEmpty) {
+    document.getElementById('table-body').innerHTML = `
+      <tr><td colspan="10" style="padding:0">
+        <div class="onboarding-box">
+          <div class="onboarding-icon">🚀</div>
+          <h3 class="onboarding-title">${t('onboard_title')}</h3>
+          <p class="onboarding-text">${t('onboard_text')}</p>
+          <div class="onboarding-steps">
+            <div class="onboarding-step"><span class="onboarding-num">1</span>${t('onboard_step1')}</div>
+            <div class="onboarding-step"><span class="onboarding-num">2</span>${t('onboard_step2')}</div>
+            <div class="onboarding-step"><span class="onboarding-num">3</span>${t('onboard_step3')}</div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:20px" onclick="openPickerOverlay()">${t('btn_add')}</button>
+        </div>
+      </td></tr>`;
+    updateStats(); return;
+  }
   document.getElementById('table-body').innerHTML = filtered.length === 0
     ? `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:40px">${t('table_empty')} <a href="#" onclick="openPickerOverlay();return false" style="color:var(--accent)">${t('table_add_link')}</a></td></tr>`
     : filtered.map(s => {

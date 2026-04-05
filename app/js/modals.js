@@ -189,8 +189,16 @@ function removeStakeholderFromProject(shId) {
   const proj = getActiveProject(); if (!proj) return;
   const sh   = stakeholders.find(x => x.id === shId);
   if (!sh || !confirm(t('confirm_remove_sh').replace('{name}', sh.name))) return;
+  const itemBackup = proj.items.find(i => i.shId === shId);
   proj.items = proj.items.filter(i => i.shId !== shId);
   saveNow(); renderTable(); renderMatrix(); renderBirthdayAlerts();
+  showUndoToast(
+    (appLang === 'en' ? `"${sh.name}" removed from project` : `„${sh.name}" aus Projekt entfernt`),
+    () => {
+      if (itemBackup && !proj.items.find(i => i.shId === shId)) proj.items.push(itemBackup);
+      saveNow(); renderTable(); renderMatrix(); renderBirthdayAlerts();
+    }
+  );
 }
 
 function deleteFromEdit() {
@@ -202,9 +210,22 @@ function deleteFromEdit() {
 function deleteStakeholder(shId) {
   const sh = stakeholders.find(x => x.id === shId);
   if (!sh || !confirm(t('confirm_delete_sh').replace('{name}', sh.name))) return;
+  const shBackup   = JSON.parse(JSON.stringify(sh));
+  const itemBackup = projects.map(p => ({ projId: p.id, item: p.items.find(i => i.shId === shId) })).filter(x => x.item);
   stakeholders = stakeholders.filter(x => x.id !== shId);
   projects.forEach(p => { p.items = p.items.filter(i => i.shId !== shId); });
   saveNow(); renderTable(); renderMatrix(); renderBirthdayAlerts(); renderKontakte();
+  showUndoToast(
+    (appLang === 'en' ? `"${sh.name}" deleted` : `„${sh.name}" gelöscht`),
+    () => {
+      stakeholders.push(shBackup);
+      itemBackup.forEach(({ projId, item }) => {
+        const p = projects.find(x => x.id === projId);
+        if (p && !p.items.find(i => i.shId === shId)) p.items.push(item);
+      });
+      saveNow(); renderAll();
+    }
+  );
 }
 
 // ── Kontakt edit (central DB only) ───────────────────────────────────────────

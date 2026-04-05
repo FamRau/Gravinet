@@ -166,7 +166,10 @@ async function printProjectReport() {
     return { ...sh, ...item, id: sh.id };
   }).filter(Boolean);
 
-  const tableRows = merged.map(s => `
+  const tableRows = merged.map(s => {
+    const bez = s.beziehung || 3;
+    const stars = '★'.repeat(bez) + '☆'.repeat(5 - bez);
+    return `
     <tr>
       <td><strong>${escP(s.name)}</strong><br><span style="color:#6b748f;font-size:8pt">${escP(s.rolle)}</span></td>
       <td><span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span></td>
@@ -174,7 +177,10 @@ async function printProjectReport() {
       <td><div class="bar-wrap"><div class="bar-track"><div style="width:${s.interesse * 10}%;height:4px;background:#d97706;border-radius:2px"></div></div><span style="font-family:'DM Mono',monospace;font-size:8pt">${s.interesse}</span></div></td>
       <td><span class="badge badge-${s.haltung}">${t('badge_' + s.haltung)}</span></td>
       <td style="font-size:8.5pt;color:#4b5563">${getStrategieP(s.einfluss, s.interesse)}</td>
-    </tr>`).join('');
+      <td style="color:#d97706;letter-spacing:1px;font-size:9pt">${stars}</td>
+      ${s.notizen ? `<td style="font-size:8pt;color:#4b5563;max-width:120px">${escP(s.notizen.length > 80 ? s.notizen.slice(0,80)+'…' : s.notizen)}</td>` : '<td style="color:#9ca3af">–</td>'}
+    </tr>`;
+  }).join('');
 
   const pL = 12, pB = 8, pT = 4, pR = 4;
   const COLORS = { supportiv: '#059669', neutral: '#6b748f', kritisch: '#dc2626' };
@@ -210,7 +216,7 @@ async function printProjectReport() {
     </div>
     <h2 style="margin-bottom:10px">${t('print_stakeholder_list')}</h2>
     <table>
-      <thead><tr><th>${t('print_col_name')}</th><th>${t('print_col_group')}</th><th>${t('print_col_influence')}</th><th>${t('print_col_interest')}</th><th>${t('print_col_attitude')}</th><th>${t('print_col_strategy')}</th></tr></thead>
+      <thead><tr><th>${t('print_col_name')}</th><th>${t('print_col_group')}</th><th>${t('print_col_influence')}</th><th>${t('print_col_interest')}</th><th>${t('print_col_attitude')}</th><th>${t('print_col_strategy')}</th><th>${t('detail_beziehung')}</th><th>${t('label_notes')}</th></tr></thead>
       <tbody>${tableRows}</tbody>
     </table>
     <div class="page-break"></div>
@@ -234,5 +240,59 @@ async function printProjectReport() {
 
   const fname  = `${proj.name.replace(/[^a-zA-Z0-9äöüÄÖÜß\s]/g, '').trim()}-${date}.pdf`;
   const result = await window.electronAPI.printPDF(html, fname);
+  if (!result.ok) alert(t('alert_pdf_error') + result.error);
+}
+
+// ── Print dashboard ───────────────────────────────────────────────────────────
+
+async function printDashboard() {
+  const date = new Date().toISOString().slice(0, 10);
+  const now  = Date.now();
+  const COLORS = { supportiv: '#059669', neutral: '#6b748f', kritisch: '#dc2626' };
+
+  const all = [];
+  projects.forEach(proj => {
+    proj.items.forEach(item => {
+      const sh = stakeholders.find(s => s.id === item.shId); if (!sh) return;
+      const s = { ...sh, ...item, id: sh.id, projName: proj.name };
+      const interval = getContactInterval(s);
+      const j = sh.journal || [];
+      const lastEntry = j.length ? j.reduce((a, b) => a.date > b.date ? a : b) : null;
+      const daysSince = lastEntry ? Math.floor((now - new Date(lastEntry.date).getTime()) / 86400000) : null;
+      all.push({ ...s, interval, daysSince });
+    });
+  });
+
+  const overdue  = all.filter(s => s.daysSince === null || s.daysSince > s.interval).sort((a,b)=>(b.daysSince??99999)-(a.daysSince??99999));
+  const dueSoon  = all.filter(s => s.daysSince !== null && s.daysSince > s.interval*0.6 && s.daysSince <= s.interval).sort((a,b)=>b.daysSince-a.daysSince);
+  const birthdays = stakeholders.map(sh => { const bd=daysUntilBirthday(sh.geburtstag); return (bd!==null&&bd<=30)?{...sh,daysUntilBd:bd}:null; }).filter(Boolean).sort((a,b)=>a.daysUntilBd-b.daysUntilBd);
+
+  const cardRow = (s, ageHtml) => {
+    const col = COLORS[s.haltung] || '#6b748f';
+    return `<tr><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;border-left:3px solid ${col}"><strong>${escP(s.name)}</strong><br><span style="font-size:8pt;color:#6b748f">${escP(s.rolle)} · ${escP(s.projName||'')}</span></td><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:8pt;white-space:nowrap">${ageHtml}</td></tr>`;
+  };
+
+  const overdueRows  = overdue.map(s => cardRow(s, `<span style="color:#dc2626">${s.daysSince===null?t('dash_never'):s.daysSince+t('days_unit')+' / '+s.interval+t('days_unit')}</span>`)).join('');
+  const dueSoonRows  = dueSoon.map(s => cardRow(s, `<span style="color:#d97706">${s.daysSince}${t('days_unit')} / ${s.interval}${t('days_unit')}</span>`)).join('');
+  const bdRows       = birthdays.map(s => `<tr><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb">🎂 <strong>${escP(s.name)}</strong><br><span style="font-size:8pt;color:#6b748f">${escP(s.rolle)}</span></td><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:8pt;color:#d97706">${s.daysUntilBd===0?t('birthday_today'):s.daysUntilBd+t('days_unit')}</td></tr>`).join('');
+
+  const section = (title, color, rows, emptyKey) => `
+    <div style="margin-bottom:24px;break-inside:avoid">
+      <h3 style="font-family:'DM Mono',monospace;font-size:8pt;text-transform:uppercase;letter-spacing:.1em;color:${color};margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid ${color}">${title}</h3>
+      ${rows ? `<table style="width:100%;border-collapse:collapse"><tbody>${rows}</tbody></table>` : `<p style="color:#9ca3af;font-size:9pt">${t(emptyKey)}</p>`}
+    </div>`;
+
+  const html = `<!DOCTYPE html><html lang="${appLang==='en'?'en':'de'}"><head><meta charset="UTF-8">${printCSS()}<title>Dashboard</title></head><body>
+  <div class="page">
+    <div class="report-header">
+      <h1>📊 ${appLang==='en'?'Dashboard':'Dashboard'}</h1>
+      <div class="report-meta">${t('print_report_created')} ${fmtDateP(date)}</div>
+    </div>
+    ${section(t('dash_overdue'), '#dc2626', overdueRows, 'dash_no_overdue')}
+    ${section(t('dash_due_soon'), '#d97706', dueSoonRows, 'dash_no_soon')}
+    ${section(t('dash_birthdays'), '#2563eb', bdRows, 'dash_no_birthdays')}
+  </div></body></html>`;
+
+  const result = await window.electronAPI.printPDF(html, `gravinet-dashboard-${date}.pdf`);
   if (!result.ok) alert(t('alert_pdf_error') + result.error);
 }

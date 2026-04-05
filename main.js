@@ -6,6 +6,10 @@ const path = require('path');
 const fs   = require('fs');
 const os   = require('os');
 
+// Pin userData to a fixed path so data survives AppImage updates and
+// is never affected by app-name or package-name changes.
+app.setPath('userData', path.join(os.homedir(), '.config', 'Gravinet'));
+
 nativeTheme.themeSource = 'dark';
 
 let win = null;
@@ -56,6 +60,7 @@ function ensureDirs() {
 
 // ── Workspace ────────────────────────────────────────────────────────────────
 
+ipcMain.handle('get-version',        () => app.getVersion());
 ipcMain.handle('data:get-data-path', () => getDataDir());
 
 ipcMain.handle('data:read-workspace', () => {

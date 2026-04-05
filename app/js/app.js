@@ -5,10 +5,11 @@ async function init() {
   setTheme(localStorage.getItem('gravinet_theme') || 'dark');
   setSaveStatus('saved');
 
-  // Show version (major.minor only)
-  const ver = window.electronAPI?.appVersion || '';
-  const vEl = document.getElementById('app-version');
-  if (vEl && ver) vEl.textContent = 'v' + ver.split('.').slice(0, 2).join('.');
+  // Show version (major.minor only) — async IPC call, reliable in packaged AppImage
+  window.electronAPI?.getVersion().then(ver => {
+    const vEl = document.getElementById('app-version');
+    if (vEl && ver) vEl.textContent = 'v' + ver.split('.').slice(0, 2).join('.');
+  });
 
   // Load data from files (async IPC)
   await loadData();

@@ -15,6 +15,12 @@ function getStrategie(s) {
   return key ? t(key) : '–';
 }
 
+// Returns the effective contact interval for a stakeholder item.
+// Uses item-level override if set, otherwise the global setting.
+function getContactInterval(s) {
+  return s.contactInterval || contactWarningDays;
+}
+
 function initials(name) {
   return String(name || '').split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
 }

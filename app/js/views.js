@@ -184,8 +184,15 @@ function renderMatrix() {
     dot.style.background  = col + '22';
     dot.style.borderColor = col;
     dot.style.color       = col;
+    // Dot size based on Beziehungsstärke (1–5 → 22px–46px)
+    const bez = s.beziehung || 3;
+    const dotPx = 20 + bez * 5;
+    dot.style.width  = dotPx + 'px';
+    dot.style.height = dotPx + 'px';
+    dot.style.fontSize = (0.55 + bez * 0.03) + 'rem';
+    const stars = '★'.repeat(bez) + '☆'.repeat(5 - bez);
     const tipDir = dotTopPct < 25 ? 'tip-down' : 'tip-up';
-    dot.innerHTML = `${initials(s.name)}<div class="dot-tooltip ${tipDir}"><strong>${esc(s.name)}</strong><br>${esc(s.rolle)}<br>${t('detail_influence')}: ${s.einfluss} · ${t('detail_interest')}: ${s.interesse}</div>`;
+    dot.innerHTML = `${initials(s.name)}<div class="dot-tooltip ${tipDir}"><strong>${esc(s.name)}</strong><br>${esc(s.rolle)}<br>${t('detail_influence')}: ${s.einfluss} · ${t('detail_interest')}: ${s.interesse}<br><span style="color:var(--accent2);letter-spacing:1px">${stars}</span></div>`;
     dot.onclick = () => openDetail(s.id);
     c.appendChild(dot);
   });
@@ -244,6 +251,112 @@ function renderProjectsView() {
     </div>`;
 }
 
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+function renderDashboard() {
+  const el = document.getElementById('dash-body'); if (!el) return;
+  const now = Date.now();
+
+  // Build enriched list of all items across all projects
+  const all = [];
+  projects.forEach(proj => {
+    proj.items.forEach(item => {
+      const sh = stakeholders.find(s => s.id === item.shId); if (!sh) return;
+      const s = { ...sh, ...item, id: sh.id, projName: proj.name, projId: proj.id };
+      const interval = getContactInterval(s);
+      const j = sh.journal || [];
+      const lastEntry = j.length ? j.reduce((a, b) => a.date > b.date ? a : b) : null;
+      const daysSince = lastEntry ? Math.floor((now - new Date(lastEntry.date).getTime()) / 86400000) : null;
+      all.push({ ...s, interval, daysSince, lastEntry });
+    });
+  });
+
+  // Overdue: never contacted OR daysSince > interval
+  const overdue = all
+    .filter(s => s.daysSince === null || s.daysSince > s.interval)
+    .sort((a, b) => (b.daysSince ?? 99999) - (a.daysSince ?? 99999));
+
+  // Due soon: 60–100% of interval (not yet overdue)
+  const dueSoon = all
+    .filter(s => s.daysSince !== null && s.daysSince > s.interval * 0.6 && s.daysSince <= s.interval)
+    .sort((a, b) => b.daysSince - a.daysSince);
+
+  // Birthdays: next 30 days
+  const birthdays = stakeholders.map(sh => {
+    const bd = daysUntilBirthday(sh.geburtstag);
+    return (bd !== null && bd <= 30) ? { ...sh, daysUntilBd: bd } : null;
+  }).filter(Boolean).sort((a, b) => a.daysUntilBd - b.daysUntilBd);
+
+  // Recent journal entries across all stakeholders, newest first
+  const recentEntries = [];
+  stakeholders.forEach(sh => {
+    (sh.journal || []).forEach(e => {
+      recentEntries.push({ ...e, shId: sh.id, shName: sh.name, shRolle: sh.rolle });
+    });
+  });
+  recentEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const recent = recentEntries.slice(0, 8);
+
+  const col = s => `background:${HALTUNG_COLORS[s.haltung]}22;border-left:3px solid ${HALTUNG_COLORS[s.haltung]}`;
+
+  const overdueHtml = overdue.length === 0
+    ? `<div class="dash-empty">${t('dash_no_overdue')}</div>`
+    : overdue.map(s => `
+      <div class="dash-card" style="${col(s)}" onclick="switchProject('${s.projId}');openDetail(${s.id})">
+        <div class="dash-card-name">${esc(s.name)}</div>
+        <div class="dash-card-meta">${esc(s.rolle)} · <span class="dash-proj-tag">${esc(s.projName)}</span></div>
+        <div class="dash-card-age overdue">${s.daysSince === null ? t('dash_never') : s.daysSince + t('days_unit') + ' / ' + s.interval + t('days_unit')}</div>
+      </div>`).join('');
+
+  const dueSoonHtml = dueSoon.length === 0
+    ? `<div class="dash-empty">${t('dash_no_soon')}</div>`
+    : dueSoon.map(s => `
+      <div class="dash-card" style="${col(s)}" onclick="switchProject('${s.projId}');openDetail(${s.id})">
+        <div class="dash-card-name">${esc(s.name)}</div>
+        <div class="dash-card-meta">${esc(s.rolle)} · <span class="dash-proj-tag">${esc(s.projName)}</span></div>
+        <div class="dash-card-age warn">${s.daysSince}${t('days_unit')} / ${s.interval}${t('days_unit')}</div>
+      </div>`).join('');
+
+  const bdHtml = birthdays.length === 0
+    ? `<div class="dash-empty">${t('dash_no_birthdays')}</div>`
+    : birthdays.map(s => `
+      <div class="dash-card" style="background:rgba(212,160,23,.07);border-left:3px solid var(--accent2)" onclick="openDetail(${s.id})">
+        <div class="dash-card-name">🎂 ${esc(s.name)}</div>
+        <div class="dash-card-meta">${esc(s.rolle)}</div>
+        <div class="dash-card-age warn">${s.daysUntilBd === 0 ? t('birthday_today') : s.daysUntilBd + t('days_unit')}</div>
+      </div>`).join('');
+
+  const recentHtml = recent.length === 0
+    ? `<div class="dash-empty">${t('dash_no_recent')}</div>`
+    : recent.map(e => `
+      <div class="dash-card" style="cursor:default">
+        <div class="dash-card-name">${esc(e.shName)}</div>
+        <div class="dash-card-meta">${esc(e.shRolle)}</div>
+        <div class="dash-card-text">${esc(e.text.length > 80 ? e.text.slice(0, 80) + '…' : e.text)}</div>
+        <div class="dash-card-date">${fmtDateTime(e.date)}</div>
+      </div>`).join('');
+
+  el.innerHTML = `
+    <div class="dash-cols">
+      <div class="dash-col">
+        <div class="dash-section-title overdue">${t('dash_overdue')} <span class="dash-count">${overdue.length}</span></div>
+        <div class="dash-list">${overdueHtml}</div>
+      </div>
+      <div class="dash-col">
+        <div class="dash-section-title warn">${t('dash_due_soon')} <span class="dash-count">${dueSoon.length}</span></div>
+        <div class="dash-list">${dueSoonHtml}</div>
+      </div>
+      <div class="dash-col">
+        <div class="dash-section-title">${t('dash_birthdays')} <span class="dash-count">${birthdays.length}</span></div>
+        <div class="dash-list">${bdHtml}</div>
+      </div>
+      <div class="dash-col">
+        <div class="dash-section-title">${t('dash_recent')}</div>
+        <div class="dash-list">${recentHtml}</div>
+      </div>
+    </div>`;
+}
+
 function switchProjectAndView(id) {
   activeProjectId = id;
   saveNow();
@@ -265,4 +378,5 @@ function renderAll() {
   updatePlanTabLabel();
   renderKontakte();
   renderProjectsView();
+  renderDashboard();
 }

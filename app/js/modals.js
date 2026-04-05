@@ -45,6 +45,9 @@ function openLinkModal(shId) {
   document.getElementById('link-haltung').value  = 'neutral';
   document.getElementById('link-ziel').value     = '';
   document.getElementById('link-massnahmen').value = '';
+  document.getElementById('link-beziehung').value          = 3;
+  document.getElementById('link-beziehung-val').textContent = 3;
+  document.getElementById('link-contact-interval').value    = '';
   document.getElementById('link-overlay').classList.add('open');
 }
 
@@ -52,14 +55,17 @@ function confirmLink() {
   const shId = parseInt(document.getElementById('link-shid').value);
   const proj = getActiveProject(); if (!proj) return;
   if (proj.items.find(i => i.shId === shId)) { closePanel('link-overlay'); return; }
+  const ciVal = parseInt(document.getElementById('link-contact-interval').value);
   proj.items.push({
     shId,
-    gruppe:     document.getElementById('link-gruppe').value,
-    haltung:    document.getElementById('link-haltung').value,
-    einfluss:   parseInt(document.getElementById('link-einfluss').value),
-    interesse:  parseInt(document.getElementById('link-interesse').value),
-    ziel:       document.getElementById('link-ziel').value,
-    massnahmen: document.getElementById('link-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
+    gruppe:          document.getElementById('link-gruppe').value,
+    haltung:         document.getElementById('link-haltung').value,
+    einfluss:        parseInt(document.getElementById('link-einfluss').value),
+    interesse:       parseInt(document.getElementById('link-interesse').value),
+    beziehung:       parseInt(document.getElementById('link-beziehung').value) || 3,
+    contactInterval: ciVal || null,
+    ziel:            document.getElementById('link-ziel').value,
+    massnahmen:      document.getElementById('link-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
   });
   saveNow(); closePanel('link-overlay');
   renderTable(); renderBirthdayAlerts();
@@ -86,14 +92,17 @@ function addNewStakeholder() {
   });
   const proj = getActiveProject();
   if (proj) {
+    const fCi = parseInt(document.getElementById('f-contact-interval').value);
     proj.items.push({
       shId,
-      gruppe:     document.getElementById('f-gruppe').value,
-      haltung:    document.getElementById('f-haltung').value,
-      einfluss:   parseInt(document.getElementById('f-einfluss').value),
-      interesse:  parseInt(document.getElementById('f-interesse').value),
-      ziel:       document.getElementById('f-ziel').value,
-      massnahmen: document.getElementById('f-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
+      gruppe:          document.getElementById('f-gruppe').value,
+      haltung:         document.getElementById('f-haltung').value,
+      einfluss:        parseInt(document.getElementById('f-einfluss').value),
+      interesse:       parseInt(document.getElementById('f-interesse').value),
+      beziehung:       parseInt(document.getElementById('f-beziehung').value) || 3,
+      contactInterval: fCi || null,
+      ziel:            document.getElementById('f-ziel').value,
+      massnahmen:      document.getElementById('f-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
     });
   }
   saveNow(); closePanel('new-sh-overlay');
@@ -103,6 +112,9 @@ function addNewStakeholder() {
   ['f-einfluss','f-interesse'].forEach(id => { document.getElementById(id).value = 5; });
   document.getElementById('f-einfluss-val').textContent = 5;
   document.getElementById('f-interesse-val').textContent = 5;
+  document.getElementById('f-beziehung').value = 3;
+  document.getElementById('f-beziehung-val').textContent = 3;
+  document.getElementById('f-contact-interval').value = '';
   renderTable(); renderBirthdayAlerts();
 }
 
@@ -126,6 +138,9 @@ function openEditModal(shId) {
   document.getElementById('e-interesse-val').textContent = item.interesse || 5;
   document.getElementById('e-ziel').value      = item.ziel   || '';
   document.getElementById('e-massnahmen').value = (item.massnahmen || []).join('\n');
+  document.getElementById('e-beziehung').value          = item.beziehung  || 3;
+  document.getElementById('e-beziehung-val').textContent = item.beziehung  || 3;
+  document.getElementById('e-contact-interval').value    = item.contactInterval || '';
   document.getElementById('edit-overlay').classList.add('open');
 }
 
@@ -144,14 +159,17 @@ function saveEdit() {
   const proj    = getActiveProject();
   const itemIdx = proj?.items.findIndex(i => i.shId === shId) ?? -1;
   if (itemIdx !== -1) {
+    const eCi = parseInt(document.getElementById('e-contact-interval').value);
     proj.items[itemIdx] = {
       ...proj.items[itemIdx],
-      gruppe:     document.getElementById('e-gruppe').value,
-      haltung:    document.getElementById('e-haltung').value,
-      einfluss:   parseInt(document.getElementById('e-einfluss').value),
-      interesse:  parseInt(document.getElementById('e-interesse').value),
-      ziel:       document.getElementById('e-ziel').value,
-      massnahmen: document.getElementById('e-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
+      gruppe:          document.getElementById('e-gruppe').value,
+      haltung:         document.getElementById('e-haltung').value,
+      einfluss:        parseInt(document.getElementById('e-einfluss').value),
+      interesse:       parseInt(document.getElementById('e-interesse').value),
+      beziehung:       parseInt(document.getElementById('e-beziehung').value) || 3,
+      contactInterval: eCi || null,
+      ziel:            document.getElementById('e-ziel').value,
+      massnahmen:      document.getElementById('e-massnahmen').value.split('\n').map(m => m.trim()).filter(Boolean)
     };
   }
   saveNow(); closePanel('edit-overlay');

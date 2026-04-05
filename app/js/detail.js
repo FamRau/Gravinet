@@ -50,6 +50,10 @@ function renderDetailProfile(shId) {
         <div class="detail-card-label">${t('detail_strategy')}</div>
         <div class="detail-card-val" style="font-size:.85rem">${getStrategie(s)}</div>
       </div>
+      <div class="detail-card">
+        <div class="detail-card-label">${t('detail_beziehung')}</div>
+        <div class="detail-card-val" style="color:var(--accent2);letter-spacing:2px;font-size:1rem">${'★'.repeat(s.beziehung || 3)}${'☆'.repeat(5 - (s.beziehung || 3))}</div>
+      </div>
     </div>
     ${s.ziel ? `<div class="detail-section"><h3>${t('detail_goal')}</h3><p>${esc(s.ziel)}</p></div>` : ''}
     ${(s.massnahmen || []).length ? `<div class="detail-section"><h3>${t('detail_measures')}</h3><ul class="massnahmen-list">${s.massnahmen.map(m => `<li>${esc(m)}</li>`).join('')}</ul></div>` : ''}

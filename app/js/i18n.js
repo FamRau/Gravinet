@@ -125,6 +125,24 @@ const TRANSLATIONS = {
     print_report_created: 'Projektbericht · Erstellt am', print_report_stakeholders: 'Stakeholder',
     print_goal_label: 'Strategisches Ziel', print_measures_label: 'Maßnahmen',
     print_journal_entries: 'Einträge',
+    // Dashboard
+    tab_dashboard: '📊 Dashboard',
+    dash_overdue: 'Kontakt überfällig',
+    dash_due_soon: 'Kontakt bald fällig',
+    dash_birthdays: 'Geburtstage',
+    dash_recent: 'Letzte Aktivität',
+    dash_no_overdue: 'Alle Kontakte sind aktuell.',
+    dash_no_soon: 'Keine Kontakte demnächst fällig.',
+    dash_no_birthdays: 'Keine Geburtstage in den nächsten 30 Tagen.',
+    dash_no_recent: 'Noch keine Journal-Einträge.',
+    dash_never: 'Nie',
+    // Relationship
+    label_beziehung: 'Beziehungsstärke (1–5)',
+    detail_beziehung: 'Beziehungsstärke',
+    // Contact interval per stakeholder
+    label_contact_interval: 'Kontakt-Intervall',
+    interval_global: 'Standard ({n}d)',
+    interval_days: '{n} Tage',
   },
   en: {
     // Navigation
@@ -249,6 +267,24 @@ const TRANSLATIONS = {
     print_report_created: 'Project Report · Created on', print_report_stakeholders: 'Stakeholders',
     print_goal_label: 'Strategic Goal', print_measures_label: 'Measures',
     print_journal_entries: 'entries',
+    // Dashboard
+    tab_dashboard: '📊 Dashboard',
+    dash_overdue: 'Contact Overdue',
+    dash_due_soon: 'Due Soon',
+    dash_birthdays: 'Birthdays',
+    dash_recent: 'Recent Activity',
+    dash_no_overdue: 'All contacts are up to date.',
+    dash_no_soon: 'No contacts due soon.',
+    dash_no_birthdays: 'No birthdays in the next 30 days.',
+    dash_no_recent: 'No journal entries yet.',
+    dash_never: 'Never',
+    // Relationship
+    label_beziehung: 'Relationship Strength (1–5)',
+    detail_beziehung: 'Relationship',
+    // Contact interval per stakeholder
+    label_contact_interval: 'Contact Interval',
+    interval_global: 'Default ({n}d)',
+    interval_days: '{n} days',
   }
 };
 

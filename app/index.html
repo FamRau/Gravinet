@@ -105,6 +105,7 @@
 <nav>
   <button class="tab active" data-i18n="tab_list" onclick="switchTab(this,'liste')">📋 Liste</button>
   <button class="tab" data-i18n="tab_matrix" onclick="switchTab(this,'matrix')">🎯 Matrix</button>
+  <button class="tab" data-i18n="tab_dashboard" onclick="switchTab(this,'dashboard')">📊 Dashboard</button>
   <button class="tab" id="plan-tab" onclick="switchTab(this,'plan')">📅 5-Jahres-Plan</button>
   <div class="nav-project">
     <span class="nav-project-label" data-i18n="tab_project">Projekt</span>
@@ -161,6 +162,11 @@
     <span style="display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--muted)"><span style="width:12px;height:12px;border-radius:50%;background:var(--muted);opacity:.85;display:inline-block"></span><span data-i18n="filter_neutral">Neutral</span></span>
     <span style="display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--danger)"><span style="width:12px;height:12px;border-radius:50%;background:var(--danger);opacity:.85;display:inline-block"></span><span data-i18n="filter_kritisch">Kritisch</span></span>
   </div>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div class="view" id="view-dashboard">
+  <div id="dash-body"></div>
 </div>
 
 <!-- PLAN VIEW -->
@@ -236,6 +242,19 @@
     </div>
     <div class="form-group"><label data-i18n="label_goal">Strategisches Ziel</label><textarea id="e-ziel"></textarea></div>
     <div class="form-group"><label data-i18n="label_measures">Maßnahmen (eine pro Zeile)</label><textarea id="e-massnahmen" rows="3"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label data-i18n="label_beziehung">Beziehungsstärke (1–5)</label>
+        <div class="range-wrap"><input type="range" min="1" max="5" value="3" id="e-beziehung" oninput="document.getElementById('e-beziehung-val').textContent=this.value"><span class="range-val" id="e-beziehung-val">3</span></div>
+      </div>
+      <div class="form-group"><label data-i18n="label_contact_interval">Kontakt-Intervall</label>
+        <select id="e-contact-interval">
+          <option value="">Standard</option>
+          <option value="14">14 Tage</option><option value="30">30 Tage</option>
+          <option value="60">60 Tage</option><option value="90">90 Tage</option>
+          <option value="180">180 Tage</option><option value="365">365 Tage</option>
+        </select>
+      </div>
+    </div>
     <div style="display:flex;gap:12px;margin-top:8px">
       <button class="btn btn-primary" data-i18n="btn_save" style="flex:1" onclick="saveEdit()">Speichern</button>
       <button class="btn btn-secondary" data-i18n="btn_remove_from_project" onclick="removeFromProject()">Aus Projekt entfernen</button>
@@ -276,6 +295,19 @@
     </div>
     <div class="form-group"><label data-i18n="label_goal">Strategisches Ziel</label><textarea id="link-ziel" data-i18n-ph="link_goal_placeholder" placeholder="Was soll sich in dieser Beziehung verändern?"></textarea></div>
     <div class="form-group"><label data-i18n="label_measures">Maßnahmen (eine pro Zeile)</label><textarea id="link-massnahmen" rows="3"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label data-i18n="label_beziehung">Beziehungsstärke (1–5)</label>
+        <div class="range-wrap"><input type="range" min="1" max="5" value="3" id="link-beziehung" oninput="document.getElementById('link-beziehung-val').textContent=this.value"><span class="range-val" id="link-beziehung-val">3</span></div>
+      </div>
+      <div class="form-group"><label data-i18n="label_contact_interval">Kontakt-Intervall</label>
+        <select id="link-contact-interval">
+          <option value="">Standard</option>
+          <option value="14">14 Tage</option><option value="30">30 Tage</option>
+          <option value="60">60 Tage</option><option value="90">90 Tage</option>
+          <option value="180">180 Tage</option><option value="365">365 Tage</option>
+        </select>
+      </div>
+    </div>
     <button class="btn btn-primary" data-i18n="btn_add_to_project" style="width:100%;margin-top:6px" onclick="confirmLink()">Zum Projekt hinzufügen</button>
   </div>
 </div>
@@ -308,6 +340,19 @@
     </div>
     <div class="form-group"><label data-i18n="label_goal">Strategisches Ziel</label><textarea id="f-ziel" data-i18n-ph="link_goal_placeholder" placeholder="Was soll sich in dieser Beziehung verändern?"></textarea></div>
     <div class="form-group"><label data-i18n="label_measures">Maßnahmen (eine pro Zeile)</label><textarea id="f-massnahmen" rows="3"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label data-i18n="label_beziehung">Beziehungsstärke (1–5)</label>
+        <div class="range-wrap"><input type="range" min="1" max="5" value="3" id="f-beziehung" oninput="document.getElementById('f-beziehung-val').textContent=this.value"><span class="range-val" id="f-beziehung-val">3</span></div>
+      </div>
+      <div class="form-group"><label data-i18n="label_contact_interval">Kontakt-Intervall</label>
+        <select id="f-contact-interval">
+          <option value="">Standard</option>
+          <option value="14">14 Tage</option><option value="30">30 Tage</option>
+          <option value="60">60 Tage</option><option value="90">90 Tage</option>
+          <option value="180">180 Tage</option><option value="365">365 Tage</option>
+        </select>
+      </div>
+    </div>
     <button class="btn btn-primary" data-i18n="btn_save_stakeholder" style="width:100%;margin-top:6px" onclick="addNewStakeholder()">Stakeholder speichern</button>
   </div>
 </div>

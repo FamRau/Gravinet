@@ -166,13 +166,11 @@ tbody tr:hover .row-actions{opacity:1}
 .dash-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
 @media(max-width:1200px){.dash-cols{grid-template-columns:repeat(2,1fr)}}
 .dash-col{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;min-height:120px}
-.dash-col:nth-child(1){border-top:3px solid var(--danger)}
-.dash-col:nth-child(2){border-top:3px solid var(--accent2)}
-.dash-col:nth-child(3){border-top:3px solid var(--accent)}
-.dash-col:nth-child(4){border-top:3px solid var(--accent3)}
-.dash-section-title{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:0 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.dash-section-title.overdue{color:var(--danger)}
-.dash-section-title.warn{color:var(--accent2)}
+.dash-section-title{font-family:var(--font-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:0 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.dash-col:nth-child(1) .dash-section-title{color:var(--danger)}
+.dash-col:nth-child(2) .dash-section-title{color:var(--accent2)}
+.dash-col:nth-child(3) .dash-section-title{color:var(--accent)}
+.dash-col:nth-child(4) .dash-section-title{color:var(--accent3)}
 .dash-count{background:var(--surface2);border-radius:10px;padding:1px 7px;font-size:.65rem;color:var(--text)}
 .dash-list{display:flex;flex-direction:column;gap:8px}
 .dash-card{background:var(--surface);border-radius:8px;padding:10px 12px;cursor:pointer;transition:background .15s;border-left:3px solid var(--border)}

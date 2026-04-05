@@ -7,7 +7,7 @@
   --notes-bg:rgba(212,160,23,.09);
 }
 [data-theme="light"] {
-  --bg:#f0f2f8;--surface:#ffffff;--surface2:#e8ecf6;--border:#c8d0e8;
+  --bg:#f0f2f8;--surface:#f7f8fc;--surface2:#eceef6;--border:#c8d0e8;
   --accent:#2563eb;--accent2:#b45309;--accent3:#059669;--danger:#dc2626;
   --text:#1a1f35;--muted:#6b748f;--text-soft:#4a5270;
   --shadow:0 2px 16px rgba(0,0,0,.10);

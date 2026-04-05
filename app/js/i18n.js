@@ -14,7 +14,7 @@ const TRANSLATIONS = {
     // Stats
     stat_stakeholder: 'Stakeholder', stat_supportive: 'Supportiv', stat_critical: 'Kritisch',
     // Tabs
-    tab_list: '📋 Liste', tab_matrix: '🎯 Matrix', tab_project: 'Projekt',
+    tab_list: '📋 Stakeholder', tab_matrix: '🎯 Matrix', tab_project: 'Projekt',
     tab_plan_label: '{n}-Jahres-Plan',
     // Save
     save_loading: 'Lädt…', save_saved: 'Gespeichert', save_saving: 'Speichert…', save_error: 'Fehler',
@@ -50,7 +50,7 @@ const TRANSLATIONS = {
     th_email: 'E-Mail', th_phone: 'Telefon', th_birthday: 'Geburtstag', th_projects: 'Projekte',
     // Projects view
     proj_active_badge: 'Aktiv', proj_plan_measures: 'Planmaßnahmen',
-    btn_open: 'Öffnen', btn_to_list: 'Zur Liste', btn_new_project: 'Neues Projekt',
+    btn_open: 'Öffnen', btn_to_list: 'Zu Stakeholder', btn_new_project: 'Neues Projekt',
     // Detail
     detail_tab_profile: '📋 Profil', detail_tab_journal: '📓 Journal',
     detail_influence: 'Einfluss', detail_interest: 'Interesse',
@@ -157,7 +157,7 @@ const TRANSLATIONS = {
     // Stats
     stat_stakeholder: 'Stakeholders', stat_supportive: 'Supportive', stat_critical: 'Critical',
     // Tabs
-    tab_list: '📋 List', tab_matrix: '🎯 Matrix', tab_project: 'Project',
+    tab_list: '📋 Stakeholders', tab_matrix: '🎯 Matrix', tab_project: 'Project',
     tab_plan_label: '{n}-Year Plan',
     // Save
     save_loading: 'Loading…', save_saved: 'Saved', save_saving: 'Saving…', save_error: 'Error',
@@ -193,7 +193,7 @@ const TRANSLATIONS = {
     th_email: 'E-Mail', th_phone: 'Phone', th_birthday: 'Birthday', th_projects: 'Projects',
     // Projects view
     proj_active_badge: 'Active', proj_plan_measures: 'Plan items',
-    btn_open: 'Open', btn_to_list: 'To List', btn_new_project: 'New Project',
+    btn_open: 'Open', btn_to_list: 'To Stakeholders', btn_new_project: 'New Project',
     // Detail
     detail_tab_profile: '📋 Profile', detail_tab_journal: '📓 Journal',
     detail_influence: 'Influence', detail_interest: 'Interest',

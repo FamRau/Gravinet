@@ -217,6 +217,17 @@ All data is stored as JSON files in the Electron user-data directory:
 
 ## Changelog
 
+### v1.8.1
+- "Liste" tab renamed to "Stakeholder" (DE: Stakeholder, EN: Stakeholders)
+- Dashboard column headers coloured by category (red, amber, blue, green); coloured top border removed
+- Light theme surfaces changed to very light grey for dashboard cards and menus
+- App starts on the Dashboard tab
+
+### v1.8.0
+- Inline editing in the stakeholder table: Group (dropdown), Influence/Interest (range slider), Attitude (coloured dropdown), Relationship strength (clickable stars)
+- Journal column: clickable 📄 icon opens journal tab directly; ✎ button opens inline entry form for first journal entry
+- Dashboard columns styled as cards; app starts on the Dashboard tab
+
 ### v1.7.0
 - Stakeholder notes field — free-text area per stakeholder for permanent information (interests, red lines, personal details); shown in detail panel and printed in contact sheets
 - Row background colour in the stakeholder table reflects attitude (red tint for critical, green for supportive)

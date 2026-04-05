@@ -17,6 +17,9 @@ async function init() {
   // Render initial state and open dashboard on start
   applyTranslations();
   switchTab(document.querySelector('nav .tab[onclick*=dashboard]'), 'dashboard');
+
+  // Start desktop notification schedule for overdue contacts
+  startNotificationSchedule();
 }
 
 // Start when DOM is ready

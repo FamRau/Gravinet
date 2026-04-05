@@ -36,8 +36,6 @@
 
   <!-- Background rounded square -->
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <!-- White border -->
-  <rect width="512" height="512" rx="96" fill="none" stroke="white" stroke-width="6"/>
 
   <!-- Connection lines (asymmetric, varying distances) -->
   <!-- Node 1: top-left, close -->

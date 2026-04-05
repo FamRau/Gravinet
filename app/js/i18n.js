@@ -27,7 +27,7 @@ const TRANSLATIONS = {
     // Table headers
     th_name: 'Name / Funktion', th_gruppe: 'Gruppe', th_einfluss: 'Einfluss',
     th_interesse: 'Interesse', th_haltung: 'Haltung', th_strategie: 'Strategie',
-    th_journal: 'Journal', th_kontakt: 'Letzter Kontakt',
+    th_beziehung: 'Beziehung', th_kontakt: 'Letzter Kontakt', th_journal: 'Journal',
     // Table states
     table_no_project: 'Kein Projekt ausgewählt.',
     table_empty: 'Keine Stakeholder in diesem Projekt.',
@@ -169,7 +169,7 @@ const TRANSLATIONS = {
     // Table headers
     th_name: 'Name / Role', th_gruppe: 'Group', th_einfluss: 'Influence',
     th_interesse: 'Interest', th_haltung: 'Attitude', th_strategie: 'Strategy',
-    th_journal: 'Journal', th_kontakt: 'Last Contact',
+    th_beziehung: 'Relationship', th_kontakt: 'Last Contact', th_journal: 'Journal',
     // Table states
     table_no_project: 'No project selected.',
     table_empty: 'No stakeholders in this project.',

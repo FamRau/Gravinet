@@ -58,7 +58,7 @@ function renderTable() {
   const proj = getActiveProject();
   if (!proj) {
     document.getElementById('table-body').innerHTML =
-      '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">' + t('table_no_project') + '</td></tr>';
+      '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:40px">' + t('table_no_project') + '</td></tr>';
     return;
   }
   const q  = (document.getElementById('search')?.value || '').toLowerCase();
@@ -83,8 +83,9 @@ function renderTable() {
       else if (sortCol === 'interesse') { va = a.interesse;                vb = b.interesse; }
       else if (sortCol === 'haltung')   { va = HALTUNG_ORDER[a.haltung] ?? 9; vb = HALTUNG_ORDER[b.haltung] ?? 9; }
       else if (sortCol === 'strategie') { va = getStrategie(a);            vb = getStrategie(b); }
-      else if (sortCol === 'journal')   { va = (a.journal||[]).length;     vb = (b.journal||[]).length; }
+      else if (sortCol === 'beziehung')  { va = a.beziehung || 3;           vb = b.beziehung || 3; }
       else if (sortCol === 'kontakt')   { va = _lastContactTs(a);          vb = _lastContactTs(b); }
+      else if (sortCol === 'journal')   { va = (a.journal||[]).length;     vb = (b.journal||[]).length; }
       if (va < vb) return -sortDir;
       if (va > vb) return  sortDir;
       return 0;
@@ -92,17 +93,18 @@ function renderTable() {
   }
 
   // Update header indicators
-  document.getElementById('th-name').innerHTML      = `${t('th_name')} ${_sortIndicator('name')}`;
-  document.getElementById('th-gruppe').innerHTML    = `${t('th_gruppe')} ${_sortIndicator('gruppe')}`;
-  document.getElementById('th-einfluss').innerHTML  = `${t('th_einfluss')} ${_sortIndicator('einfluss')}`;
-  document.getElementById('th-interesse').innerHTML = `${t('th_interesse')} ${_sortIndicator('interesse')}`;
-  document.getElementById('th-haltung').innerHTML   = `${t('th_haltung')} ${_sortIndicator('haltung')}`;
-  document.getElementById('th-strategie').innerHTML = `${t('th_strategie')} ${_sortIndicator('strategie')}`;
-  document.getElementById('th-journal').innerHTML   = `${t('th_journal')} ${_sortIndicator('journal')}`;
-  document.getElementById('th-kontakt').innerHTML   = `${t('th_kontakt')} ${_sortIndicator('kontakt')}`;
+  document.getElementById('th-name').innerHTML       = `${t('th_name')} ${_sortIndicator('name')}`;
+  document.getElementById('th-gruppe').innerHTML     = `${t('th_gruppe')} ${_sortIndicator('gruppe')}`;
+  document.getElementById('th-einfluss').innerHTML   = `${t('th_einfluss')} ${_sortIndicator('einfluss')}`;
+  document.getElementById('th-interesse').innerHTML  = `${t('th_interesse')} ${_sortIndicator('interesse')}`;
+  document.getElementById('th-haltung').innerHTML    = `${t('th_haltung')} ${_sortIndicator('haltung')}`;
+  document.getElementById('th-strategie').innerHTML  = `${t('th_strategie')} ${_sortIndicator('strategie')}`;
+  document.getElementById('th-beziehung').innerHTML  = `${t('th_beziehung')} ${_sortIndicator('beziehung')}`;
+  document.getElementById('th-kontakt').innerHTML    = `${t('th_kontakt')} ${_sortIndicator('kontakt')}`;
+  document.getElementById('th-journal').innerHTML    = `${t('th_journal')} ${_sortIndicator('journal')}`;
 
   document.getElementById('table-body').innerHTML = filtered.length === 0
-    ? `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">${t('table_empty')} <a href="#" onclick="openPickerOverlay();return false" style="color:var(--accent)">${t('table_add_link')}</a></td></tr>`
+    ? `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:40px">${t('table_empty')} <a href="#" onclick="openPickerOverlay();return false" style="color:var(--accent)">${t('table_add_link')}</a></td></tr>`
     : filtered.map(s => {
         const jc = (s.journal || []).length;
         const bd = daysUntilBirthday(s.geburtstag);
@@ -115,11 +117,17 @@ function renderTable() {
           const daysSince = Math.floor((Date.now() - d.getTime()) / 86400000);
           const locale = appLang === 'en' ? 'en-US' : 'de-AT';
           const label = d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
-          const cls = daysSince > contactWarningDays        ? 'overdue'
-                    : daysSince > contactWarningDays * 0.6  ? 'warn'
-                    :                                         'ok';
+          const interval = getContactInterval(s);
+          const cls = daysSince > interval        ? 'overdue'
+                    : daysSince > interval * 0.6  ? 'warn'
+                    :                               'ok';
           return `<td><span class="contact-date">${label}</span> <span class="contact-age ${cls}">${daysSince}${t('days_unit')}</span></td>`;
         })();
+        const bez = s.beziehung || 3;
+        const bezStars = `<span style="color:var(--accent2);letter-spacing:1px;font-size:.85rem">${'★'.repeat(bez)}${'☆'.repeat(5 - bez)}</span>`;
+        const journalCell = jc > 0
+          ? `<td onclick="event.stopPropagation();openDetailJournal(${s.id})" style="cursor:pointer;text-align:center" title="${jc} ${t('th_journal')}"><span style="font-size:1rem">📄</span></td>`
+          : '<td><span style="color:var(--muted);font-size:.8rem">–</span></td>';
         return `<tr onclick="openDetail(${s.id})">
           <td class="name-cell"><strong>${esc(s.name)}${bdChip}</strong><span>${esc(s.rolle)}</span></td>
           <td><span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span></td>
@@ -127,8 +135,9 @@ function renderTable() {
           <td><div class="score-wrap"><div class="bar-track bar-interesse"><div class="bar-fill" style="width:${s.interesse * 10}%"></div></div><span class="score-num">${s.interesse}</span></div></td>
           <td><span class="badge badge-${s.haltung}">${t('badge_' + s.haltung)}</span></td>
           <td style="font-size:.82rem;color:var(--muted)">${getStrategie(s)}</td>
-          <td style="font-size:.8rem;color:var(--muted);font-family:var(--font-mono)">${jc > 0 ? `📓 ${jc}` : '–'}</td>
+          <td>${bezStars}</td>
           ${lastContactCell}
+          ${journalCell}
           <td onclick="event.stopPropagation()">
             <div class="row-actions">
               <button class="row-btn" onclick="openEditModal(${s.id})">${t('btn_edit')}</button>
@@ -184,12 +193,15 @@ function renderMatrix() {
     dot.style.background  = col + '22';
     dot.style.borderColor = col;
     dot.style.color       = col;
-    // Dot size based on Beziehungsstärke (1–5 → 22px–46px)
+    // Dot size and weight based on Beziehungsstärke (1–5 → 22px–58px)
     const bez = s.beziehung || 3;
-    const dotPx = 20 + bez * 5;
-    dot.style.width  = dotPx + 'px';
-    dot.style.height = dotPx + 'px';
-    dot.style.fontSize = (0.55 + bez * 0.03) + 'rem';
+    const dotPx = 16 + bez * 8;
+    dot.style.width       = dotPx + 'px';
+    dot.style.height      = dotPx + 'px';
+    dot.style.fontSize    = (0.5 + bez * 0.06) + 'rem';
+    dot.style.borderWidth = (1 + bez * 0.5) + 'px';
+    dot.style.opacity     = (0.6 + bez * 0.08).toString();
+    if (bez >= 4) dot.style.boxShadow = `0 0 ${bez * 4}px ${col}66`;
     const stars = '★'.repeat(bez) + '☆'.repeat(5 - bez);
     const tipDir = dotTopPct < 25 ? 'tip-down' : 'tip-up';
     dot.innerHTML = `${initials(s.name)}<div class="dot-tooltip ${tipDir}"><strong>${esc(s.name)}</strong><br>${esc(s.rolle)}<br>${t('detail_influence')}: ${s.einfluss} · ${t('detail_interest')}: ${s.interesse}<br><span style="color:var(--accent2);letter-spacing:1px">${stars}</span></div>`;

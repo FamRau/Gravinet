@@ -9,6 +9,15 @@ function openDetail(shId) {
   document.getElementById('detail-overlay').classList.add('open');
 }
 
+function openDetailJournal(shId) {
+  renderDetailProfile(shId);
+  renderDetailJournal(shId);
+  document.querySelectorAll('.panel-tab').forEach((t, i) => t.classList.toggle('active', i === 1));
+  document.getElementById('dtab-profil').style.display  = 'none';
+  document.getElementById('dtab-journal').style.display = '';
+  document.getElementById('detail-overlay').classList.add('open');
+}
+
 function renderDetailProfile(shId) {
   const sh   = stakeholders.find(x => x.id === shId); if (!sh) return;
   const proj = getActiveProject();

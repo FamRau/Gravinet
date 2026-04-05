@@ -103,9 +103,9 @@
 </header>
 
 <nav>
+  <button class="tab" data-i18n="tab_dashboard" onclick="switchTab(this,'dashboard')">📊 Dashboard</button>
   <button class="tab active" data-i18n="tab_list" onclick="switchTab(this,'liste')">📋 Liste</button>
   <button class="tab" data-i18n="tab_matrix" onclick="switchTab(this,'matrix')">🎯 Matrix</button>
-  <button class="tab" data-i18n="tab_dashboard" onclick="switchTab(this,'dashboard')">📊 Dashboard</button>
   <button class="tab" id="plan-tab" onclick="switchTab(this,'plan')">📅 5-Jahres-Plan</button>
   <div class="nav-project">
     <span class="nav-project-label" data-i18n="tab_project">Projekt</span>
@@ -143,8 +143,9 @@
         <th id="th-interesse" class="th-sort" onclick="setSortCol('interesse')">Interesse <span class="sort-icon">⇅</span></th>
         <th id="th-haltung"   class="th-sort" onclick="setSortCol('haltung')">Haltung <span class="sort-icon">⇅</span></th>
         <th id="th-strategie" class="th-sort" onclick="setSortCol('strategie')">Strategie <span class="sort-icon">⇅</span></th>
-        <th id="th-journal"   class="th-sort" onclick="setSortCol('journal')">Journal <span class="sort-icon">⇅</span></th>
+        <th id="th-beziehung" class="th-sort" onclick="setSortCol('beziehung')">Beziehung <span class="sort-icon">⇅</span></th>
         <th id="th-kontakt"   class="th-sort" onclick="setSortCol('kontakt')">Letzter Kontakt <span class="sort-icon">⇅</span></th>
+        <th id="th-journal"   class="th-sort" onclick="setSortCol('journal')">Journal <span class="sort-icon">⇅</span></th>
         <th></th>
       </tr></thead>
       <tbody id="table-body"></tbody>

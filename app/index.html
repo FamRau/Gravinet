@@ -50,6 +50,7 @@
           <span data-i18n="nav_data">Daten</span><span class="pill-chevron">▾</span>
         </button>
         <div class="pill-menu" id="daten-menu">
+          <div class="pill-menu-section-title" data-i18n="nav_data_json">JSON</div>
           <button class="pill-menu-item" onclick="exportJSON();closePillMenus()">
             <svg viewBox="0 0 16 16"><path d="M8 10V2M4 6l4-4 4 4M2 13h12"/></svg>
             <span data-i18n="nav_data_export">Exportieren</span>
@@ -57,6 +58,16 @@
           <button class="pill-menu-item" onclick="document.getElementById('import-file-input').click();closePillMenus()">
             <svg viewBox="0 0 16 16"><path d="M8 6v8M4 10l4 4 4-4M2 3h12"/></svg>
             <span data-i18n="nav_data_import">Importieren</span>
+          </button>
+          <div class="pill-menu-divider"></div>
+          <div class="pill-menu-section-title" data-i18n="nav_data_csv">CSV</div>
+          <button class="pill-menu-item" onclick="exportCSV();closePillMenus()">
+            <svg viewBox="0 0 16 16"><path d="M8 10V2M4 6l4-4 4 4M2 13h12"/></svg>
+            <span data-i18n="nav_data_export_csv">Stakeholder exportieren</span>
+          </button>
+          <button class="pill-menu-item" onclick="document.getElementById('import-csv-input').click();closePillMenus()">
+            <svg viewBox="0 0 16 16"><path d="M8 6v8M4 10l4 4 4-4M2 3h12"/></svg>
+            <span data-i18n="nav_data_import_csv">Stakeholder importieren</span>
           </button>
         </div>
       </div>
@@ -118,6 +129,7 @@
   <div class="save-status"><div class="save-dot" id="save-dot"></div><span id="save-label">Lädt…</span></div>
 </nav>
 <input type="file" id="import-file-input" accept=".json" onchange="importJSON(event)" style="display:none">
+<input type="file" id="import-csv-input" accept=".csv" onchange="importCSV(event)" style="display:none">
 
 <main>
 

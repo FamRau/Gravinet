@@ -111,6 +111,109 @@ function importJSON(event) {
   event.target.value = '';
 }
 
+// ── CSV Export ───────────────────────────────────────────────────────────────
+
+function exportCSV() {
+  const cols = ['name','rolle','email','tel','geburtstag','notizen'];
+  const header = cols.join(';');
+  const rows = stakeholders.map(sh =>
+    cols.map(c => {
+      const v = String(sh[c] || '');
+      return v.includes(';') || v.includes('"') || v.includes('\n')
+        ? '"' + v.replace(/"/g, '""') + '"'
+        : v;
+    }).join(';')
+  );
+  const csv = '\uFEFF' + [header, ...rows].join('\r\n'); // BOM for Excel
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gravinet-stakeholders-' + new Date().toISOString().slice(0, 10) + '.csv';
+  a.click();
+}
+
+// ── CSV Import ────────────────────────────────────────────────────────────────
+
+function importCSV(event) {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const text = e.target.result.replace(/^\uFEFF/, ''); // strip BOM
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) throw new Error('Empty file');
+
+      const header = _csvSplit(lines[0]).map(h => h.trim().toLowerCase());
+      const idx = f => header.indexOf(f);
+
+      const parsed = lines.slice(1).map(line => {
+        const cells = _csvSplit(line);
+        return {
+          name:       (cells[idx('name')]       || '').trim(),
+          rolle:      (cells[idx('rolle')]      || '').trim(),
+          email:      (cells[idx('email')]      || '').trim(),
+          tel:        (cells[idx('tel')]        || '').trim(),
+          geburtstag: (cells[idx('geburtstag')] || '').trim(),
+          notizen:    (cells[idx('notizen')]    || '').trim(),
+        };
+      }).filter(r => r.name);
+
+      let added = 0, updated = 0;
+      parsed.forEach(row => {
+        // Match by email (if set) or name
+        const existing = stakeholders.find(sh =>
+          (row.email && sh.email && sh.email.toLowerCase() === row.email.toLowerCase()) ||
+          sh.name.toLowerCase() === row.name.toLowerCase()
+        );
+        if (existing) {
+          existing.rolle      = row.rolle      || existing.rolle;
+          existing.email      = row.email      || existing.email;
+          existing.tel        = row.tel        || existing.tel;
+          existing.geburtstag = row.geburtstag || existing.geburtstag;
+          existing.notizen    = row.notizen    || existing.notizen;
+          updated++;
+        } else {
+          stakeholders.push({ id: nextStakeholderId++, journal: [], ...row });
+          added++;
+        }
+      });
+
+      _writeContacts();
+      _writeWorkspace();
+      renderAll();
+      setSaveStatus('saved');
+      alert(
+        appLang === 'en'
+          ? `CSV imported: ${added} added, ${updated} updated.`
+          : `CSV importiert: ${added} hinzugefügt, ${updated} aktualisiert.`
+      );
+    } catch (err) {
+      alert(t('alert_import_error') + err.message);
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+  event.target.value = '';
+}
+
+function _csvSplit(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQ) {
+      if (ch === '"' && line[i+1] === '"') { cur += '"'; i++; }
+      else if (ch === '"') inQ = false;
+      else cur += ch;
+    } else {
+      if (ch === '"') inQ = true;
+      else if (ch === ';') { result.push(cur); cur = ''; }
+      else cur += ch;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
 // ── load ─────────────────────────────────────────────────────────────────────
 
 async function loadData() {

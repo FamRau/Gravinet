@@ -67,6 +67,7 @@ function renderDetailProfile(shId) {
     ${s.ziel ? `<div class="detail-section"><h3>${t('detail_goal')}</h3><p>${esc(s.ziel)}</p></div>` : ''}
     ${(s.massnahmen || []).length ? `<div class="detail-section"><h3>${t('detail_measures')}</h3><ul class="massnahmen-list">${s.massnahmen.map(m => `<li>${esc(m)}</li>`).join('')}</ul></div>` : ''}
     ` : ''}
+    ${sh.notizen ? `<div class="detail-section detail-notes"><h3>📌 ${t('label_notes')}</h3><p class="detail-notes-text">${esc(sh.notizen)}</p></div>` : ''}
     <div style="display:flex;gap:12px;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
       <button class="btn btn-primary" style="flex:1" onclick="closePanel('detail-overlay');openEditModal(${s.id})">${t('btn_edit_full')}</button>
     </div>`;

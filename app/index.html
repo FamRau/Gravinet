@@ -20,7 +20,7 @@
 <header>
   <div class="header-left">
     <div style="display:flex;align-items:baseline;gap:6px">
-      <h1>Gravi<span>net</span></h1><span id="app-version" style="font-family:var(--font-mono);font-size:.75rem;color:rgba(255,255,255,.45);font-weight:400;letter-spacing:.04em;margin-left:10px"></span>
+      <h1>Gravi<span>net</span></h1><span id="app-version" style="font-family:var(--font-mono);font-size:.75rem;color:var(--muted);font-weight:400;letter-spacing:.04em;margin-left:10px"></span>
     </div>
     <div class="header-sub" id="org-subtitle"><span id="org-name-display"></span><button class="org-edit-btn" onclick="startEditOrg()" data-i18n-title="tooltip_edit_org" title="Bezeichnung bearbeiten">✏</button></div>
   </div>
@@ -243,6 +243,7 @@
     </div>
     <div class="form-group"><label data-i18n="label_goal">Strategisches Ziel</label><textarea id="e-ziel"></textarea></div>
     <div class="form-group"><label data-i18n="label_measures">Maßnahmen (eine pro Zeile)</label><textarea id="e-massnahmen" rows="3"></textarea></div>
+    <div class="form-group"><label data-i18n="label_notes">Notizen</label><textarea id="e-notizen" rows="3" data-i18n-ph="notes_placeholder" placeholder="Interessen, rote Linien, persönliche Details…"></textarea></div>
     <div class="form-row">
       <div class="form-group"><label data-i18n="label_beziehung">Beziehungsstärke (1–5)</label>
         <div class="range-wrap"><input type="range" min="1" max="5" value="3" id="e-beziehung" oninput="document.getElementById('e-beziehung-val').textContent=this.value"><span class="range-val" id="e-beziehung-val">3</span></div>
@@ -341,6 +342,7 @@
     </div>
     <div class="form-group"><label data-i18n="label_goal">Strategisches Ziel</label><textarea id="f-ziel" data-i18n-ph="link_goal_placeholder" placeholder="Was soll sich in dieser Beziehung verändern?"></textarea></div>
     <div class="form-group"><label data-i18n="label_measures">Maßnahmen (eine pro Zeile)</label><textarea id="f-massnahmen" rows="3"></textarea></div>
+    <div class="form-group"><label data-i18n="label_notes">Notizen</label><textarea id="f-notizen" rows="3" data-i18n-ph="notes_placeholder" placeholder="Interessen, rote Linien, persönliche Details…"></textarea></div>
     <div class="form-row">
       <div class="form-group"><label data-i18n="label_beziehung">Beziehungsstärke (1–5)</label>
         <div class="range-wrap"><input type="range" min="1" max="5" value="3" id="f-beziehung" oninput="document.getElementById('f-beziehung-val').textContent=this.value"><span class="range-val" id="f-beziehung-val">3</span></div>
@@ -373,6 +375,7 @@
       <div class="form-group"><label data-i18n="label_phone">Telefon</label><input type="tel" id="ke-tel"></div>
       <div class="form-group"><label data-i18n="label_birthday">Geburtstag</label><input type="date" id="ke-geburtstag"></div>
     </div>
+    <div class="form-group"><label data-i18n="label_notes">Notizen</label><textarea id="ke-notizen" rows="3" data-i18n-ph="notes_placeholder" placeholder="Interessen, rote Linien, persönliche Details…"></textarea></div>
     <div style="display:flex;gap:12px;margin-top:8px">
       <button class="btn btn-primary" data-i18n="btn_save" style="flex:1" onclick="saveKontakt()">Speichern</button>
       <button class="btn btn-danger" data-i18n="btn_delete" onclick="deleteKontakt()">🗑 Löschen</button>

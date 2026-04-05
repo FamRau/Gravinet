@@ -88,6 +88,7 @@ function addNewStakeholder() {
     email:      document.getElementById('f-email').value,
     tel:        document.getElementById('f-tel').value,
     geburtstag: document.getElementById('f-geburtstag').value,
+    notizen:    document.getElementById('f-notizen').value,
     journal:    []
   });
   const proj = getActiveProject();
@@ -106,7 +107,7 @@ function addNewStakeholder() {
     });
   }
   saveNow(); closePanel('new-sh-overlay');
-  ['f-name','f-rolle','f-email','f-tel','f-geburtstag','f-ziel','f-massnahmen'].forEach(id => {
+  ['f-name','f-rolle','f-email','f-tel','f-geburtstag','f-ziel','f-massnahmen','f-notizen'].forEach(id => {
     document.getElementById(id).value = '';
   });
   ['f-einfluss','f-interesse'].forEach(id => { document.getElementById(id).value = 5; });
@@ -138,6 +139,7 @@ function openEditModal(shId) {
   document.getElementById('e-interesse-val').textContent = item.interesse || 5;
   document.getElementById('e-ziel').value      = item.ziel   || '';
   document.getElementById('e-massnahmen').value = (item.massnahmen || []).join('\n');
+  document.getElementById('e-notizen').value    = sh.notizen || '';
   document.getElementById('e-beziehung').value          = item.beziehung  || 3;
   document.getElementById('e-beziehung-val').textContent = item.beziehung  || 3;
   document.getElementById('e-contact-interval').value    = item.contactInterval || '';
@@ -155,6 +157,7 @@ function saveEdit() {
     email:      document.getElementById('e-email').value,
     tel:        document.getElementById('e-tel').value,
     geburtstag: document.getElementById('e-geburtstag').value,
+    notizen:    document.getElementById('e-notizen').value,
   };
   const proj    = getActiveProject();
   const itemIdx = proj?.items.findIndex(i => i.shId === shId) ?? -1;
@@ -222,6 +225,7 @@ function openKontaktEditModal(shId) {
   document.getElementById('ke-email').value     = sh.email    || '';
   document.getElementById('ke-tel').value       = sh.tel      || '';
   document.getElementById('ke-geburtstag').value = sh.geburtstag || '';
+  document.getElementById('ke-notizen').value   = sh.notizen  || '';
   document.getElementById('kontakt-edit-overlay').classList.add('open');
 }
 
@@ -236,7 +240,8 @@ function saveKontakt() {
       rolle:      document.getElementById('ke-rolle').value,
       email:      document.getElementById('ke-email').value,
       tel:        document.getElementById('ke-tel').value,
-      geburtstag: document.getElementById('ke-geburtstag').value
+      geburtstag: document.getElementById('ke-geburtstag').value,
+      notizen:    document.getElementById('ke-notizen').value,
     };
   } else {
     stakeholders.push({
@@ -246,6 +251,7 @@ function saveKontakt() {
       email:      document.getElementById('ke-email').value,
       tel:        document.getElementById('ke-tel').value,
       geburtstag: document.getElementById('ke-geburtstag').value,
+      notizen:    document.getElementById('ke-notizen').value,
       journal:    []
     });
   }

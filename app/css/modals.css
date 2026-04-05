@@ -29,6 +29,9 @@
 .detail-section{margin-bottom:16px}
 .detail-section h3{font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
 .detail-section p{font-size:.88rem;line-height:1.6;color:var(--text-soft)}
+.detail-notes{background:var(--notes-bg);border-left:3px solid var(--accent2);border-radius:6px;padding:10px 14px}
+.detail-notes h3{color:var(--accent2)}
+.detail-notes-text{white-space:pre-wrap;color:var(--text-soft)}
 
 /* JOURNAL */
 .journal-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}

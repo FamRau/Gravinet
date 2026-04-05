@@ -116,6 +116,7 @@ async function doPrintContacts() {
           <div class="card"><div class="label">Geburtstag</div><div class="val">${fmtDateP(sh.geburtstag)}</div></div>
           <div class="card"><div class="label">Journal-Einträge</div><div class="val">${journal.length}</div></div>
         </div>
+        ${sh.notizen ? `<div class="card" style="border-left:3px solid #d97706;background:#fffbeb"><div class="label">📌 ${t('label_notes')}</div><div style="font-size:9.5pt;margin-top:4px;white-space:pre-wrap;line-height:1.6">${escP(sh.notizen)}</div></div>` : ''}
       </div>
       ${projContexts.length ? `
       <div class="section">

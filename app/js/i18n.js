@@ -69,6 +69,7 @@ const TRANSLATIONS = {
     section_project_assign: 'Projektzuordnung', label_group: 'Gruppe', label_attitude: 'Haltung',
     label_influence_range: 'Einfluss (1–10)', label_interest_range: 'Interesse (1–10)',
     label_goal: 'Strategisches Ziel', label_measures: 'Maßnahmen (eine pro Zeile)',
+    label_notes: 'Notizen', notes_placeholder: 'Interessen, rote Linien, persönliche Details…',
     btn_save: 'Speichern', btn_remove_from_project: 'Aus Projekt entfernen',
     // Picker
     picker_title: 'Stakeholder hinzufügen', picker_placeholder: 'Name oder Funktion suchen…',
@@ -211,6 +212,7 @@ const TRANSLATIONS = {
     section_project_assign: 'Project Assignment', label_group: 'Group', label_attitude: 'Attitude',
     label_influence_range: 'Influence (1–10)', label_interest_range: 'Interest (1–10)',
     label_goal: 'Strategic Goal', label_measures: 'Measures (one per line)',
+    label_notes: 'Notes', notes_placeholder: 'Interests, red lines, personal details…',
     btn_save: 'Save', btn_remove_from_project: 'Remove from Project',
     // Picker
     picker_title: 'Add Stakeholder', picker_placeholder: 'Search by name or role…',

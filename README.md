@@ -27,13 +27,18 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 
 ## Screenshots
 
-| List | Matrix |
+| Dark | Light | 
+| -----| ------| 
+| ![List](docs/screenshots/list.png) | ![List Light](docs/screenshots/list_light.png) |
 |------|--------|
-| ![List](docs/screenshots/liste.png) | ![Matrix](docs/screenshots/matrix.png) |
+| ![Matrix](docs/screenshots/matrix.png) | ![Matrix Light](docs/screenshots/matrix_light.png) |
+|------|--------|
+| ![Plan](docs/screenshots/plan.png) | ![Plan Light](docs/screenshots/plan_light.png) |
+|------|--------|
+| ![Projects](docs/screenshots/projects.png) | ![Projexts Light](docs/screenshots/projects_light.png) |
+|------|--------|
+| ![Contacts](docs/screenshots/contacts.png) | ![Contacts Light](docs/screenshots/contacts_light.png) |
 
-| N-Year Plan | Projects |
-|-------------|---------|
-| ![Plan](docs/screenshots/plan.png) | ![Projects](docs/screenshots/projekte.png) |
 
 ---
 
@@ -41,12 +46,12 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 
 ### AppImage (recommended)
 
-1. [Download the latest release](../../releases/latest) → `Gravinet-1.5.0.AppImage`
+1. [Download the latest release](../../releases/latest) → `Gravinet-1.7.0.AppImage`
 2. Make it executable and run it:
 
 ```bash
-chmod +x Gravinet-1.5.0.AppImage
-./Gravinet-1.5.0.AppImage
+chmod +x Gravinet-1.7.0.AppImage
+./Gravinet-1.7.0.AppImage
 ```
 
 Optional: Integrate into GNOME as a desktop app (Nautilus → Properties → Allow executing as program).
@@ -62,7 +67,7 @@ git clone https://github.com/famrau/gravinet.git
 cd gravinet
 npm install
 npm start          # Development mode
-npm run build      # Build AppImage → dist/Gravinet-1.5.0.AppImage
+npm run build      # Build AppImage → dist/Gravinet-1.7.0.AppImage
 ```
 
 ### Windows (.exe / NSIS installer)
@@ -87,7 +92,7 @@ npm install
 npx electron-builder --win
 ```
 
-Result: `dist/Gravinet Setup 1.5.0.exe` (NSIS installer)
+Result: `dist/Gravinet Setup 1.7.0.exe` (NSIS installer)
 
 Alternatively, build a portable EXE without installer:
 
@@ -120,7 +125,7 @@ npm install
 npx electron-builder --mac
 ```
 
-Result: `dist/Gravinet-1.5.0.dmg` (for Intel and Apple Silicon)
+Result: `dist/Gravinet-1.7.0.dmg` (for Intel and Apple Silicon)
 
 > **Note:** A signed and notarized macOS app requires a paid Apple Developer account. Without signing, a security warning appears on first launch, which can be bypassed via System Settings → Privacy & Security → "Open Anyway".
 
@@ -207,3 +212,44 @@ All data is stored as JSON files in the Electron user-data directory:
 | [Outfit](https://fonts.google.com/specimen/Outfit) | UI font |
 | [DM Serif Display](https://fonts.google.com/specimen/DM+Serif+Display) | Headings |
 | [DM Mono](https://fonts.google.com/specimen/DM+Mono) | Monospace / labels |
+
+---
+
+## Changelog
+
+### v1.7.0
+- Stakeholder notes field — free-text area per stakeholder for permanent information (interests, red lines, personal details); shown in detail panel and printed in contact sheets
+- Row background colour in the stakeholder table reflects attitude (red tint for critical, green for supportive)
+- Version number in header now uses theme-aware colour (visible in both dark and light mode)
+- Notes section background adapts to current theme
+
+### v1.6.0
+- **Activity Dashboard** — new tab with four columns: overdue contacts, contacts due soon, upcoming birthdays (30 days), recent journal activity across all projects
+- **Per-stakeholder contact interval** — each stakeholder can have its own contact interval; falls back to global setting
+- **Relationship strength (Beziehungsstärke)** — 1–5 rating stored per project assignment; shown as ★ stars in the detail panel, as a sortable column in the table, and as variable dot size/glow in the matrix
+
+### v1.5.0
+- Full German / English UI with live language switcher in Settings
+- All translatable strings use `data-i18n` attributes and a central `TRANSLATIONS` object
+- Strategy labels, badges, and PDF output are fully translated
+- App version number displayed top-left next to the logo
+- Data persistence fixed: `userData` path pinned to `~/.config/Gravinet/` so data survives AppImage updates
+- Version retrieved via IPC (`app.getVersion()`) for reliable display in packaged builds
+- README rewritten in English
+
+### v1.4.0
+- Language switcher introduced (DE/EN) in the Settings menu
+- i18n architecture: `i18n.js` loaded first, `t(key)` function, `applyTranslations()` on every render
+
+### v1.3.0
+- Settings menu restructured into sub-sections (Theme, Contact Interval, Language)
+- Contact interval warning: stakeholders whose last contact exceeds the configured interval are highlighted in the table and on the dashboard
+
+### v1.2.0
+- Sortable table columns (Name, Group, Influence, Interest, Attitude, Strategy, Journal, Last Contact)
+- Sort direction indicator (▲/▼) in column headers
+
+### v1.1.0
+- Codebase split from a single HTML file into separate JS and CSS modules
+- File-based storage via Electron IPC (one JSON file per project + `contacts.json` + `workspace.json`)
+- Multiple projects with independent stakeholder assignments

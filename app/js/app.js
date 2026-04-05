@@ -14,8 +14,9 @@ async function init() {
   // Load data from files (async IPC)
   await loadData();
 
-  // Render initial state
+  // Render initial state and open dashboard on start
   applyTranslations();
+  switchTab(document.querySelector('nav .tab[onclick*=dashboard]'), 'dashboard');
 }
 
 // Start when DOM is ready

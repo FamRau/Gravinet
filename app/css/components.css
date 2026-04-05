@@ -48,6 +48,29 @@ tbody td{padding:12px 14px;vertical-align:middle}
 .score-wrap{display:flex;align-items:center;gap:8px}
 .bar-track{width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
 .bar-fill{height:100%;border-radius:2px}
+
+/* INLINE TABLE EDITING */
+.inline-select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-mono);font-size:.72rem;font-weight:600;padding:3px 6px;cursor:pointer;outline:none;max-width:90px}
+.inline-select:focus{border-color:var(--accent)}
+.inline-select.hs{color:var(--accent3)}
+.inline-select.hn{color:var(--muted)}
+.inline-select.hk{color:var(--danger)}
+.inline-range-wrap{display:flex;align-items:center;gap:6px}
+.inline-range{width:64px;height:3px;cursor:pointer;accent-color:var(--accent);background:var(--border);border-radius:2px;outline:none;-webkit-appearance:none}
+.inline-range::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent);cursor:pointer}
+.inline-range::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--accent);border:none;cursor:pointer}
+.inline-range-val{font-family:var(--font-mono);font-size:.78rem;color:var(--accent);min-width:14px}
+.inline-stars span{cursor:pointer;font-size:.9rem;letter-spacing:1px;transition:opacity .1s}
+.inline-stars span:hover{opacity:.7}
+.inline-stars .on{color:var(--accent2)}
+.inline-stars .off{color:var(--border)}
+.journal-col{text-align:center}
+.inline-journal-btn{background:none;border:1px dashed var(--border);border-radius:5px;color:var(--muted);font-size:.8rem;padding:2px 7px;cursor:pointer;transition:all .15s}
+.inline-journal-btn:hover{border-color:var(--accent);color:var(--accent)}
+.inline-journal-form{display:flex;flex-direction:column;gap:4px;min-width:160px}
+.inline-journal-ta{background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--font-body);font-size:.78rem;padding:5px 7px;resize:vertical;outline:none}
+.inline-journal-ta:focus{border-color:var(--accent)}
+.inline-journal-save{background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:.75rem;padding:3px 10px;cursor:pointer;align-self:flex-end}
 .bar-einfluss .bar-fill{background:var(--accent)}
 .bar-interesse .bar-fill{background:var(--accent2)}
 .score-num{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);min-width:20px}
@@ -140,9 +163,13 @@ tbody tr:hover .row-actions{opacity:1}
 .print-sel-all{font-size:.78rem;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;margin-bottom:8px;font-family:var(--font-body)}
 
 /* DASHBOARD */
-.dash-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:start}
+.dash-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
 @media(max-width:1200px){.dash-cols{grid-template-columns:repeat(2,1fr)}}
-.dash-col{}
+.dash-col{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;min-height:120px}
+.dash-col:nth-child(1){border-top:3px solid var(--danger)}
+.dash-col:nth-child(2){border-top:3px solid var(--accent2)}
+.dash-col:nth-child(3){border-top:3px solid var(--accent)}
+.dash-col:nth-child(4){border-top:3px solid var(--accent3)}
 .dash-section-title{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:0 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .dash-section-title.overdue{color:var(--danger)}
 .dash-section-title.warn{color:var(--accent2)}

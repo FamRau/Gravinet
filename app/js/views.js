@@ -29,6 +29,36 @@ function renderBirthdayAlerts() {
   }).join('');
 }
 
+// ── Inline editing ────────────────────────────────────────────────────────────
+
+function saveInlineField(shId, field, value) {
+  const proj = getActiveProject(); if (!proj) return;
+  const itemIdx = proj.items.findIndex(i => i.shId === shId);
+  if (itemIdx === -1) return;
+  proj.items[itemIdx][field] = value;
+  saveNow();
+  renderTable();
+  renderMatrix();
+}
+
+function openInlineJournal(shId) {
+  const cell = document.getElementById('jcell-' + shId); if (!cell) return;
+  cell.innerHTML = `<div class="inline-journal-form">
+    <textarea id="ijtext-${shId}" class="inline-journal-ta" rows="2" placeholder="${t('journal_placeholder')}"></textarea>
+    <button class="inline-journal-save" onclick="saveInlineJournal(${shId})">✓ ${t('btn_save_entry')}</button>
+  </div>`;
+  cell.querySelector('textarea').focus();
+}
+
+function saveInlineJournal(shId) {
+  const el = document.getElementById('ijtext-' + shId);
+  const text = el?.value.trim(); if (!text) return;
+  const sh = stakeholders.find(x => x.id === shId); if (!sh) return;
+  if (!sh.journal) sh.journal = [];
+  sh.journal.push({ date: new Date().toISOString(), text });
+  saveNow(); renderTable();
+}
+
 // ── Table sort ────────────────────────────────────────────────────────────────
 
 function setSortCol(col) {
@@ -124,22 +154,49 @@ function renderTable() {
           return `<td><span class="contact-date">${label}</span> <span class="contact-age ${cls}">${daysSince}${t('days_unit')}</span></td>`;
         })();
         const bez = s.beziehung || 3;
-        const bezStars = `<span style="color:var(--accent2);letter-spacing:1px;font-size:.85rem">${'★'.repeat(bez)}${'☆'.repeat(5 - bez)}</span>`;
         const journalCell = jc > 0
-          ? `<td onclick="event.stopPropagation();openDetailJournal(${s.id})" style="cursor:pointer;text-align:center" title="${jc} ${t('th_journal')}"><span style="font-size:1rem">📄</span></td>`
-          : '<td><span style="color:var(--muted);font-size:.8rem">–</span></td>';
+          ? `<td class="journal-col" onclick="event.stopPropagation();openDetailJournal(${s.id})" style="cursor:pointer" title="${jc} ${t('th_journal')}"><span style="font-size:1rem">📄</span></td>`
+          : `<td class="journal-col" onclick="event.stopPropagation()" id="jcell-${s.id}"><button class="inline-journal-btn" onclick="openInlineJournal(${s.id})">✎</button></td>`;
         const rowCol = HALTUNG_COLORS[s.haltung];
         const rowStyle = s.haltung === 'neutral'
           ? ''
           : `background:${rowCol}0d;border-left:3px solid ${rowCol}88;`;
+        const hCls = s.haltung === 'supportiv' ? 'hs' : s.haltung === 'kritisch' ? 'hk' : 'hn';
         return `<tr onclick="openDetail(${s.id})" style="${rowStyle}">
           <td class="name-cell"><strong>${esc(s.name)}${bdChip}</strong><span>${esc(s.rolle)}</span></td>
-          <td><span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span></td>
-          <td><div class="score-wrap"><div class="bar-track bar-einfluss"><div class="bar-fill" style="width:${s.einfluss * 10}%"></div></div><span class="score-num">${s.einfluss}</span></div></td>
-          <td><div class="score-wrap"><div class="bar-track bar-interesse"><div class="bar-fill" style="width:${s.interesse * 10}%"></div></div><span class="score-num">${s.interesse}</span></div></td>
-          <td><span class="badge badge-${s.haltung}">${t('badge_' + s.haltung)}</span></td>
+          <td onclick="event.stopPropagation()">
+            <select class="inline-select" onchange="saveInlineField(${s.id},'gruppe',this.value)">
+              <option value="intern" ${s.gruppe==='intern'?'selected':''}>${t('badge_intern')}</option>
+              <option value="extern" ${s.gruppe==='extern'?'selected':''}>${t('badge_extern')}</option>
+            </select>
+          </td>
+          <td onclick="event.stopPropagation()">
+            <div class="inline-range-wrap">
+              <input type="range" min="1" max="10" value="${s.einfluss}" class="inline-range"
+                oninput="this.nextElementSibling.textContent=this.value"
+                onchange="saveInlineField(${s.id},'einfluss',parseInt(this.value))">
+              <span class="inline-range-val">${s.einfluss}</span>
+            </div>
+          </td>
+          <td onclick="event.stopPropagation()">
+            <div class="inline-range-wrap">
+              <input type="range" min="1" max="10" value="${s.interesse}" class="inline-range"
+                oninput="this.nextElementSibling.textContent=this.value"
+                onchange="saveInlineField(${s.id},'interesse',parseInt(this.value))">
+              <span class="inline-range-val">${s.interesse}</span>
+            </div>
+          </td>
+          <td onclick="event.stopPropagation()">
+            <select class="inline-select ${hCls}" onchange="saveInlineField(${s.id},'haltung',this.value)">
+              <option value="supportiv" ${s.haltung==='supportiv'?'selected':''}>${t('badge_supportiv')}</option>
+              <option value="neutral"   ${s.haltung==='neutral'  ?'selected':''}>${t('badge_neutral')}</option>
+              <option value="kritisch"  ${s.haltung==='kritisch' ?'selected':''}>${t('badge_kritisch')}</option>
+            </select>
+          </td>
           <td style="font-size:.82rem;color:var(--muted)">${getStrategie(s)}</td>
-          <td>${bezStars}</td>
+          <td onclick="event.stopPropagation()" class="inline-stars">
+            ${[1,2,3,4,5].map(i=>`<span class="${i<=bez?'on':'off'}" onclick="saveInlineField(${s.id},'beziehung',${i})">${i<=bez?'★':'☆'}</span>`).join('')}
+          </td>
           ${lastContactCell}
           ${journalCell}
           <td onclick="event.stopPropagation()">

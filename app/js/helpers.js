@@ -25,6 +25,12 @@ function initials(name) {
   return String(name || '').split(' ').map(w => w[0] || '').join('').slice(0, 2).toUpperCase();
 }
 
+function shFullName(sh) {
+  if (!sh) return '';
+  if (sh.vorname || sh.nachname) return ((sh.vorname || '') + ' ' + (sh.nachname || '')).trim();
+  return sh.name || '';
+}
+
 function esc(t) {
   return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }

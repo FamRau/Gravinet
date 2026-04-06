@@ -5,8 +5,8 @@
 /* OVERLAY / PANEL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.open{opacity:1;pointer-events:all}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;width:90%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative}
-.panel-wide{max-width:820px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;width:90%;max-width:640px;max-height:96vh;overflow-y:auto;position:relative}
+.panel-wide{max-width:1100px}
 .panel-close{position:absolute;top:20px;right:20px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:.85rem;padding:4px 10px;transition:all .15s}
 .panel-close:hover{color:var(--danger);border-color:var(--danger)}
 .panel-tabs{display:flex;gap:6px;margin-bottom:20px}

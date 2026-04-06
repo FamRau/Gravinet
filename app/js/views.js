@@ -25,7 +25,7 @@ function renderBirthdayAlerts() {
   el.innerHTML = soon.map(s => {
     const [, m, d] = s.geburtstag.split('-').map(Number);
     const isToday = m === mm && d === dd;
-    return `<div class="birthday-bar">🎂 <strong>${esc(s.name)}</strong> ${isToday ? t('birthday_alert_today') : t('birthday_alert_soon')} (${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.)</div>`;
+    return `<div class="birthday-bar">🎂 <strong>${esc(shFullName(s))}</strong> ${isToday ? t('birthday_alert_today') : t('birthday_alert_soon')} (${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.)</div>`;
   }).join('');
 }
 
@@ -96,7 +96,7 @@ function renderTable() {
   const fh = document.getElementById('filter-haltung')?.value || '';
   const merged   = proj.items.map(item => getMerged(item)).filter(Boolean);
   const filtered = merged.filter(s => {
-    if (q  && !s.name.toLowerCase().includes(q) && !s.rolle.toLowerCase().includes(q)) return false;
+    if (q  && !shFullName(s).toLowerCase().includes(q) && !s.rolle.toLowerCase().includes(q)) return false;
     if (fg && s.gruppe   !== fg) return false;
     if (fh && s.haltung  !== fh) return false;
     return true;
@@ -107,7 +107,7 @@ function renderTable() {
   if (sortCol) {
     filtered.sort((a, b) => {
       let va, vb;
-      if      (sortCol === 'name')      { va = a.name.toLowerCase();       vb = b.name.toLowerCase(); }
+      if      (sortCol === 'name')      { va = shFullName(a).toLowerCase(); vb = shFullName(b).toLowerCase(); }
       else if (sortCol === 'gruppe')    { va = a.gruppe;                   vb = b.gruppe; }
       else if (sortCol === 'einfluss')  { va = a.einfluss;                 vb = b.einfluss; }
       else if (sortCol === 'interesse') { va = a.interesse;                vb = b.interesse; }
@@ -182,7 +182,7 @@ function renderTable() {
           : `background:${rowCol}0d;border-left:3px solid ${rowCol}88;`;
         const hCls = s.haltung === 'supportiv' ? 'hs' : s.haltung === 'kritisch' ? 'hk' : 'hn';
         return `<tr onclick="openDetail(${s.id})" style="${rowStyle}">
-          <td class="name-cell"><strong>${esc(s.name)}${bdChip}</strong><span>${esc(s.rolle)}</span></td>
+          <td class="name-cell"><strong>${esc(shFullName(s))}${bdChip}</strong><span>${esc(s.rolle)}</span></td>
           <td onclick="event.stopPropagation()">
             <select class="inline-select" onchange="saveInlineField(${s.id},'gruppe',this.value)">
               <option value="intern" ${s.gruppe==='intern'?'selected':''}>${t('badge_intern')}</option>
@@ -273,7 +273,7 @@ function renderMatrix() {
     dot.style.background  = col + '22';
     dot.style.borderColor = col;
     dot.style.color       = col;
-    // Dot size and weight based on Beziehungsstärke (1–5 → 22px–58px)
+    // Dot size and border weight based on relationship strength (1–5 → 24px–56px)
     const bez = s.beziehung || 3;
     const dotPx = 16 + bez * 8;
     dot.style.width       = dotPx + 'px';
@@ -284,7 +284,7 @@ function renderMatrix() {
     if (bez >= 4) dot.style.boxShadow = `0 0 ${bez * 4}px ${col}66`;
     const stars = '★'.repeat(bez) + '☆'.repeat(5 - bez);
     const tipDir = dotTopPct < 25 ? 'tip-down' : 'tip-up';
-    dot.innerHTML = `${initials(s.name)}<div class="dot-tooltip ${tipDir}"><strong>${esc(s.name)}</strong><br>${esc(s.rolle)}<br>${t('detail_influence')}: ${s.einfluss} · ${t('detail_interest')}: ${s.interesse}<br><span style="color:var(--accent2);letter-spacing:1px">${stars}</span></div>`;
+    dot.innerHTML = `${initials(shFullName(s))}<div class="dot-tooltip ${tipDir}"><strong>${esc(shFullName(s))}</strong><br>${esc(s.rolle)}<br>${t('detail_influence')}: ${s.einfluss} · ${t('detail_interest')}: ${s.interesse}<br><span style="color:var(--accent2);letter-spacing:1px">${stars}</span></div>`;
     dot.onclick = () => openDetail(s.id);
     c.appendChild(dot);
   });
@@ -294,7 +294,7 @@ function renderMatrix() {
 
 function renderKontakte() {
   const q    = (document.getElementById('shdb-search')?.value || '').toLowerCase();
-  const list = stakeholders.filter(sh => !q || sh.name.toLowerCase().includes(q) || sh.rolle.toLowerCase().includes(q));
+  const list = stakeholders.filter(sh => !q || shFullName(sh).toLowerCase().includes(q) || (sh.rolle || '').toLowerCase().includes(q));
   const el   = document.getElementById('shdb-body'); if (!el) return;
   el.innerHTML = list.length === 0
     ? `<tr><td colspan="6"><div class="shdb-empty">${t('contacts_empty')}</div></td></tr>`
@@ -305,7 +305,7 @@ function renderKontakte() {
         const bdChip = bd !== null && bd <= 14
           ? `<span class="bday-chip">${bd === 0 ? '🎂 ' + t('birthday_today') : bd === 1 ? '🎂 ' + t('birthday_tomorrow') : '🎂 ' + bd + t('days_unit')}</span>` : '';
         return `<tr>
-          <td class="name-cell"><strong>${esc(sh.name)}${bdChip}</strong><span>${esc(sh.rolle)}</span></td>
+          <td class="name-cell"><strong>${esc(shFullName(sh))}${bdChip}</strong><span>${esc(sh.rolle)}</span></td>
           <td style="font-size:.83rem;color:var(--muted)">${sh.email ? `<a href="mailto:${esc(sh.email)}" style="color:inherit">${esc(sh.email)}</a>` : '-'}</td>
           <td style="font-size:.83rem;color:var(--muted)">${esc(sh.tel) || '-'}</td>
           <td style="font-size:.83rem;color:var(--muted)">${sh.geburtstag ? fmtDate(sh.geburtstag) : '-'}</td>
@@ -327,7 +327,7 @@ function renderProjectsView() {
   el.innerHTML = projects.map(p => `
     <div class="proj-card${p.id === activeProjectId ? ' is-active' : ''}">
       <div class="proj-card-name">${esc(p.name)}${p.id === activeProjectId ? `<span class="proj-card-badge">${t('proj_active_badge')}</span>` : ''}</div>
-      <div class="proj-card-meta">${p.items.length} Stakeholder · ${p.plan?.reduce((n, y) => n + y.items.length, 0) || 0} ${t('proj_plan_measures')}</div>
+      <div class="proj-card-meta">${p.items.length} ${t('proj_stakeholder_count')} · ${p.plan?.reduce((n, y) => n + y.items.length, 0) || 0} ${t('proj_plan_measures')}</div>
       ${p.desc ? `<div class="proj-card-desc">${esc(p.desc)}</div>` : '<div class="proj-card-desc"></div>'}
       <div class="proj-card-actions">
         ${p.id !== activeProjectId
@@ -373,51 +373,70 @@ function renderDashboard() {
     .filter(s => s.daysSince !== null && s.daysSince > s.interval * 0.6 && s.daysSince <= s.interval)
     .sort((a, b) => b.daysSince - a.daysSince);
 
-  // Birthdays: next 30 days
-  const birthdays = stakeholders.map(sh => {
-    const bd = daysUntilBirthday(sh.geburtstag);
-    return (bd !== null && bd <= 30) ? { ...sh, daysUntilBd: bd } : null;
-  }).filter(Boolean).sort((a, b) => a.daysUntilBd - b.daysUntilBd);
+  // Aufgaben: all open tasks across all projects, sorted by date
+  const aufgabenList = [];
+  projects.forEach(proj => {
+    proj.items.forEach(item => {
+      const sh = stakeholders.find(s => s.id === item.shId); if (!sh) return;
+      (item.aufgaben || []).filter(a => !a.done).forEach(a => {
+        aufgabenList.push({ ...a, shName: shFullName(sh), shId: sh.id, projId: proj.id });
+      });
+    });
+  });
+  aufgabenList.sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1);
 
   // Recent journal entries across all stakeholders, newest first
   const recentEntries = [];
   stakeholders.forEach(sh => {
     (sh.journal || []).forEach(e => {
-      recentEntries.push({ ...e, shId: sh.id, shName: sh.name, shRolle: sh.rolle });
+      recentEntries.push({ ...e, shId: sh.id, shName: shFullName(sh), shRolle: sh.rolle });
     });
   });
   recentEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
   const recent = recentEntries.slice(0, 8);
 
-  const col = s => `background:${HALTUNG_COLORS[s.haltung]}22;border-left:3px solid ${HALTUNG_COLORS[s.haltung]}`;
-  const overdueCol = s => `background:${HALTUNG_COLORS[s.haltung]}18`;
+  const today = new Date().toISOString().slice(0, 10);
 
-  const overdueHtml = overdue.length === 0
+  // Column 1: overdue tasks (date < today)
+  const aufgabenOverdue = aufgabenList.filter(a => a.date && a.date < today);
+  const overdueHtml = aufgabenOverdue.length === 0
     ? `<div class="dash-empty">${t('dash_no_overdue')}</div>`
-    : overdue.map(s => `
-      <div class="dash-card" style="${overdueCol(s)}" onclick="switchProject('${s.projId}');openDetail(${s.id})">
-        <div class="dash-card-name">${esc(s.name)}</div>
-        <div class="dash-card-meta">${esc(s.rolle)} · <span class="dash-proj-tag">${esc(s.projName)}</span></div>
-        <div class="dash-card-age overdue">${s.daysSince === null ? t('dash_never') : s.daysSince + t('days_unit') + ' / ' + s.interval + t('days_unit')}</div>
-      </div>`).join('');
+    : aufgabenOverdue.map(a => {
+        const isBd = !!a.autoBirthday;
+        return `<div class="dash-card${isBd ? '" style="background:rgba(212,160,23,.07)' : ''}" onclick="switchProject('${a.projId}');openDetailAufgaben(${a.shId})">
+          <div class="dash-card-name">${esc(a.title)}</div>
+          <div class="dash-card-meta">${esc(a.shName)}${a.tag ? ` · <span class="dash-proj-tag">${esc(a.tag)}</span>` : ''}</div>
+          <div class="dash-card-age overdue">${a.date}</div>
+        </div>`;
+      }).join('');
 
-  const dueSoonHtml = dueSoon.length === 0
+  // Column 2: tasks due soon (today or within next 14 days, not overdue)
+  const in14 = new Date(); in14.setDate(in14.getDate() + 14);
+  const in14Str = in14.toISOString().slice(0, 10);
+  const aufgabenSoon = aufgabenList.filter(a => a.date && a.date >= today && a.date <= in14Str);
+  const dueSoonHtml = aufgabenSoon.length === 0
     ? `<div class="dash-empty">${t('dash_no_soon')}</div>`
-    : dueSoon.map(s => `
-      <div class="dash-card" style="${col(s)}" onclick="switchProject('${s.projId}');openDetail(${s.id})">
-        <div class="dash-card-name">${esc(s.name)}</div>
-        <div class="dash-card-meta">${esc(s.rolle)} · <span class="dash-proj-tag">${esc(s.projName)}</span></div>
-        <div class="dash-card-age warn">${s.daysSince}${t('days_unit')} / ${s.interval}${t('days_unit')}</div>
-      </div>`).join('');
+    : aufgabenSoon.map(a => {
+        const remind = a.reminder && a.reminder <= today;
+        return `<div class="dash-card" onclick="switchProject('${a.projId}');openDetailAufgaben(${a.shId})">
+          <div class="dash-card-name">${esc(a.title)}</div>
+          <div class="dash-card-meta">${esc(a.shName)}${a.tag ? ` · <span class="dash-proj-tag">${esc(a.tag)}</span>` : ''}</div>
+          <div class="dash-card-age warn">${a.date}${remind ? ' 🔔' : ''}</div>
+        </div>`;
+      }).join('');
 
-  const bdHtml = birthdays.length === 0
-    ? `<div class="dash-empty">${t('dash_no_birthdays')}</div>`
-    : birthdays.map(s => `
-      <div class="dash-card" style="background:rgba(212,160,23,.07);border-left:3px solid var(--accent2)" onclick="openDetail(${s.id})">
-        <div class="dash-card-name">🎂 ${esc(s.name)}</div>
-        <div class="dash-card-meta">${esc(s.rolle)}</div>
-        <div class="dash-card-age warn">${s.daysUntilBd === 0 ? t('birthday_today') : s.daysUntilBd + t('days_unit')}</div>
-      </div>`).join('');
+  // Column 3: all open tasks
+  const aufgabenHtml = aufgabenList.length === 0
+    ? `<div class="dash-empty">${t('dash_aufgaben_empty')}</div>`
+    : aufgabenList.map(a => {
+        const isOverdue = a.date && a.date < today;
+        const remind    = a.reminder && a.reminder <= today;
+        return `<div class="dash-card" onclick="switchProject('${a.projId}');openDetailAufgaben(${a.shId})">
+          <div class="dash-card-name">${esc(a.title)}</div>
+          <div class="dash-card-meta">${esc(a.shName)}${a.tag ? ` · <span class="dash-proj-tag">${esc(a.tag)}</span>` : ''}</div>
+          <div class="dash-card-age${isOverdue ? ' overdue' : remind ? ' warn' : ''}">${a.date || '–'}${remind ? ' 🔔' : ''}</div>
+        </div>`;
+      }).join('');
 
   const recentHtml = recent.length === 0
     ? `<div class="dash-empty">${t('dash_no_recent')}</div>`
@@ -438,16 +457,16 @@ function renderDashboard() {
     </div>
     <div class="dash-cols">
       <div class="dash-col">
-        <div class="dash-section-title overdue">${t('dash_overdue')} <span class="dash-count">${overdue.length}</span></div>
+        <div class="dash-section-title overdue">${t('dash_overdue')} <span class="dash-count">${aufgabenOverdue.length}</span></div>
         <div class="dash-list">${overdueHtml}</div>
       </div>
       <div class="dash-col">
-        <div class="dash-section-title warn">${t('dash_due_soon')} <span class="dash-count">${dueSoon.length}</span></div>
+        <div class="dash-section-title warn">${t('dash_due_soon')} <span class="dash-count">${aufgabenSoon.length}</span></div>
         <div class="dash-list">${dueSoonHtml}</div>
       </div>
       <div class="dash-col">
-        <div class="dash-section-title">${t('dash_birthdays')} <span class="dash-count">${birthdays.length}</span></div>
-        <div class="dash-list">${bdHtml}</div>
+        <div class="dash-section-title">${t('dash_all_tasks')} <span class="dash-count">${aufgabenList.length}</span></div>
+        <div class="dash-list">${aufgabenHtml}</div>
       </div>
       <div class="dash-col">
         <div class="dash-section-title">${t('dash_recent')}</div>
@@ -464,7 +483,7 @@ function renderDashboardSearch(q) {
   const now = Date.now();
   const matches = [];
   stakeholders.forEach(sh => {
-    if (!sh.name.toLowerCase().includes(q) && !sh.rolle.toLowerCase().includes(q)) return;
+    if (!shFullName(sh).toLowerCase().includes(q) && !(sh.rolle || '').toLowerCase().includes(q)) return;
     const projContexts = projects.map(p => {
       const item = p.items.find(i => i.shId === sh.id); if (!item) return null;
       const s = { ...sh, ...item };
@@ -498,7 +517,7 @@ function renderDashboardSearch(q) {
     const bdChip = bd !== null && bd <= 14
       ? `<span class="bday-chip">${bd === 0 ? '🎂 ' + t('birthday_today') : bd === 1 ? '🎂 ' + t('birthday_tomorrow') : '🎂 ' + bd + t('days_unit')}</span>` : '';
     return `<div class="dash-search-row" onclick="openDetail(${sh.id})">
-      <div class="dash-search-name">${esc(sh.name)}${bdChip} <span class="dash-search-rolle">${esc(sh.rolle)}</span></div>
+      <div class="dash-search-name">${esc(shFullName(sh))}${bdChip} <span class="dash-search-rolle">${esc(sh.rolle)}</span></div>
       <div class="dash-search-projs">${projTags || '<span style="color:var(--muted);font-size:.75rem">–</span>'}</div>
     </div>`;
   }).join('');
@@ -506,6 +525,31 @@ function renderDashboardSearch(q) {
 }
 
 // ── Journal Search ────────────────────────────────────────────────────────────
+
+function renderJsNewContactSelect() {
+  const sel = document.getElementById('js-new-contact'); if (!sel) return;
+  const cur = sel.value;
+  const sorted = [...stakeholders].sort((a, b) => shFullName(a).localeCompare(shFullName(b)));
+  sel.innerHTML = `<option value="">${t('js_select_contact')}</option>`
+    + sorted.map(sh => `<option value="${sh.id}"${sh.id == cur ? ' selected' : ''}>${esc(shFullName(sh))}</option>`).join('');
+}
+
+function addJournalFromSearch() {
+  const shId   = parseInt(document.getElementById('js-new-contact')?.value);
+  const type   = document.getElementById('js-new-type')?.value || null;
+  const textEl = document.getElementById('js-new-text');
+  const text   = textEl?.value.trim();
+  if (!shId || !text) return;
+  const sh = stakeholders.find(s => s.id === shId); if (!sh) return;
+  if (!sh.journal) sh.journal = [];
+  sh.journal.push({ date: new Date().toISOString(), text, type: type || null });
+  _syncAutoContactTask(shId);
+  _syncBirthdayTask(shId);
+  saveNow();
+  textEl.value = '';
+  renderJournalSearch();
+  renderTable();
+}
 
 function renderJournalSearch() {
   const el = document.getElementById('journal-search-body'); if (!el) return;
@@ -517,7 +561,7 @@ function renderJournalSearch() {
   stakeholders.filter(sh => projItemIds.has(sh.id)).forEach(sh => {
     (sh.journal || []).forEach((e, idx) => {
       if (type && e.type !== type) return;
-      if (q && !e.text.toLowerCase().includes(q) && !sh.name.toLowerCase().includes(q)) return;
+      if (q && !e.text.toLowerCase().includes(q) && !shFullName(sh).toLowerCase().includes(q)) return;
       all.push({ sh, e, idx });
     });
   });
@@ -532,12 +576,133 @@ function renderJournalSearch() {
     const hi = s => q ? s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), m => `<mark class="js-hi">${m}</mark>`) : s;
     return `<div class="js-row" onclick="openDetailJournal(${sh.id})">
       <div class="js-row-head">
-        <span class="js-row-name">${esc(sh.name)}</span>
+        <span class="js-row-name">${esc(shFullName(sh))}</span>
         <span class="js-row-date">${fmtDateTime(e.date)}</span>
         ${e.type ? `<span class="journal-type-badge jtype-${e.type}">${t('jtype_' + e.type)}</span>` : ''}
       </div>
       <div class="js-row-rolle">${esc(sh.rolle)}</div>
       <div class="js-row-text">${hi(esc(e.text))}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Aufgaben View ─────────────────────────────────────────────────────────────
+
+function renderAvNewContactSelect() {
+  const sel = document.getElementById('av-new-contact'); if (!sel) return;
+  const cur = sel.value;
+  const sorted = [...stakeholders].sort((a, b) => shFullName(a).localeCompare(shFullName(b)));
+  sel.innerHTML = `<option value="">${t('js_select_contact')}</option>`
+    + sorted.map(sh => `<option value="${sh.id}"${sh.id == cur ? ' selected' : ''}>${esc(shFullName(sh))}</option>`).join('');
+  sel.value = cur;
+  renderAvNewProjSelect();
+}
+
+function renderAvNewProjSelect() {
+  const contSel = document.getElementById('av-new-contact');
+  const projSel = document.getElementById('av-new-proj'); if (!projSel) return;
+  const shId = parseInt(contSel?.value);
+  const cur  = projSel.value;
+  const shProjects = isNaN(shId) ? [] : projects.filter(p => p.items.some(i => i.shId == shId));
+  projSel.innerHTML = `<option value="">${t('js_select_project')}</option>`
+    + shProjects.map(p => `<option value="${p.id}"${p.id == cur ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  projSel.value = shProjects.find(p => p.id == cur) ? cur : (shProjects.length === 1 ? String(shProjects[0].id) : '');
+}
+
+function addAufgabeFromView() {
+  const shId  = parseInt(document.getElementById('av-new-contact')?.value);
+  const projId = parseInt(document.getElementById('av-new-proj')?.value);
+  const title  = document.getElementById('av-new-title')?.value.trim();
+  if (!shId || !projId || !title) return;
+  const proj = projects.find(p => p.id == projId); if (!proj) return;
+  const item = proj.items.find(i => i.shId == shId); if (!item) return;
+  if (!item.aufgaben) item.aufgaben = [];
+  const date     = document.getElementById('av-new-date')?.value || '';
+  const reminder = document.getElementById('av-new-reminder')?.value || '';
+  const interval = parseInt(document.getElementById('av-new-interval')?.value) || null;
+  const tag      = document.getElementById('av-new-tag')?.value.trim() || '';
+  item.aufgaben.push({ id: nextAufgabeId++, title, date, reminder, interval, tag, done: false });
+  saveNow();
+  // Reset fields
+  ['av-new-title','av-new-date','av-new-reminder','av-new-tag'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('av-new-interval').value = '';
+  renderAufgabenView();
+}
+
+function renderAufgabenView() {
+  const el = document.getElementById('av-body'); if (!el) return;
+  const q      = (document.getElementById('av-query')?.value || '').toLowerCase();
+  const status = document.getElementById('av-status')?.value || 'open';
+  const projId = document.getElementById('av-proj')?.value || '';
+  const tag    = document.getElementById('av-tag')?.value || '';
+  const today  = new Date().toISOString().slice(0, 10);
+
+  // Collect all tasks with context
+  const all = [];
+  projects.forEach(proj => {
+    proj.items.forEach(item => {
+      const sh = stakeholders.find(s => s.id === item.shId); if (!sh) return;
+      (item.aufgaben || []).forEach(a => {
+        all.push({ ...a, shName: shFullName(sh), shId: sh.id, shRolle: sh.rolle, projId: proj.id, projName: proj.name });
+      });
+    });
+  });
+
+  // Populate project filter (preserve selection)
+  const projSel = document.getElementById('av-proj');
+  if (projSel && projSel.options.length <= 1) {
+    projects.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id; opt.textContent = p.name;
+      projSel.appendChild(opt);
+    });
+  }
+
+  // Populate tag filter (preserve selection)
+  const tagSel = document.getElementById('av-tag');
+  if (tagSel && tagSel.options.length <= 1) {
+    const tags = [...new Set(all.map(a => a.tag).filter(Boolean))].sort();
+    tags.forEach(tg => {
+      const opt = document.createElement('option');
+      opt.value = tg; opt.textContent = tg;
+      tagSel.appendChild(opt);
+    });
+  }
+
+  // Filter
+  const filtered = all.filter(a => {
+    if (status === 'open' && a.done) return false;
+    if (status === 'done' && !a.done) return false;
+    if (projId && String(a.projId) !== String(projId)) return false;
+    if (tag && a.tag !== tag) return false;
+    if (q && !a.title.toLowerCase().includes(q) && !a.shName.toLowerCase().includes(q) && !(a.tag||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1);
+
+  if (filtered.length === 0) {
+    el.innerHTML = `<div style="color:var(--muted);padding:30px 0;text-align:center">${t('av_empty')}</div>`;
+    return;
+  }
+
+  const hi = s => q ? s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), m => `<mark class="js-hi">${m}</mark>`) : s;
+
+  el.innerHTML = filtered.map(a => {
+    const overdue  = !a.done && a.date && a.date < today;
+    const remindDue = !a.done && a.reminder && a.reminder <= today;
+    const autoIcon = a.autoBirthday ? '🎂 ' : a.autoContact ? '🔄 ' : '';
+    const dateStr  = a.date ? `<span class="av-row-date${overdue ? ' overdue' : ''}">${a.date}</span>` : '';
+    const reminderStr = a.reminder ? `<span class="av-row-date${remindDue ? ' overdue' : ''}" title="${t('aufgaben_th_reminder')}">🔔 ${a.reminder}</span>` : '';
+    const tagChip  = a.tag ? `<span class="dash-proj-tag">${esc(a.tag)}</span>` : '';
+    const projChip = `<span style="font-size:.72rem;color:var(--muted)">${esc(a.projName)}</span>`;
+    return `<div class="js-row${a.done ? ' aufgabe-done' : ''}" onclick="switchProject('${a.projId}');openDetailAufgaben(${a.shId})">
+      <div class="js-row-head">
+        <span class="js-row-name">${a.done ? '✅ ' : overdue ? '⚠️ ' : ''}${autoIcon}${hi(esc(a.title))}</span>
+        ${dateStr}${reminderStr}
+        ${tagChip}
+      </div>
+      <div class="js-row-rolle">${hi(esc(a.shName))} · ${esc(a.shRolle)} · ${projChip}</div>
     </div>`;
   }).join('');
 }

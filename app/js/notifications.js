@@ -17,7 +17,9 @@ function checkAndNotify() {
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
   const now = Date.now();
+  const today = new Date().toISOString().slice(0, 10);
   const overdue = [];
+  const reminders = [];
 
   projects.forEach(proj => {
     proj.items.forEach(item => {
@@ -30,16 +32,31 @@ function checkAndNotify() {
         ? Math.floor((now - new Date(lastEntry.date).getTime()) / 86400000)
         : null;
       if (daysSince === null || daysSince > interval) {
-        overdue.push({ name: sh.name, daysSince, projName: proj.name });
+        overdue.push({ name: shFullName(sh), daysSince, projName: proj.name });
       }
+      (item.aufgaben || []).forEach(task => {
+        if (!task.done && task.reminder && task.reminder <= today) {
+          reminders.push({ name: shFullName(sh), taskTitle: task.title });
+        }
+      });
     });
   });
+
+  if (reminders.length > 0) {
+    const rTitle = appLang === 'en'
+      ? `Gravinet – ${reminders.length} task reminder${reminders.length > 1 ? 's' : ''}`
+      : `Gravinet – ${reminders.length} Aufgaben-Erinnerung${reminders.length > 1 ? 'en' : ''}`;
+    const rBody = reminders.slice(0, 5).map(r => `${r.name}: ${r.taskTitle}`).join('\n')
+      + (reminders.length > 5 ? `\n+${reminders.length - 5}…` : '');
+    const rn = new Notification(rTitle, { body: rBody, icon: 'icons/icon-192.png' });
+    rn.onclick = () => { window.focus(); switchTab(document.querySelector('nav .tab[onclick*=dashboard]'), 'dashboard'); };
+  }
 
   if (overdue.length === 0) return;
 
   const title = appLang === 'en'
-    ? `Gravinet – ${overdue.length} overdue contact${overdue.length > 1 ? 's' : ''}`
-    : `Gravinet – ${overdue.length} überfällige${overdue.length > 1 ? '' : 'r'} Kontakt${overdue.length > 1 ? 'e' : ''}`;
+    ? `Gravinet – ${overdue.length} overdue task${overdue.length > 1 ? 's' : ''}`
+    : `Gravinet – ${overdue.length} überfällige Aufgabe${overdue.length > 1 ? 'n' : ''}`;
 
   const names = overdue.slice(0, 5).map(o => {
     const age = o.daysSince === null

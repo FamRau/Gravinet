@@ -19,6 +19,7 @@ function _buildWorkspace() {
     nextStakeholderId,
     nextProjectId,
     nextPlanId,
+    nextAufgabeId,
     contactWarningDays,
     appLang,
     savedAt:            new Date().toISOString()
@@ -114,7 +115,7 @@ function importJSON(event) {
 // ── CSV Export ───────────────────────────────────────────────────────────────
 
 function exportCSV() {
-  const cols = ['name','rolle','email','tel','geburtstag','notizen'];
+  const cols = ['vorname','nachname','rolle','email','tel','geburtstag','notizen'];
   const header = cols.join(';');
   const rows = stakeholders.map(sh =>
     cols.map(c => {
@@ -148,24 +149,32 @@ function importCSV(event) {
 
       const parsed = lines.slice(1).map(line => {
         const cells = _csvSplit(line);
+        // Support both old 'name' column and new 'vorname'/'nachname'
+        const rawName = (cells[idx('name')] || '').trim();
+        const vorname = (cells[idx('vorname')] || '').trim() || rawName.split(' ')[0] || '';
+        const nachname = (cells[idx('nachname')] || '').trim() || rawName.split(' ').slice(1).join(' ') || '';
         return {
-          name:       (cells[idx('name')]       || '').trim(),
+          vorname,
+          nachname,
           rolle:      (cells[idx('rolle')]      || '').trim(),
           email:      (cells[idx('email')]      || '').trim(),
           tel:        (cells[idx('tel')]        || '').trim(),
           geburtstag: (cells[idx('geburtstag')] || '').trim(),
           notizen:    (cells[idx('notizen')]    || '').trim(),
         };
-      }).filter(r => r.name);
+      }).filter(r => r.vorname || r.nachname);
 
       let added = 0, updated = 0;
       parsed.forEach(row => {
-        // Match by email (if set) or name
+        const rowFullName = (row.vorname + ' ' + row.nachname).trim().toLowerCase();
+        // Match by email (if set) or full name
         const existing = stakeholders.find(sh =>
           (row.email && sh.email && sh.email.toLowerCase() === row.email.toLowerCase()) ||
-          sh.name.toLowerCase() === row.name.toLowerCase()
+          shFullName(sh).toLowerCase() === rowFullName
         );
         if (existing) {
+          existing.vorname    = row.vorname    || existing.vorname;
+          existing.nachname   = row.nachname   || existing.nachname;
           existing.rolle      = row.rolle      || existing.rolle;
           existing.email      = row.email      || existing.email;
           existing.tel        = row.tel        || existing.tel;
@@ -227,6 +236,13 @@ async function loadData() {
       stakeholders = (rawContacts || []).map(s => ({
         email: '', tel: '', geburtstag: '', journal: [], ...s
       }));
+      stakeholders = stakeholders.map(s => {
+        if (!s.vorname && !s.nachname && s.name) {
+          const parts = s.name.split(' ');
+          return { ...s, vorname: parts[0] || '', nachname: parts.slice(1).join(' ') || '' };
+        }
+        return s;
+      });
 
       // Load each project file
       const loadedProjects = await Promise.all(
@@ -236,7 +252,7 @@ async function loadData() {
         .filter(Boolean)
         .map(proj => ({
           ...proj,
-          items: proj.items || [],
+          items: (proj.items || []).map(item => ({ aufgaben: [], ...item })),
           plan:  (proj.plan || JSON.parse(JSON.stringify(DEFAULT_PLAN)))
                    .map(y => ({ ...y, items: y.items.map(i => ({ done: false, ...i })) }))
         }));
@@ -250,6 +266,7 @@ async function loadData() {
       nextStakeholderId  = ws.nextStakeholderId || (Math.max(0, ...(stakeholders.length ? stakeholders.map(s => s.id) : [0])) + 1);
       nextProjectId      = ws.nextProjectId || (projects.length + 2);
       nextPlanId         = Math.max(ws.nextPlanId || 0, 6);
+      nextAufgabeId      = ws.nextAufgabeId || 1;
       contactWarningDays = ws.contactWarningDays || 90;
       appLang            = ws.appLang || 'de';
       return;
@@ -312,10 +329,17 @@ function _applyParsedData(p) {
     stakeholders = (p.stakeholders || []).map(s => ({
       email: '', tel: '', geburtstag: '', journal: [], ...s
     }));
+    stakeholders = stakeholders.map(s => {
+      if (!s.vorname && !s.nachname && s.name) {
+        const parts = s.name.split(' ');
+        return { ...s, vorname: parts[0] || '', nachname: parts.slice(1).join(' ') || '' };
+      }
+      return s;
+    });
     projects = (p.projects || []).map(proj => {
       const plan = (proj.plan || JSON.parse(JSON.stringify(DEFAULT_PLAN)))
         .map(y => ({ ...y, items: y.items.map(i => ({ done: false, ...i })) }));
-      return { ...proj, items: proj.items || [], plan };
+      return { ...proj, items: (proj.items || []).map(item => ({ aufgaben: [], ...item })), plan };
     });
     if (!projects.length) _initDefaultProject();
     activeProjectId   = p.activeProjectId || projects[0]?.id || '';
@@ -328,11 +352,16 @@ function _applyParsedData(p) {
     const old = (p.stakeholders || []).map(s => ({
       email: '', tel: '', geburtstag: '', journal: [], ...s
     }));
-    stakeholders = old.map(s => ({
-      id: s.id, name: s.name, rolle: s.rolle,
-      email: s.email || '', tel: s.tel || '',
-      geburtstag: s.geburtstag || '', journal: s.journal || []
-    }));
+    stakeholders = old.map(s => {
+      const parts = (s.name || '').split(' ');
+      return {
+        id: s.id, name: s.name,
+        vorname: parts[0] || '', nachname: parts.slice(1).join(' ') || '',
+        rolle: s.rolle,
+        email: s.email || '', tel: s.tel || '',
+        geburtstag: s.geburtstag || '', journal: s.journal || []
+      };
+    });
     const items = old.map(s => ({
       shId: s.id,
       gruppe:    s.gruppe    || 'intern',
@@ -340,7 +369,8 @@ function _applyParsedData(p) {
       einfluss:  s.einfluss  || 5,
       interesse: s.interesse || 5,
       ziel:      s.ziel      || '',
-      massnahmen: s.massnahmen || []
+      massnahmen: s.massnahmen || [],
+      aufgaben: []
     }));
     const plan = (p.plan || JSON.parse(JSON.stringify(DEFAULT_PLAN)))
       .map(y => ({ ...y, items: y.items.map(i => ({ done: false, ...i })) }));

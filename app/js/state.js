@@ -9,6 +9,7 @@ let orgName           = 'Meine Organisation';
 let nextStakeholderId = 1;
 let nextProjectId     = 2;
 let nextPlanId        = 6;
+let nextAufgabeId     = 1;
 
 // Table sort state
 let sortCol = '';   // 'name' | 'einfluss' | 'interesse' | 'kontakt'

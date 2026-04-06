@@ -76,7 +76,7 @@ function openPrintContactsModal() {
     <label class="print-picker-row">
       <input type="checkbox" value="${sh.id}" checked>
       <div class="print-picker-row-info">
-        <div class="print-picker-name">${escP(sh.name)}</div>
+        <div class="print-picker-name">${escP(shFullName(sh))}</div>
         <div class="print-picker-rolle">${escP(sh.rolle)}</div>
       </div>
     </label>`).join('');
@@ -97,6 +97,7 @@ async function doPrintContacts() {
 
   const pages = ids.map(id => {
     const sh = stakeholders.find(s => s.id === id); if (!sh) return '';
+    const fullName = shFullName(sh);
     const projContexts = projects.map(p => {
       const item = p.items.find(i => i.shId === id);
       return item ? { ...item, projName: p.name } : null;
@@ -105,7 +106,7 @@ async function doPrintContacts() {
     return `
     <div class="page page-break">
       <div class="report-header">
-        <h1>${escP(sh.name)}</h1>
+        <h1>${escP(fullName)}</h1>
         <div class="report-meta">${escP(sh.rolle)}${projContexts.length ? ' · ' + projContexts.map(p => escP(p.projName)).join(', ') : ''}</div>
       </div>
       <div class="section">
@@ -132,6 +133,17 @@ async function doPrintContacts() {
             </div>
             ${item.ziel ? `<div style="margin-top:6px"><div class="label">${t('print_goal_label')}</div><div style="font-size:9.5pt;margin-top:3px">${escP(item.ziel)}</div></div>` : ''}
             ${(item.massnahmen || []).length ? `<div style="margin-top:8px"><div class="label">${t('print_measures_label')}</div>${item.massnahmen.map(m => `<div class="massnahmen-item"><span class="arrow">→</span>${escP(m)}</div>`).join('')}</div>` : ''}
+            ${(item.aufgaben || []).length ? `
+<div style="margin-top:8px">
+  <div class="label">${t('print_aufgaben_label')}</div>
+  ${item.aufgaben.map(a => `
+    <div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;${a.done ? 'text-decoration:line-through;color:#9ca3af' : ''}">
+      <span style="font-size:9pt">${a.done ? '☑' : '☐'}</span>
+      <span style="font-size:9pt">${escP(a.title)}</span>
+      ${a.date ? `<span style="font-size:8pt;color:#6b7280">${a.date}</span>` : ''}
+      ${a.interval ? `<span style="font-size:8pt;color:#6b7280">🔁 ${a.interval}d</span>` : ''}
+    </div>`).join('')}
+</div>` : ''}
           </div>`).join('')}
       </div>` : ''}
       <div class="section">
@@ -150,7 +162,7 @@ async function doPrintContacts() {
   const html = `<!DOCTYPE html><html lang="${appLang === 'en' ? 'en' : 'de'}"><head><meta charset="UTF-8">${printCSS()}<title>${t('nav_print_contacts')}</title></head><body>${pages}</body></html>`;
   const date = new Date().toISOString().slice(0, 10);
   const safeName = ids.length === 1
-    ? stakeholders.find(s => s.id === ids[0])?.name.replace(/[^a-zA-Z0-9äöüÄÖÜß\s]/g, '').trim() || 'Kontakt'
+    ? shFullName(stakeholders.find(s => s.id === ids[0])).replace(/[^a-zA-Z0-9äöüÄÖÜß\s]/g, '').trim() || 'Kontakt'
     : `${ids.length}-Kontakte`;
   const result = await window.electronAPI.printPDF(html, `${safeName}-${date}.pdf`);
   if (!result.ok) alert(t('alert_pdf_error') + result.error);
@@ -171,7 +183,7 @@ async function printProjectReport() {
     const stars = '★'.repeat(bez) + '☆'.repeat(5 - bez);
     return `
     <tr>
-      <td><strong>${escP(s.name)}</strong><br><span style="color:#6b748f;font-size:8pt">${escP(s.rolle)}</span></td>
+      <td><strong>${escP(shFullName(s))}</strong><br><span style="color:#6b748f;font-size:8pt">${escP(s.rolle)}</span></td>
       <td><span class="badge badge-${s.gruppe}">${t('badge_' + s.gruppe)}</span></td>
       <td><div class="bar-wrap"><div class="bar-track"><div style="width:${s.einfluss * 10}%;height:4px;background:#2563eb;border-radius:2px"></div></div><span style="font-family:'DM Mono',monospace;font-size:8pt">${s.einfluss}</span></div></td>
       <td><div class="bar-wrap"><div class="bar-track"><div style="width:${s.interesse * 10}%;height:4px;background:#d97706;border-radius:2px"></div></div><span style="font-family:'DM Mono',monospace;font-size:8pt">${s.interesse}</span></div></td>
@@ -188,7 +200,7 @@ async function printProjectReport() {
     const col  = COLORS[s.haltung] || '#6b748f';
     const left = pL + ((s.einfluss - 1) / 9) * (100 - pL - pR);
     const top  = pT + ((10 - s.interesse) / 9) * (100 - pT - pB);
-    return `<div class="m-dot" style="left:${left}%;top:${top}%;background:${col}22;border-color:${col};color:${col}">${initialsP(s.name)}</div>`;
+    return `<div class="m-dot" style="left:${left}%;top:${top}%;background:${col}22;border-color:${col};color:${col}">${initialsP(shFullName(s))}</div>`;
   }).join('');
 
   const planHTML = (proj.plan || []).map(y => `
@@ -235,6 +247,28 @@ async function printProjectReport() {
     <div class="page-break"></div>
     <div class="report-header" style="margin-top:0"><h2>${t('tab_plan_label').replace('{n}', proj.plan?.length || 0)}</h2></div>
     ${planHTML}
+    ${(() => {
+      const itemsWithTasks = merged.filter(s => {
+        const item = proj.items.find(i => i.shId === s.id);
+        return (item?.aufgaben || []).length > 0;
+      });
+      if (!itemsWithTasks.length) return '';
+      return `<div class="page-break"></div>
+    <div class="report-header" style="margin-top:0"><h2>${t('print_aufgaben_chapter')}</h2></div>
+    ${itemsWithTasks.map(s => {
+      const item = proj.items.find(i => i.shId === s.id);
+      return `<div class="card" style="margin-bottom:10px">
+        <div style="font-weight:600;font-size:10pt;margin-bottom:8px">${escP(shFullName(s))}</div>
+        ${(item.aufgaben || []).map(a => `
+          <div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;${a.done ? 'text-decoration:line-through;color:#9ca3af' : ''}">
+            <span style="font-size:9pt">${a.done ? '☑' : '☐'}</span>
+            <span style="font-size:9pt">${escP(a.title)}</span>
+            ${a.date ? `<span style="font-size:8pt;color:#6b7280">${a.date}</span>` : ''}
+            ${a.interval ? `<span style="font-size:8pt;color:#6b7280">🔁 ${a.interval}d</span>` : ''}
+          </div>`).join('')}
+      </div>`;
+    }).join('')}`;
+    })()}
   </div>
   </body></html>`;
 
@@ -269,12 +303,12 @@ async function printDashboard() {
 
   const cardRow = (s, ageHtml) => {
     const col = COLORS[s.haltung] || '#6b748f';
-    return `<tr><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;border-left:3px solid ${col}"><strong>${escP(s.name)}</strong><br><span style="font-size:8pt;color:#6b748f">${escP(s.rolle)} · ${escP(s.projName||'')}</span></td><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:8pt;white-space:nowrap">${ageHtml}</td></tr>`;
+    return `<tr><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;border-left:3px solid ${col}"><strong>${escP(shFullName(s))}</strong><br><span style="font-size:8pt;color:#6b748f">${escP(s.rolle)} · ${escP(s.projName||'')}</span></td><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:8pt;white-space:nowrap">${ageHtml}</td></tr>`;
   };
 
   const overdueRows  = overdue.map(s => cardRow(s, `<span style="color:#dc2626">${s.daysSince===null?t('dash_never'):s.daysSince+t('days_unit')+' / '+s.interval+t('days_unit')}</span>`)).join('');
   const dueSoonRows  = dueSoon.map(s => cardRow(s, `<span style="color:#d97706">${s.daysSince}${t('days_unit')} / ${s.interval}${t('days_unit')}</span>`)).join('');
-  const bdRows       = birthdays.map(s => `<tr><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb">🎂 <strong>${escP(s.name)}</strong><br><span style="font-size:8pt;color:#6b748f">${escP(s.rolle)}</span></td><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:8pt;color:#d97706">${s.daysUntilBd===0?t('birthday_today'):s.daysUntilBd+t('days_unit')}</td></tr>`).join('');
+  const bdRows       = birthdays.map(s => `<tr><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb">🎂 <strong>${escP(shFullName(s))}</strong><br><span style="font-size:8pt;color:#6b748f">${escP(s.rolle)}</span></td><td style="padding:7px 10px;border-bottom:1px solid #e5e7eb;font-family:'DM Mono',monospace;font-size:8pt;color:#d97706">${s.daysUntilBd===0?t('birthday_today'):s.daysUntilBd+t('days_unit')}</td></tr>`).join('');
 
   const section = (title, color, rows, emptyKey) => `
     <div style="margin-bottom:24px;break-inside:avoid">

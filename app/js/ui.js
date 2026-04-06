@@ -16,7 +16,7 @@ function setSaveStatus(state) {
 function renderOrgName() {
   const sub = document.getElementById('org-subtitle');
   if (!sub) return;
-  sub.innerHTML = `<span id="org-name-display">${esc(orgName)}</span><button class="org-edit-btn" onclick="startEditOrg()" title="Bezeichnung bearbeiten">✏</button>`;
+  sub.innerHTML = `<span id="org-name-display">${esc(orgName)}</span><button class="org-edit-btn" onclick="startEditOrg()" title="${t('org_edit_title')}">✏</button>`;
 }
 
 function startEditOrg() {
@@ -36,6 +36,21 @@ function saveOrgName() {
 }
 
 // ── Project selector ──────────────────────────────────────────────────────────
+
+const PROJECT_TABS = new Set(['liste','matrix','journalsuche','plan']);
+
+function updateHeaderProject(tabName) {
+  const lbl      = document.getElementById('header-project-label');
+  const dropdown = document.getElementById('nav-proj-dropdown');
+  if (!lbl) return;
+  if (!tabName || !PROJECT_TABS.has(tabName)) {
+    lbl.textContent = t('tab_project'); // "Alle Projekte"
+    if (dropdown) dropdown.style.display = 'none';
+  } else {
+    lbl.textContent = t('label_current_project') + ' ';
+    if (dropdown) dropdown.style.display = '';
+  }
+}
 
 function renderProjectSelector() {
   const label = document.getElementById('nav-project-name');
@@ -68,6 +83,8 @@ function switchProject(id) {
   renderBirthdayAlerts();
   updateStats();
   updatePlanTabLabel();
+  const activeTab = document.querySelector('nav .tab.active')?.getAttribute('onclick')?.match(/'(\w+)'\)/)?.[1];
+  updateHeaderProject(activeTab);
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
@@ -77,12 +94,19 @@ function switchTab(btn, name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
+  updateHeaderProject(name);
   if (name === 'matrix')        renderMatrix();
   if (name === 'dashboard')     renderDashboard();
   if (name === 'plan')          renderPlan();
   if (name === 'projekte')      renderProjectsView();
   if (name === 'kontakte')      renderKontakte();
-  if (name === 'journalsuche')  renderJournalSearch();
+  if (name === 'journalsuche')   { renderJsNewContactSelect(); renderJournalSearch(); }
+  if (name === 'aufgabenview') {
+    renderAvNewContactSelect();
+    const intSel = document.getElementById('av-new-interval');
+    if (intSel && !intSel.options.length) intSel.innerHTML = _intervalOptions('');
+    renderAufgabenView();
+  }
 }
 
 // ── Panel helpers ─────────────────────────────────────────────────────────────
@@ -91,11 +115,11 @@ function closePanel(id) {
   document.getElementById(id).classList.remove('open');
 }
 
-function switchPanelTab(btn, showId, hideId) {
+function switchPanelTab(btn, show, ...hide) {
   document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById(showId).style.display = '';
-  document.getElementById(hideId).style.display = 'none';
+  document.getElementById(show).style.display = '';
+  hide.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
 }
 
 // ── Pill menus ────────────────────────────────────────────────────────────────

@@ -113,7 +113,11 @@ tbody tr:hover .row-actions{opacity:1}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .range-wrap{display:flex;align-items:center;gap:10px}
-.range-wrap input[type=range]{flex:1;accent-color:var(--accent)}
+.range-wrap input[type=range]{flex:1;margin:0;padding:0;-webkit-appearance:none;appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none;cursor:pointer}
+.range-wrap input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--border);border-radius:2px}
+.range-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;margin-top:-6px}
+.range-wrap input[type=range]::-moz-range-track{height:4px;background:var(--border);border-radius:2px}
+.range-wrap input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:none;cursor:pointer}
 .range-val{font-family:var(--font-mono);font-size:.88rem;color:var(--accent);min-width:20px}
 .form-section-title{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:18px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 
@@ -191,12 +195,18 @@ tbody tr:hover .row-actions{opacity:1}
 .onboarding-num{background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.72rem;flex-shrink:0;margin-top:1px}
 
 /* Journal Search View */
+.js-new-entry-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:18px;display:flex;flex-direction:column;gap:10px}
+.js-new-entry-row{display:flex;gap:10px;align-items:flex-start}
+.js-new-entry-box input[type=text],.js-new-entry-box input[type=date],.js-new-entry-box select,.js-new-entry-box textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-family:var(--font-body);font-size:.85rem;outline:none}
+.js-new-entry-box input[type=text]:focus,.js-new-entry-box input[type=date]:focus,.js-new-entry-box select:focus,.js-new-entry-box textarea:focus{border-color:var(--accent)}
 .js-toolbar{display:flex;gap:12px;margin-bottom:18px;align-items:center}
 .js-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:background .13s}
 .js-row:hover{background:var(--surface2)}
 .js-row-head{display:flex;align-items:center;gap:10px;margin-bottom:3px}
 .js-row-name{font-weight:600;font-size:.9rem}
 .js-row-date{font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-left:auto}
+.av-row-date{font-family:var(--font-mono);font-size:.72rem;color:var(--muted)}
+.av-row-date.overdue{color:var(--danger);font-weight:600}
 .js-row-rolle{font-size:.75rem;color:var(--muted);margin-bottom:6px}
 .js-row-text{font-size:.85rem;color:var(--text-soft);line-height:1.6;white-space:pre-wrap}
 mark.js-hi{background:rgba(212,160,23,.35);color:inherit;border-radius:2px;padding:0 1px}
@@ -223,3 +233,38 @@ mark.js-hi{background:rgba(212,160,23,.35);color:inherit;border-radius:2px;paddi
 .dash-empty{font-size:.82rem;color:var(--muted);opacity:.6;padding:8px 0}
 /* RELATIONSHIP STRENGTH STARS */
 .stars-display{color:var(--accent2);letter-spacing:2px;font-size:.95rem}
+/* Tasks (Aufgaben) */
+/* Aufgaben table */
+.aufgaben-table-wrap{overflow-x:auto}
+.aufgaben-table{width:100%;border-collapse:collapse;font-size:.84rem}
+.aufgaben-table thead th{text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.aufgaben-table tbody tr{border-bottom:1px solid var(--border)}
+.aufgaben-table tbody tr:hover{background:var(--surface2)}
+.aufgaben-table tbody tr.aufgabe-done{opacity:.6}
+.aufgaben-table tbody tr.aufgabe-overdue{border-left:3px solid var(--danger)}
+.aufgaben-table tfoot tr{border-top:2px solid var(--border);background:var(--surface2)}
+.aufgaben-table td{padding:5px 6px;vertical-align:middle}
+.aufgabe-td-check{width:28px;text-align:center}
+.aufgabe-td-title{min-width:160px}
+.aufgabe-td-date{width:130px}
+.aufgabe-td-interval{width:110px}
+.aufgabe-td-tag{width:100px}
+.aufgabe-td-del{width:36px;text-align:center}
+.aufgabe-check{width:15px;height:15px;cursor:pointer;accent-color:var(--accent)}
+.aufgabe-inline-input{background:none;border:none;border-bottom:1px solid transparent;color:var(--text);font-family:var(--font-body);font-size:.84rem;width:100%;padding:2px 4px;border-radius:0;outline:none;transition:border-color .15s}
+.aufgabe-inline-input:focus{border-bottom-color:var(--accent);background:var(--surface2)}
+.aufgabe-inline-input.aufgabe-inline-date{font-family:var(--font-mono);font-size:.78rem}
+.aufgabe-inline-input.overdue{color:var(--danger)}
+.aufgabe-inline-select{background:none;border:none;border-bottom:1px solid transparent;color:var(--muted);font-family:var(--font-mono);font-size:.75rem;padding:2px 2px;outline:none;cursor:pointer;width:100%}
+.aufgabe-inline-select:focus{border-bottom-color:var(--accent)}
+.aufgabe-toggle-done{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:.78rem;padding:4px 10px;font-family:var(--font-body);transition:all .15s}
+.aufgabe-toggle-done:hover{border-color:var(--accent);color:var(--accent)}
+.aufgabe-toggle-done.active{background:var(--surface2);border-color:var(--accent);color:var(--accent)}
+.aufgabe-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:2px 4px;opacity:0;transition:opacity .15s}
+.aufgaben-table tr:hover .aufgabe-del{opacity:1}
+.aufgabe-auto{background:rgba(79,142,247,.06)}
+.aufgabe-auto-icon{font-size:.75rem;margin-right:4px;opacity:.5}
+.aufgabe-new-input{opacity:.45;transition:opacity .15s}
+.aufgaben-table tfoot tr:focus-within .aufgabe-new-input,.aufgabe-new-input:focus{opacity:1}
+.aufgabe-add-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 8px;transition:all .15s;opacity:.5}
+.aufgabe-add-btn:hover{opacity:1;color:var(--accent);border-color:var(--accent)}

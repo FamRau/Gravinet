@@ -2,7 +2,7 @@
 
 **Stakeholder Management for Linux** — as an Electron AppImage, fully offline, no server or cloud required.
 
-Gravinet helps you capture stakeholders, map them by influence and interest, document relationships through a journal, and maintain a multi-year action plan.
+Gravinet helps you capture stakeholders, map them by influence and interest, document relationships through a journal, manage tasks per stakeholder, and maintain a multi-year action plan.
 
 > 🇩🇪 Die App ist vollständig auf Deutsch und Englisch verfügbar — umschaltbar über Einstellungen → Sprache.
 > 🇬🇧 The app is fully available in German and English — switchable via Settings → Language.
@@ -15,9 +15,13 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 - **Contacts** — central stakeholder database, shared across projects
 - **List** — stakeholder table with search, filters, birthday reminders and last-contact display
 - **Matrix** — interactive influence/interest matrix with quadrant overlay and tooltips
+- **Journal** — per-stakeholder contact notes with timestamp, type badge and full-text search; quick entry from the Journal tab
+- **Tasks** — per-stakeholder tasks with title, date, reminder, recurrence interval and tag; auto-generated contact and birthday tasks; global task view with filters
+- **Dashboard** — four columns: overdue tasks, tasks due soon, all open tasks, recent journal activity; full-text stakeholder search
 - **N-Year Plan** — flexible multi-year plan per project, measures per quarter, checkable
-- **Journal** — personal contact notes per stakeholder with timestamp
+- **Desktop Notifications** — task reminders and overdue tasks; triggered on startup and every 4 hours
 - **PDF Export** — contact sheets and project report (table + matrix + plan) as PDF to Downloads
+- **CSV Import/Export** — stakeholder data as semicolon-separated CSV
 - **Data Backup** — export/import as JSON file
 - **Light/Dark Theme** — saved and restored on next launch
 - **Language** — German and English, persisted per workspace
@@ -48,12 +52,12 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 
 ### AppImage (recommended)
 
-1. [Download the latest release](../../releases/latest) → `Gravinet-2.0.6.AppImage`
+1. [Download the latest release](../../releases/latest) → `Gravinet-2.2.0.AppImage`
 2. Make it executable and run it:
 
 ```bash
-chmod +x Gravinet-2.0.6.AppImage
-./Gravinet-2.0.6.AppImage
+chmod +x Gravinet-2.2.0.AppImage
+./Gravinet-2.2.0.AppImage
 ```
 
 Optional: Integrate into GNOME as a desktop app (Nautilus → Properties → Allow executing as program).
@@ -83,7 +87,7 @@ npm install
 npm run build-win
 ```
 
-Result: `dist/Gravinet Setup 2.0.6.exe` (NSIS installer with optional install directory selection)
+Result: `dist/Gravinet Setup 2.2.0.exe` (NSIS installer with optional install directory selection)
 
 > On Linux, install Wine first: `sudo dnf install wine`
 
@@ -98,7 +102,7 @@ npm install
 npm run build-mac
 ```
 
-Result: `dist/Gravinet-2.0.6.dmg` (universal: Intel x64 + Apple Silicon arm64)
+Result: `dist/Gravinet-2.2.0.dmg` (universal: Intel x64 + Apple Silicon arm64)
 
 > **Note:** A signed and notarized macOS app requires a paid Apple Developer account. Without signing, bypass the security warning via System Settings → Privacy & Security → "Open Anyway".
 
@@ -124,7 +128,7 @@ gravinet/
         ├── storage.js   # File-based persistence (IPC)
         ├── ui.js        # Navigation, pill menus, save status
         ├── views.js     # Table, matrix, contacts, projects rendering
-        ├── detail.js    # Detail panel + journal
+        ├── detail.js    # Detail panel, journal and tasks per stakeholder
         ├── modals.js    # All modal dialogs
         ├── plan.js      # N-year plan view
         ├── print.js     # PDF generation
@@ -189,6 +193,22 @@ All data is stored as JSON files in the Electron user-data directory:
 ---
 
 ## Changelog
+
+### v2.2.0 — Tasks, Global Views & Code Quality
+- **Tasks per stakeholder** — title, date, reminder, recurrence interval, tag; checkable; auto-generated contact and birthday tasks
+- **Global task view** (✅ Tasks tab) — searchable, filterable by status / project / tag; quick-entry form with contact and project selection
+- **Global journal entry** — new entries directly from the Journal tab (contact + type + text)
+- **Dashboard restructured** — columns now show overdue tasks, tasks due soon, all open tasks, recent journal activity; birthday tasks merged into task columns
+- **Auto birthday tasks** — created and synced per project item whenever a stakeholder has a birthday stored
+- **Auto contact tasks** — updated on every journal entry and on detail-panel open
+- **Task notifications** — reminder-date based desktop notifications (separate from overdue-contact notifications)
+- **Done tasks toggle** — show/hide completed tasks in the detail-panel task tab
+- **Simplified contact-interval display** — "Kontaktintervall: 30 Tage (Vorgabe)"
+- **Wider/taller detail panel** — max-width 1100 px, max-height 96 vh
+- **Journal redesigned as table** — matches task-tab style (Date / Type / Note columns)
+- **Slider fix** — range inputs now reach both ends correctly (custom `-webkit-` / `-moz-` thumb styles)
+- **i18n** — all hardcoded German strings replaced with `t()` calls; new keys for auto-task titles, interval label, dashboard columns, delete button
+- **Code quality** — German comments translated to English; `proj_stakeholder_count` i18n key; dashboard column-3 title key corrected
 
 ### v2.0.6 — Code Quality
 - All confirm/alert dialogs in the plan view are now fully translated (DE/EN)

@@ -9,6 +9,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Native theme sync
   setNativeTheme: (theme) => ipcRenderer.invoke('set-native-theme', theme),
 
+  // Todoist secure token
+  todoist: {
+    getToken: ()        => ipcRenderer.invoke('todoist:get-token'),
+    setToken: (token)   => ipcRenderer.invoke('todoist:set-token', token),
+  },
+
   // File-based data storage
   data: {
     getDataPath:    ()          => ipcRenderer.invoke('data:get-data-path'),

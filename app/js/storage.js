@@ -22,6 +22,7 @@ function _buildWorkspace() {
     nextAufgabeId,
     contactWarningDays,
     appLang,
+    todoistSettings,
     savedAt:            new Date().toISOString()
   };
 }
@@ -269,6 +270,7 @@ async function loadData() {
       nextAufgabeId      = ws.nextAufgabeId || 1;
       contactWarningDays = ws.contactWarningDays || 90;
       appLang            = ws.appLang || 'de';
+      if (ws.todoistSettings) todoistSettings = { ...todoistSettings, ...ws.todoistSettings };
       return;
     }
 

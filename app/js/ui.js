@@ -141,23 +141,57 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.pill-wrap')) closePillMenus();
 });
 
-// ── Settings menu sync ────────────────────────────────────────────────────────
+// ── Settings page ─────────────────────────────────────────────────────────────
 
-function syncSettingsMenu() {
-  // Sync interval select
-  const sel = document.getElementById('inline-warning-days');
+function openSettings() {
+  syncSettingsPage();
+  document.getElementById('settings-overlay').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+
+function switchSettingsCategory(btn, sectionId) {
+  document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(sectionId).classList.add('active');
+}
+
+function syncSettingsPage() {
+  // Rebuild interval select
+  const sel = document.getElementById('settings-warning-days');
   if (sel) {
-    // Rebuild options with translated day label
     const vals = [14, 30, 60, 90, 180, 365];
     sel.innerHTML = vals.map(v => `<option value="${v}"${v === contactWarningDays ? ' selected' : ''}>${v} ${t('days_label')}</option>`).join('');
   }
-  // Theme active indicator
+  // Theme buttons
   const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-  document.getElementById('theme-opt-dark')?.classList.toggle('active-opt', isDark);
-  document.getElementById('theme-opt-light')?.classList.toggle('active-opt', !isDark);
-  // Language active indicator
-  document.getElementById('lang-opt-de')?.classList.toggle('active-opt', appLang === 'de');
-  document.getElementById('lang-opt-en')?.classList.toggle('active-opt', appLang === 'en');
+  document.getElementById('theme-opt-dark')?.classList.toggle('active', isDark);
+  document.getElementById('theme-opt-light')?.classList.toggle('active', !isDark);
+  // Language buttons
+  document.getElementById('lang-opt-de')?.classList.toggle('active', appLang === 'de');
+  document.getElementById('lang-opt-en')?.classList.toggle('active', appLang === 'en');
+  // Todoist fields
+  const unEl = document.getElementById('todoist-username');
+  if (unEl) unEl.value = todoistSettings.username || '';
+  // Load token into field (masked)
+  window.electronAPI?.todoist.getToken().then(tok => {
+    const tokEl = document.getElementById('todoist-token');
+    if (tokEl) tokEl.value = tok || '';
+  });
+  // Sync mode buttons
+  ['none','start','30min','1hour'].forEach(m => {
+    document.getElementById('tsync-' + m)?.classList.toggle('active', todoistSettings.syncMode === m);
+  });
+  // Load project list if settings page is opening on todoist category
+  const tpSel = document.getElementById('todoist-project');
+  if (tpSel && tpSel.options.length <= 1) loadTodoistProjects();
+  // Fill import target dropdowns
+  _fillTodoistImportSelects();
+  // Re-apply translations (language may have changed)
+  applyTranslations();
 }
 
 function setWarningDays(val) {
@@ -171,6 +205,10 @@ function setWarningDays(val) {
 document.addEventListener('keydown', e => {
   // Esc: close any open overlay/panel
   if (e.key === 'Escape') {
+    const settingsOpen = document.getElementById('settings-overlay');
+    if (settingsOpen?.classList.contains('open')) { closeSettings(); return; }
+    const avModal = document.getElementById('av-new-modal');
+    if (avModal?.classList.contains('open')) { closeAvNewModal(); return; }
     const open = document.querySelector('.overlay.open');
     if (open) { closePanel(open.id); return; }
     closePillMenus();

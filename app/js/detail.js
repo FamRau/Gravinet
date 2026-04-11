@@ -249,8 +249,8 @@ function toggleShowDoneAufgaben(shId) {
   renderDetailAufgaben(shId);
 }
 
-function renderDetailAufgaben(shId) {
-  const el = document.getElementById('dtab-aufgaben'); if (!el) return;
+function renderDetailAufgaben(shId, elId = 'dtab-aufgaben') {
+  const el = document.getElementById(elId); if (!el) return;
   const sh = stakeholders.find(x => x.id === shId); if (!sh) return;
   const proj = getActiveProject();
   const item = proj?.items.find(i => i.shId === shId);
@@ -319,7 +319,7 @@ function addAufgabe(shId) {
   const item = proj?.items.find(i => i.shId === shId); if (!item) return;
   if (!item.aufgaben) item.aufgaben = [];
   item.aufgaben.push({ id: nextAufgabeId++, title, date, reminder, interval, tag, done: false });
-  saveNow(); renderDetailAufgaben(shId);
+  saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
 }
 
 function saveAufgabeField(shId, aufgabeId, field, value) {
@@ -351,12 +351,12 @@ function toggleAufgabe(shId, aufgabeId, done) {
       done: false
     });
   }
-  saveNow(); renderDetailAufgaben(shId);
+  saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
 }
 
 function deleteAufgabe(shId, aufgabeId) {
   const proj = getActiveProject();
   const item = proj?.items.find(i => i.shId === shId); if (!item) return;
   item.aufgaben = (item.aufgaben || []).filter(a => a.id !== aufgabeId);
-  saveNow(); renderDetailAufgaben(shId);
+  saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
 }

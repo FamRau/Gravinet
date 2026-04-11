@@ -25,6 +25,12 @@ nav{display:flex;gap:4px;padding:12px 40px;border-bottom:1px solid var(--border)
 .save-dot{width:7px;height:7px;border-radius:50%;background:var(--accent3);flex-shrink:0}
 .save-dot.pending{background:var(--accent2);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-status{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.7rem;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px;transition:background .15s;margin-left:6px}
+.sync-status:hover{background:var(--surface2)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0}
+.sync-dot.synced{background:var(--accent3)}
+.sync-dot.pending{background:var(--accent2);animation:pulse 1s infinite}
+.sync-dot.error{background:var(--danger)}
 
 /* PROJECT SELECTOR */
 .nav-project{display:flex;align-items:center;gap:8px;padding:0 16px}

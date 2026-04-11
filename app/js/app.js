@@ -20,6 +20,9 @@ async function init() {
 
   // Start desktop notification schedule for overdue contacts
   startNotificationSchedule();
+
+  // Start Todoist sync (respects syncMode setting)
+  startTodoistSync();
 }
 
 // Start when DOM is ready

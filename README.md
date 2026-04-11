@@ -16,7 +16,8 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 - **List** — stakeholder table with search, filters, birthday reminders and last-contact display
 - **Matrix** — interactive influence/interest matrix with quadrant overlay and tooltips
 - **Journal** — per-stakeholder contact notes with timestamp, type badge and full-text search; quick entry from the Journal tab
-- **Tasks** — per-stakeholder tasks with title, date, reminder, recurrence interval and tag; auto-generated contact and birthday tasks; global task view with filters
+- **Tasks** — per-stakeholder tasks with title, date, reminder, recurrence interval and tag; auto-generated contact and birthday tasks; global task view with filters, split-panel detail view, inline delete buttons
+- **Todoist Sync** — bidirectional sync with Todoist (API v1); configurable sync modes (on start / every 30 min / every hour); secure token storage via Electron safeStorage; project selection and import target; sync status indicator in nav bar
 - **Dashboard** — four columns: overdue tasks, tasks due soon, all open tasks, recent journal activity; full-text stakeholder search
 - **N-Year Plan** — flexible multi-year plan per project, measures per quarter, checkable
 - **Desktop Notifications** — task reminders and overdue tasks; triggered on startup and every 4 hours
@@ -52,12 +53,12 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 
 ### AppImage (recommended)
 
-1. [Download the latest release](../../releases/latest) → `Gravinet-2.2.0.AppImage`
+1. [Download the latest release](../../releases/latest) → `Gravinet-2.3.6.AppImage`
 2. Make it executable and run it:
 
 ```bash
-chmod +x Gravinet-2.2.0.AppImage
-./Gravinet-2.2.0.AppImage
+chmod +x Gravinet-2.3.6.AppImage
+./Gravinet-2.3.6.AppImage
 ```
 
 Optional: Integrate into GNOME as a desktop app (Nautilus → Properties → Allow executing as program).
@@ -87,7 +88,7 @@ npm install
 npm run build-win
 ```
 
-Result: `dist/Gravinet Setup 2.2.0.exe` (NSIS installer with optional install directory selection)
+Result: `dist/Gravinet Setup 2.3.6.exe` (NSIS installer with optional install directory selection)
 
 > On Linux, install Wine first: `sudo dnf install wine`
 
@@ -102,7 +103,7 @@ npm install
 npm run build-mac
 ```
 
-Result: `dist/Gravinet-2.2.0.dmg` (universal: Intel x64 + Apple Silicon arm64)
+Result: `dist/Gravinet-2.3.6.dmg` (universal: Intel x64 + Apple Silicon arm64)
 
 > **Note:** A signed and notarized macOS app requires a paid Apple Developer account. Without signing, bypass the security warning via System Settings → Privacy & Security → "Open Anyway".
 
@@ -127,11 +128,12 @@ gravinet/
         ├── theme.js     # Light/dark theme
         ├── storage.js   # File-based persistence (IPC)
         ├── ui.js        # Navigation, pill menus, save status
-        ├── views.js     # Table, matrix, contacts, projects rendering
+        ├── views.js     # Table, matrix, contacts, projects, tasks rendering
         ├── detail.js    # Detail panel, journal and tasks per stakeholder
         ├── modals.js    # All modal dialogs
         ├── plan.js      # N-year plan view
         ├── print.js     # PDF generation
+        ├── todoist.js   # Todoist bidirectional sync (API v1)
         └── app.js       # Initialisation
 ```
 
@@ -193,6 +195,18 @@ All data is stored as JSON files in the Electron user-data directory:
 ---
 
 ## Changelog
+
+### v2.3.6 — Todoist Sync, Task UX & Settings Redesign
+- **Todoist bidirectional sync** — tasks pushed to and pulled from Todoist (API v1); conflict resolution: Todoist wins for title/date, Gravinet wins for done-status; auto-generated tasks (🎂 birthday, 🔄 contact) are included with emoji prefix; stakeholder name prepended to Todoist task title
+- **Secure token storage** — API token encrypted via Electron `safeStorage`, never stored in workspace.json
+- **Sync modes** — None / On Start / Every 30 min / Every Hour, configurable in Settings → Todoist
+- **Todoist project selection** — filter sync to a specific Todoist project; set an import target (Gravinet project + contact) for new Todoist tasks
+- **Nav sync status** — clickable dot indicator (grey = idle, yellow = syncing, green = synced, red = error) next to save status; click to trigger manual sync
+- **Tasks: popup for new entries** — "Neue Aufgabe" button in toolbar opens a modal form; old inline form removed; Escape closes the modal
+- **Tasks: inline delete buttons** — each row in the task list shows a ✕ button on hover; auto-generated tasks cannot be deleted this way
+- **Tasks: split-panel detail view** — left list + right detail panel with all task fields and per-contact task table; blue highlight on selected row
+- **Settings page redesign** — full-page overlay with vertical left menu (Appearance / Contacts / Language / Todoist); replaces the old dropdown
+- **Validation feedback** — required fields (contact, project, title) are highlighted with a red border when saving with missing data
 
 ### v2.2.0 — Tasks, Global Views & Code Quality
 - **Tasks per stakeholder** — title, date, reminder, recurrence interval, tag; checkable; auto-generated contact and birthday tasks

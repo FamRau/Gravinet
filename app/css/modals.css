@@ -1,3 +1,32 @@
+/* SETTINGS PAGE */
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.settings-overlay.open{opacity:1;pointer-events:all}
+.settings-page{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:92%;max-width:860px;height:78vh;max-height:700px;display:flex;overflow:hidden;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+.settings-sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--border);background:var(--bg);padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+.settings-sidebar-title{font-family:var(--font-mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:10px 12px 6px;opacity:.6}
+.settings-nav-item{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:9px 12px;border-radius:10px;font-family:var(--font-body);font-size:.84rem;color:var(--text);background:none;border:none;cursor:pointer;transition:background .13s}
+.settings-nav-item:hover{background:var(--surface2)}
+.settings-nav-item.active{background:rgba(79,142,247,.12);color:var(--accent);font-weight:600}
+.settings-nav-item .s-icon{font-size:.95rem;opacity:.75;width:18px;text-align:center}
+.settings-content{flex:1;overflow-y:auto;padding:32px 36px}
+.settings-page-close{position:absolute;top:16px;right:18px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:.85rem;padding:4px 10px;transition:all .15s;z-index:1}
+.settings-page-close:hover{color:var(--danger);border-color:var(--danger)}
+.settings-section{display:none}
+.settings-section.active{display:block}
+.settings-section-title{font-family:var(--font-serif);font-size:1.25rem;font-weight:600;margin-bottom:6px}
+.settings-section-sub{font-size:.83rem;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.settings-row{display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
+.settings-row-label{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.settings-row-desc{font-size:.8rem;color:var(--muted);opacity:.75;margin-top:2px}
+.settings-btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.settings-choice-btn{padding:8px 18px;border-radius:10px;font-family:var(--font-body);font-size:.84rem;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all .18s}
+.settings-choice-btn:hover{border-color:var(--accent);color:var(--accent)}
+.settings-choice-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.settings-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-family:var(--font-body);font-size:.84rem;outline:none;cursor:pointer;margin-top:6px}
+.settings-select:focus{border-color:var(--accent)}
+.settings-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-family:var(--font-body);font-size:.84rem;outline:none;margin-top:6px;width:100%}
+.settings-input:focus{border-color:var(--accent)}
+
 /* BIRTHDAY ALERT */
 .birthday-bar{background:rgba(247,201,79,.1);border:1px solid rgba(247,201,79,.3);border-radius:10px;padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--accent2)}
 .bday-chip{display:inline-block;padding:1px 7px;border-radius:20px;font-size:.68rem;font-weight:600;font-family:var(--font-mono);background:rgba(247,201,79,.18);color:var(--accent2);margin-left:7px;vertical-align:middle;letter-spacing:.02em}

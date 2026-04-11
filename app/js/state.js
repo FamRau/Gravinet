@@ -20,3 +20,13 @@ let contactWarningDays = 90;
 
 // Language
 let appLang = 'de';   // 'de' | 'en'
+
+// Todoist integration settings (token stored separately via safeStorage)
+let todoistSettings = {
+  username: '',
+  syncMode: 'none',   // 'none' | 'start' | '30min' | '1hour'
+  projectId: '',      // Todoist project ID to sync with ('' = Inbox)
+  projectName: '',    // display name for UI
+  importShId:   '',   // Gravinet stakeholder ID for importing new Todoist tasks
+  importProjId: '',   // Gravinet project ID for importing new Todoist tasks
+};

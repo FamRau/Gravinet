@@ -1,7 +1,7 @@
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 process.env['GTK_THEME'] = 'Adwaita:dark';
 
-const { app, BrowserWindow, shell, Menu, nativeTheme, ipcMain } = require('electron');
+const { app, BrowserWindow, shell, Menu, nativeTheme, ipcMain, safeStorage } = require('electron');
 const path = require('path');
 const fs   = require('fs');
 const os   = require('os');
@@ -153,6 +153,36 @@ ipcMain.handle('print-pdf', async (event, { html, filename }) => {
     try { fs.unlinkSync(tmpFile); } catch {}
     return { ok: false, error: err.message };
   }
+});
+
+// ══ TODOIST SECURE TOKEN ══
+// Token is encrypted with Electron safeStorage and stored as a hex-encoded file.
+function getTokenPath() { return path.join(getDataDir(), 'todoist.key'); }
+
+ipcMain.handle('todoist:get-token', () => {
+  try {
+    const f = getTokenPath();
+    if (!fs.existsSync(f)) return '';
+    if (!safeStorage.isEncryptionAvailable()) {
+      return fs.readFileSync(f, 'utf-8'); // fallback: plain
+    }
+    const buf = Buffer.from(fs.readFileSync(f, 'utf-8'), 'hex');
+    return safeStorage.decryptString(buf);
+  } catch { return ''; }
+});
+
+ipcMain.handle('todoist:set-token', (_, token) => {
+  try {
+    ensureDirs();
+    if (!token) { try { fs.unlinkSync(getTokenPath()); } catch {} return { ok: true }; }
+    if (!safeStorage.isEncryptionAvailable()) {
+      fs.writeFileSync(getTokenPath(), token, 'utf-8');
+    } else {
+      const enc = safeStorage.encryptString(token);
+      fs.writeFileSync(getTokenPath(), enc.toString('hex'), 'utf-8');
+    }
+    return { ok: true };
+  } catch (e) { return { ok: false, error: e.message }; }
 });
 
 // ══ NATIVE THEME SYNC ══

@@ -609,11 +609,39 @@ function renderAvNewProjSelect() {
   projSel.value = shProjects.find(p => p.id == cur) ? cur : (shProjects.length === 1 ? String(shProjects[0].id) : '');
 }
 
+function openAvNewModal() {
+  renderAvNewContactSelect();
+  const intSel = document.getElementById('av-new-interval');
+  if (intSel && !intSel.options.length) intSel.innerHTML = _intervalOptions('');
+  document.getElementById('av-new-modal').classList.add('open');
+  setTimeout(() => document.getElementById('av-new-title')?.focus(), 80);
+}
+
+function closeAvNewModal() {
+  document.getElementById('av-new-modal').classList.remove('open');
+}
+
 function addAufgabeFromView() {
   const shId  = parseInt(document.getElementById('av-new-contact')?.value);
   const projId = parseInt(document.getElementById('av-new-proj')?.value);
   const title  = document.getElementById('av-new-title')?.value.trim();
-  if (!shId || !projId || !title) return;
+  if (!shId || !projId || !title) {
+    const fields = [
+      { id: 'av-new-contact', empty: !shId },
+      { id: 'av-new-proj',    empty: !projId },
+      { id: 'av-new-title',   empty: !title },
+    ];
+    fields.forEach(({ id, empty }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (empty) {
+        el.classList.add('input-error');
+        el.addEventListener('input', () => el.classList.remove('input-error'), { once: true });
+        el.addEventListener('change', () => el.classList.remove('input-error'), { once: true });
+      }
+    });
+    return;
+  }
   const proj = projects.find(p => p.id == projId); if (!proj) return;
   const item = proj.items.find(i => i.shId == shId); if (!item) return;
   if (!item.aufgaben) item.aufgaben = [];
@@ -623,9 +651,11 @@ function addAufgabeFromView() {
   const tag      = document.getElementById('av-new-tag')?.value.trim() || '';
   item.aufgaben.push({ id: nextAufgabeId++, title, date, reminder, interval, tag, done: false });
   saveNow();
+  closeAvNewModal();
   // Reset fields
   ['av-new-title','av-new-date','av-new-reminder','av-new-tag'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  document.getElementById('av-new-interval').value = '';
+  const intEl = document.getElementById('av-new-interval');
+  if (intEl) intEl.value = '';
   renderAufgabenView();
 }
 
@@ -679,7 +709,12 @@ function renderAufgabenView() {
     return true;
   });
 
-  filtered.sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1);
+  const sort = document.getElementById('av-sort')?.value || 'date';
+  filtered.sort((a, b) => {
+    if (sort === 'title') return (a.title||'').localeCompare(b.title||'');
+    if (sort === 'name')  return (a.shName||'').localeCompare(b.shName||'');
+    return (a.date || '9999') < (b.date || '9999') ? -1 : 1;
+  });
 
   if (filtered.length === 0) {
     el.innerHTML = `<div style="color:var(--muted);padding:30px 0;text-align:center">${t('av_empty')}</div>`;
@@ -689,22 +724,165 @@ function renderAufgabenView() {
   const hi = s => q ? s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), m => `<mark class="js-hi">${m}</mark>`) : s;
 
   el.innerHTML = filtered.map(a => {
-    const overdue  = !a.done && a.date && a.date < today;
-    const remindDue = !a.done && a.reminder && a.reminder <= today;
-    const autoIcon = a.autoBirthday ? '🎂 ' : a.autoContact ? '🔄 ' : '';
-    const dateStr  = a.date ? `<span class="av-row-date${overdue ? ' overdue' : ''}">${a.date}</span>` : '';
-    const reminderStr = a.reminder ? `<span class="av-row-date${remindDue ? ' overdue' : ''}" title="${t('aufgaben_th_reminder')}">🔔 ${a.reminder}</span>` : '';
-    const tagChip  = a.tag ? `<span class="dash-proj-tag">${esc(a.tag)}</span>` : '';
-    const projChip = `<span style="font-size:.72rem;color:var(--muted)">${esc(a.projName)}</span>`;
-    return `<div class="js-row${a.done ? ' aufgabe-done' : ''}" onclick="switchProject('${a.projId}');openDetailAufgaben(${a.shId})">
-      <div class="js-row-head">
-        <span class="js-row-name">${a.done ? '✅ ' : overdue ? '⚠️ ' : ''}${autoIcon}${hi(esc(a.title))}</span>
-        ${dateStr}${reminderStr}
-        ${tagChip}
+    const overdue   = !a.done && a.date && a.date < today;
+    const autoIcon  = a.autoBirthday ? '🎂 ' : a.autoContact ? '🔄 ' : '';
+    const isSelected = _avDetailCtx && _avDetailCtx.aufgabeId === a.id && _avDetailCtx.projId === a.projId;
+    const dateLabel = a.date ? `<span class="av-row-date${overdue ? ' overdue' : ''}">${a.date}</span>` : '';
+    const autoRow = !!(a.autoBirthday || a.autoContact);
+    return `<div class="js-row${a.done ? ' aufgabe-done' : ''}${isSelected ? ' av-selected' : ''}" data-sh="${a.shId}" data-proj="${a.projId}" data-id="${a.id}" onclick="selectAvDetail(${a.shId},'${a.projId}',${a.id})">
+      <input type="checkbox" class="av-list-check" ${a.done ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleAufgabeGlobal('${a.projId}',${a.shId},${a.id},this.checked)">
+      <div class="js-row-body">
+        <div class="js-row-head">
+          <span class="js-row-name">${overdue ? '⚠️ ' : ''}${autoIcon}${hi(esc(a.title))}</span>
+          ${dateLabel}
+        </div>
+        <div class="av-row-sh-name">${hi(esc(a.shName))}</div>
       </div>
-      <div class="js-row-rolle">${hi(esc(a.shName))} · ${esc(a.shRolle)} · ${projChip}</div>
+      ${autoRow ? '' : `<button class="av-row-del" onclick="event.stopPropagation();deleteAufgabeGlobal(${a.projId},${a.shId},${a.id})" title="${t('btn_delete')}">✕</button>`}
     </div>`;
   }).join('');
+
+  // Auto-select first task if nothing selected yet
+  if (!_avDetailCtx && filtered.length > 0) {
+    const first = filtered[0];
+    selectAvDetail(first.shId, first.projId, first.id);
+  }
+}
+
+// ── Aufgaben view detail panel ────────────────────────────────────────────────
+
+let _avDetailCtx = null;
+
+function selectAvDetail(shId, projId, aufgabeId) {
+  _avDetailCtx = { shId, projId: parseInt(projId), aufgabeId };
+  renderAufgabenView();
+  // Ensure the row is highlighted even if isSelected check missed it (e.g. type mismatch)
+  document.querySelectorAll('#av-body .js-row').forEach(r => r.classList.remove('av-selected'));
+  const sel = document.querySelector(`#av-body .js-row[data-id="${aufgabeId}"]`);
+  if (sel) sel.classList.add('av-selected');
+  renderAvDetailIfOpen();
+}
+
+function renderAvDetailIfOpen() {
+  if (!_avDetailCtx) return;
+  const el = document.getElementById('av-detail'); if (!el) return;
+  const { shId, projId, aufgabeId } = _avDetailCtx;
+
+  const savedProj = activeProjectId;
+  activeProjectId = projId;
+
+  const sh   = stakeholders.find(s => s.id === shId);
+  const proj = getActiveProject();
+  const item = proj?.items.find(i => i.shId === shId);
+  const task = item?.aufgaben?.find(a => a.id === aufgabeId);
+
+  if (!sh || !task) { el.innerHTML = `<div class="av-detail-empty">${t('av_detail_select')}</div>`; activeProjectId = savedProj; return; }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const overdue = !task.done && task.date && task.date < today;
+
+  // ── Top card: selected task fields ──
+  const topCard = `
+    <div class="av-detail-task-card">
+      <div class="av-detail-task-title"${overdue ? ' style="color:var(--danger)"' : ''}>${esc(task.title)}</div>
+      <div class="av-detail-fields">
+        <div class="av-detail-field">
+          <div class="av-detail-field-label">${t('aufgaben_th_date')}</div>
+          <input type="date" value="${task.date||''}" onchange="saveAufgabeFieldGlobal(${projId},${shId},${aufgabeId},'date',this.value)">
+        </div>
+        <div class="av-detail-field">
+          <div class="av-detail-field-label">${t('aufgaben_th_reminder')}</div>
+          <input type="date" value="${task.reminder||''}" onchange="saveAufgabeFieldGlobal(${projId},${shId},${aufgabeId},'reminder',this.value)">
+        </div>
+        <div class="av-detail-field">
+          <div class="av-detail-field-label">${t('aufgaben_th_interval')}</div>
+          <select onchange="saveAufgabeFieldGlobal(${projId},${shId},${aufgabeId},'interval',this.value?parseInt(this.value):null)">${_intervalOptions(task.interval)}</select>
+        </div>
+        <div class="av-detail-field">
+          <div class="av-detail-field-label">${t('aufgaben_th_tag')}</div>
+          <input type="text" value="${esc(task.tag||'')}" placeholder="${t('aufgaben_tag_placeholder')}" onchange="saveAufgabeFieldGlobal(${projId},${shId},${aufgabeId},'tag',this.value)">
+        </div>
+        <div class="av-detail-field av-detail-field-notes">
+          <div class="av-detail-field-label">${t('aufgaben_th_notes')}</div>
+          <textarea onchange="saveAufgabeFieldGlobal(${projId},${shId},${aufgabeId},'notes',this.value)">${esc(task.notes||'')}</textarea>
+        </div>
+      </div>
+    </div>`;
+
+  // ── Bottom: all tasks of this contact ──
+  const allTasks = (item.aufgaben || []).slice().sort((a, b) => (a.date||'9999') < (b.date||'9999') ? -1 : 1);
+  const doneCount = allTasks.filter(a => a.done).length;
+  const visibleTasks = _showDoneAufgaben ? allTasks : allTasks.filter(a => !a.done);
+  const taskRows = visibleTasks.map(tk => {
+    const od = !tk.done && tk.date && tk.date < today;
+    const autoRow = !!(tk.autoContact || tk.autoBirthday);
+    const autoIcon = tk.autoBirthday ? '🎂' : '🔄';
+    const isSel = tk.id === aufgabeId;
+    return `<tr class="${tk.done ? 'aufgabe-done' : ''}${od ? ' aufgabe-overdue' : ''}${autoRow ? ' aufgabe-auto' : ''}${isSel ? ' av-task-sel' : ''} av-task-clickable" onclick="selectAvDetail(${shId},'${projId}',${tk.id})">
+      <td class="aufgabe-td-check" onclick="event.stopPropagation()"><input type="checkbox" class="aufgabe-check" ${tk.done ? 'checked' : ''} onchange="toggleAufgabeGlobal('${projId}',${shId},${tk.id},this.checked)"></td>
+      <td class="aufgabe-td-title">${autoRow ? `<span class="aufgabe-auto-icon">${autoIcon}</span>` : ''}<span style="font-size:.84rem${tk.done ? ';text-decoration:line-through;color:var(--muted)' : ''}">${esc(tk.title)}</span></td>
+      <td class="aufgabe-td-del" onclick="event.stopPropagation()">${autoRow ? '' : `<button class="aufgabe-del" onclick="deleteAufgabeGlobal(${projId},${shId},${tk.id})">✕</button>`}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    ${topCard}
+    <div class="av-detail-section-sep">
+      <span class="av-detail-section-sep-name">${esc(shFullName(sh))}</span>
+      <span class="av-detail-section-sep-label">${t('av_weitere_aufgaben')}</span>
+      ${doneCount > 0 ? `<button class="aufgabe-toggle-done${_showDoneAufgaben?' active':''}" style="margin-left:auto" onclick="toggleShowDoneAufgaben(${shId})">
+        ${_showDoneAufgaben?(appLang==='en'?'Hide done':'Erledigte ausblenden'):(appLang==='en'?`Done (${doneCount})`:`Erledigt (${doneCount})`)}
+      </button>` : ''}
+    </div>
+    <div class="aufgaben-table-wrap">
+      <table class="aufgaben-table">
+        <tbody>${taskRows}</tbody>
+        <tfoot><tr>
+          <td class="aufgabe-td-check"></td>
+          <td class="aufgabe-td-title"><input class="aufgabe-inline-input aufgabe-new-input" type="text" id="aufgabe-new-title-avd-${shId}" placeholder="${t('aufgaben_title_placeholder')}" onkeydown="if(event.key==='Enter')addAufgabeGlobal(${projId},${shId})"></td>
+          <td class="aufgabe-td-del"><button class="aufgabe-add-btn" onclick="addAufgabeGlobal(${projId},${shId})">＋</button></td>
+        </tr></tfoot>
+      </table>
+    </div>`;
+
+  activeProjectId = savedProj;
+}
+
+function saveAufgabeFieldGlobal(projId, shId, aufgabeId, field, value) {
+  const savedProj = activeProjectId;
+  activeProjectId = parseInt(projId);
+  saveAufgabeField(shId, aufgabeId, field, value);
+  activeProjectId = savedProj;
+  renderAufgabenView();
+}
+
+function deleteAufgabeGlobal(projId, shId, aufgabeId) {
+  const savedProj = activeProjectId;
+  activeProjectId = parseInt(projId);
+  deleteAufgabe(shId, aufgabeId);
+  activeProjectId = savedProj;
+}
+
+function addAufgabeGlobal(projId, shId) {
+  const title = document.getElementById(`aufgabe-new-title-avd-${shId}`)?.value.trim();
+  if (!title) return;
+  const savedProj = activeProjectId;
+  activeProjectId = parseInt(projId);
+  const proj = getActiveProject();
+  const item = proj?.items.find(i => i.shId === shId); if (!item) { activeProjectId = savedProj; return; }
+  if (!item.aufgaben) item.aufgaben = [];
+  item.aufgaben.push({ id: nextAufgabeId++, title, date: '', reminder: '', interval: null, tag: '', done: false });
+  saveNow();
+  activeProjectId = savedProj;
+  renderAvDetailIfOpen();
+  renderAufgabenView();
+}
+
+function toggleAufgabeGlobal(projId, shId, aufgabeId, done) {
+  const savedProj = activeProjectId;
+  activeProjectId = parseInt(projId);
+  toggleAufgabe(shId, aufgabeId, done);
+  activeProjectId = savedProj;
 }
 
 function switchProjectAndView(id) {

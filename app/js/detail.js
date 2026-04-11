@@ -66,6 +66,7 @@ function _syncBirthdayTask(shId) {
 
 function _contactIntervalDisplay(s) {
   const interval = getContactInterval(s);
+  if (interval === -1) return `${t('detail_contact_interval_label')}: ${t('interval_none')}`;
   const isDefault = !s.contactInterval;
   const defaultSuffix = isDefault ? t('interval_default_suffix') : '';
   return `${t('detail_contact_interval_label')}: ${interval} ${t('days_label')}${defaultSuffix}`;
@@ -319,7 +320,7 @@ function addAufgabe(shId) {
   const item = proj?.items.find(i => i.shId === shId); if (!item) return;
   if (!item.aufgaben) item.aufgaben = [];
   item.aufgaben.push({ id: nextAufgabeId++, title, date, reminder, interval, tag, done: false });
-  saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
+  _markTasksDirty(); saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
 }
 
 function saveAufgabeField(shId, aufgabeId, field, value) {
@@ -327,7 +328,7 @@ function saveAufgabeField(shId, aufgabeId, field, value) {
   const item = proj?.items.find(i => i.shId === shId); if (!item) return;
   const task = item.aufgaben?.find(a => a.id === aufgabeId); if (!task) return;
   task[field] = value;
-  saveNow();
+  _markTasksDirty(); saveNow();
 }
 
 function toggleAufgabe(shId, aufgabeId, done) {
@@ -351,12 +352,14 @@ function toggleAufgabe(shId, aufgabeId, done) {
       done: false
     });
   }
-  saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
+  _markTasksDirty(); saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
 }
 
 function deleteAufgabe(shId, aufgabeId) {
   const proj = getActiveProject();
   const item = proj?.items.find(i => i.shId === shId); if (!item) return;
+  const task = (item.aufgaben || []).find(a => a.id === aufgabeId);
+  if (task?.todoistId) _deleteRemoteTask(task.todoistId);
   item.aufgaben = (item.aufgaben || []).filter(a => a.id !== aufgabeId);
-  saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
+  _markTasksDirty(); saveNow(); renderDetailAufgaben(shId); renderAvDetailIfOpen(); renderAufgabenView();
 }

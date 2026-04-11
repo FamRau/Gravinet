@@ -26,6 +26,7 @@ function checkAndNotify() {
       const sh = stakeholders.find(s => s.id === item.shId); if (!sh) return;
       const s = { ...sh, ...item };
       const interval = getContactInterval(s);
+      if (interval === -1) return; // no interval tracking
       const j = sh.journal || [];
       const lastEntry = j.length ? j.reduce((a, b) => a.date > b.date ? a : b) : null;
       const daysSince = lastEntry

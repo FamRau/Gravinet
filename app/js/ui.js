@@ -100,7 +100,7 @@ function switchTab(btn, name) {
   if (name === 'plan')          renderPlan();
   if (name === 'projekte')      renderProjectsView();
   if (name === 'kontakte')      renderKontakte();
-  if (name === 'journalsuche')   { renderJsNewContactSelect(); renderJournalSearch(); }
+  if (name === 'journalsuche')   { _jsDetailCtx = null; renderJsNewContactSelect(); renderJournalSearch(); renderJsDetailIfOpen(); }
   if (name === 'aufgabenview') {
     renderAvNewContactSelect();
     const intSel = document.getElementById('av-new-interval');
@@ -207,6 +207,8 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     const settingsOpen = document.getElementById('settings-overlay');
     if (settingsOpen?.classList.contains('open')) { closeSettings(); return; }
+    const jsModal = document.getElementById('js-new-modal');
+    if (jsModal?.classList.contains('open')) { closeJsNewModal(); return; }
     const avModal = document.getElementById('av-new-modal');
     if (avModal?.classList.contains('open')) { closeAvNewModal(); return; }
     const open = document.querySelector('.overlay.open');

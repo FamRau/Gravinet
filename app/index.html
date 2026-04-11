@@ -95,9 +95,9 @@
   <button class="tab active" data-i18n="tab_dashboard" onclick="switchTab(this,'dashboard')">📊 Dashboard</button>
   <button class="tab" data-i18n="tab_list" onclick="switchTab(this,'liste')">📋 Stakeholder</button>
   <button class="tab" data-i18n="tab_matrix" onclick="switchTab(this,'matrix')">🎯 Matrix</button>
-  <button class="tab" data-i18n="tab_journal_search" onclick="switchTab(this,'journalsuche')">🔍 Journal</button>
+  <button class="tab" id="plan-tab" onclick="switchTab(this,'plan')">📅 N-Jahres-Plan</button>
   <button class="tab" data-i18n="tab_aufgaben_view" onclick="switchTab(this,'aufgabenview')">✅ Aufgaben</button>
-  <button class="tab" id="plan-tab" onclick="switchTab(this,'plan')">📅 5-Jahres-Plan</button>
+  <button class="tab" data-i18n="tab_journal_search" onclick="switchTab(this,'journalsuche')">🔍 Journal</button>
   <div class="nav-spacer"></div>
   <div class="save-status"><div class="save-dot" id="save-dot"></div><span id="save-label">Lädt…</span></div>
   <div class="sync-status" id="todoist-nav-sync" onclick="todoistSyncNow()" title="Todoist-Synchronisierung">
@@ -160,27 +160,7 @@
 
 <!-- JOURNAL SEARCH VIEW -->
 <div class="view" id="view-journalsuche">
-  <!-- New entry form -->
-  <div class="js-new-entry-box">
-    <div class="js-new-entry-row">
-      <select class="filter" id="js-new-contact">
-        <option value="" data-i18n="js_select_contact">Kontakt wählen…</option>
-      </select>
-      <select class="filter" id="js-new-type">
-        <option value="" data-i18n="journal_search_all_types">Alle Typen</option>
-        <option value="meeting" data-i18n="jtype_meeting">📅 Meeting</option>
-        <option value="email"   data-i18n="jtype_email">✉ E-Mail</option>
-        <option value="call"    data-i18n="jtype_call">📞 Telefonat</option>
-        <option value="talk"    data-i18n="jtype_talk">💬 Gespräch</option>
-        <option value="other"   data-i18n="jtype_other">📝 Sonstiges</option>
-      </select>
-    </div>
-    <div class="js-new-entry-row">
-      <textarea class="journal-textarea" id="js-new-text" rows="2" data-i18n-ph="journal_placeholder" placeholder="Notiz…" style="flex:1;margin:0"></textarea>
-      <button class="btn btn-primary" onclick="addJournalFromSearch()" data-i18n="btn_save_entry">Speichern</button>
-    </div>
-  </div>
-  <!-- Search toolbar -->
+  <!-- Toolbar -->
   <div class="js-toolbar">
     <input class="search-box" id="js-query" type="text" data-i18n-ph="journal_search_placeholder" placeholder="Journaleinträge durchsuchen…" oninput="renderJournalSearch()">
     <select class="filter" id="js-type" onchange="renderJournalSearch()">
@@ -191,8 +171,15 @@
       <option value="talk"    data-i18n="jtype_talk">💬 Gespräch</option>
       <option value="other"   data-i18n="jtype_other">📝 Sonstiges</option>
     </select>
+    <button class="btn btn-primary av-new-btn" onclick="openJsNewModal()" data-i18n="journal_new_entry">＋ Neuer Eintrag</button>
   </div>
-  <div id="journal-search-body"></div>
+  <!-- Split layout -->
+  <div class="av-split">
+    <div class="av-split-list" id="journal-search-body"></div>
+    <div class="av-split-detail" id="js-detail">
+      <div class="av-detail-empty" data-i18n="js_detail_select">← Eintrag auswählen</div>
+    </div>
+  </div>
 </div>
 
 <!-- AUFGABEN VIEW -->
@@ -312,6 +299,7 @@
       <div class="form-group"><label data-i18n="label_contact_interval">Kontakt-Intervall</label>
         <select id="e-contact-interval">
           <option value="">Standard</option>
+          <option value="-1" data-i18n="interval_none">Keine</option>
           <option value="14">14 Tage</option><option value="30">30 Tage</option>
           <option value="60">60 Tage</option><option value="90">90 Tage</option>
           <option value="180">180 Tage</option><option value="365">365 Tage</option>
@@ -365,6 +353,7 @@
       <div class="form-group"><label data-i18n="label_contact_interval">Kontakt-Intervall</label>
         <select id="link-contact-interval">
           <option value="">Standard</option>
+          <option value="-1" data-i18n="interval_none">Keine</option>
           <option value="14">14 Tage</option><option value="30">30 Tage</option>
           <option value="60">60 Tage</option><option value="90">90 Tage</option>
           <option value="180">180 Tage</option><option value="365">365 Tage</option>
@@ -414,6 +403,7 @@
       <div class="form-group"><label data-i18n="label_contact_interval">Kontakt-Intervall</label>
         <select id="f-contact-interval">
           <option value="">Standard</option>
+          <option value="-1" data-i18n="interval_none">Keine</option>
           <option value="14">14 Tage</option><option value="30">30 Tage</option>
           <option value="60">60 Tage</option><option value="90">90 Tage</option>
           <option value="180">180 Tage</option><option value="365">365 Tage</option>
@@ -510,6 +500,41 @@
     </div>
     <div class="form-group"><label data-i18n="label_measure">Maßnahme</label><textarea id="pi-text" rows="3"></textarea></div>
     <button class="btn btn-primary" data-i18n="btn_save" style="width:100%" onclick="savePlanItem()">Speichern</button>
+  </div>
+</div>
+
+<!-- ══ NEW JOURNAL MODAL ══ -->
+<div class="overlay" id="js-new-modal" onclick="if(event.target===this)closeJsNewModal()">
+  <div class="panel" style="max-width:480px">
+    <button class="panel-close" onclick="closeJsNewModal()">✕</button>
+    <h2 class="panel-title" data-i18n="journal_new_entry">Neuer Eintrag</h2>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+      <div>
+        <label class="av-modal-label" data-i18n="js_select_contact">Kontakt</label>
+        <select class="filter" style="width:100%" id="js-new-contact">
+          <option value="" data-i18n="js_select_contact">Kontakt wählen…</option>
+        </select>
+      </div>
+      <div>
+        <label class="av-modal-label" data-i18n="journal_type">Typ</label>
+        <select class="filter" style="width:100%" id="js-new-type">
+          <option value="" data-i18n="journal_search_all_types">—</option>
+          <option value="meeting" data-i18n="jtype_meeting">📅 Meeting</option>
+          <option value="email"   data-i18n="jtype_email">✉ E-Mail</option>
+          <option value="call"    data-i18n="jtype_call">📞 Telefonat</option>
+          <option value="talk"    data-i18n="jtype_talk">💬 Gespräch</option>
+          <option value="other"   data-i18n="jtype_other">📝 Sonstiges</option>
+        </select>
+      </div>
+      <div>
+        <label class="av-modal-label" data-i18n="journal_placeholder">Notiz</label>
+        <textarea class="journal-textarea" id="js-new-text" rows="4" data-i18n-ph="journal_placeholder" placeholder="Notiz…" style="width:100%;box-sizing:border-box;margin:0"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px">
+        <button class="btn" onclick="closeJsNewModal()" data-i18n="btn_cancel">Abbrechen</button>
+        <button class="btn btn-primary" onclick="addJournalFromSearch()" data-i18n="btn_save_entry">Speichern</button>
+      </div>
+    </div>
   </div>
 </div>
 

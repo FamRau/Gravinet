@@ -151,6 +151,22 @@ async function _updateRemoteTask(todoistId, fields) {
   });
 }
 
+// Call after any local task change to signal unsynced state
+function _markTasksDirty() {
+  if (todoistSettings.syncMode && todoistSettings.syncMode !== 'none') {
+    _setNavSyncStatus('pending');
+  }
+}
+
+async function _deleteRemoteTask(todoistId) {
+  try {
+    await _todoistFetch('/tasks/' + todoistId, { method: 'DELETE' });
+  } catch (e) {
+    // Ignore 404 (already gone on Todoist)
+    if (!e.message.includes('404')) console.warn('Todoist delete failed:', e.message);
+  }
+}
+
 // ── Main sync ─────────────────────────────────────────────────────────────────
 
 function _setNavSyncStatus(state) {

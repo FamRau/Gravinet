@@ -12,12 +12,12 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 ## Features
 
 - **Projects** — multiple stakeholder projects, each with its own configuration, plan and description
-- **Contacts** — central stakeholder database, shared across projects
+- **Contacts** — central stakeholder database, shared across projects; per-stakeholder contact interval (including "None")
 - **List** — stakeholder table with search, filters, birthday reminders and last-contact display
 - **Matrix** — interactive influence/interest matrix with quadrant overlay and tooltips
-- **Journal** — per-stakeholder contact notes with timestamp, type badge and full-text search; quick entry from the Journal tab
-- **Tasks** — per-stakeholder tasks with title, date, reminder, recurrence interval and tag; auto-generated contact and birthday tasks; global task view with filters, split-panel detail view, inline delete buttons
-- **Todoist Sync** — bidirectional sync with Todoist (API v1); configurable sync modes (on start / every 30 min / every hour); secure token storage via Electron safeStorage; project selection and import target; sync status indicator in nav bar
+- **Journal** — split-panel view: entry list left, full detail right; new entries via popup modal; inline delete; full-text search with type filter
+- **Tasks** — split-panel view: task list left, detail right; new entries via popup modal; inline delete buttons; sort by date / title / name; auto-generated contact and birthday tasks; done-task toggle
+- **Todoist Sync** — bidirectional sync with Todoist (API v1); sync modes: on start / every 30 min / every hour; secure token storage via Electron `safeStorage`; project selection and import target; deleted tasks are also removed from Todoist; nav sync status indicator (grey / yellow / green / red)
 - **Dashboard** — four columns: overdue tasks, tasks due soon, all open tasks, recent journal activity; full-text stakeholder search
 - **N-Year Plan** — flexible multi-year plan per project, measures per quarter, checkable
 - **Desktop Notifications** — task reminders and overdue tasks; triggered on startup and every 4 hours
@@ -53,12 +53,12 @@ Gravinet helps you capture stakeholders, map them by influence and interest, doc
 
 ### AppImage (recommended)
 
-1. [Download the latest release](../../releases/latest) → `Gravinet-2.3.6.AppImage`
+1. [Download the latest release](../../releases/latest) → `Gravinet-2.4.0.AppImage`
 2. Make it executable and run it:
 
 ```bash
-chmod +x Gravinet-2.3.6.AppImage
-./Gravinet-2.3.6.AppImage
+chmod +x Gravinet-2.4.0.AppImage
+./Gravinet-2.4.0.AppImage
 ```
 
 Optional: Integrate into GNOME as a desktop app (Nautilus → Properties → Allow executing as program).
@@ -88,7 +88,7 @@ npm install
 npm run build-win
 ```
 
-Result: `dist/Gravinet Setup 2.3.6.exe` (NSIS installer with optional install directory selection)
+Result: `dist/Gravinet Setup 2.4.0.exe` (NSIS installer with optional install directory selection)
 
 > On Linux, install Wine first: `sudo dnf install wine`
 
@@ -103,7 +103,7 @@ npm install
 npm run build-mac
 ```
 
-Result: `dist/Gravinet-2.3.6.dmg` (universal: Intel x64 + Apple Silicon arm64)
+Result: `dist/Gravinet-2.4.0.dmg` (universal: Intel x64 + Apple Silicon arm64)
 
 > **Note:** A signed and notarized macOS app requires a paid Apple Developer account. Without signing, bypass the security warning via System Settings → Privacy & Security → "Open Anyway".
 
@@ -128,7 +128,7 @@ gravinet/
         ├── theme.js     # Light/dark theme
         ├── storage.js   # File-based persistence (IPC)
         ├── ui.js        # Navigation, pill menus, save status
-        ├── views.js     # Table, matrix, contacts, projects, tasks rendering
+        ├── views.js     # Table, matrix, contacts, projects, tasks, journal rendering
         ├── detail.js    # Detail panel, journal and tasks per stakeholder
         ├── modals.js    # All modal dialogs
         ├── plan.js      # N-year plan view
@@ -161,6 +161,8 @@ All data is stored as JSON files in the Electron user-data directory:
 | Action | Shortcut |
 |--------|----------|
 | Save new plan measure | `Enter` in text field |
+| Close modal / panel | `Escape` |
+| Focus search box | `Ctrl+F` |
 | Edit organisation name | Hover over subtitle → ✏ |
 | Save organisation name | `Enter` or ✓ |
 | Cancel organisation name | `Escape` |
@@ -186,7 +188,7 @@ All data is stored as JSON files in the Electron user-data directory:
 | Technology | Usage |
 |------------|-------|
 | [Electron 28](https://www.electronjs.org/) | Desktop shell, PDF printing |
-| [electron-builder](https://www.electron.build/) | AppImage packaging |
+| [electron-builder](https://www.electron.build/) | AppImage / NSIS / DMG packaging |
 | Vanilla HTML/CSS/JS | Entire UI, no framework |
 | [Outfit](https://fonts.google.com/specimen/Outfit) | UI font |
 | [DM Serif Display](https://fonts.google.com/specimen/DM+Serif+Display) | Headings |
@@ -196,17 +198,29 @@ All data is stored as JSON files in the Electron user-data directory:
 
 ## Changelog
 
+### v2.4.0 — Journal Split View, UX Fixes & Todoist Improvements
+
+- **Journal split-panel view** — same two-column layout as the task view: entry list on the left (name, date, type badge, text preview), full detail on the right with editable text area and all other entries of the same contact listed below; auto-selects first entry on open
+- **Journal: new entry via popup modal** — "+ Neuer Eintrag" button in toolbar; Escape closes; validation highlights required fields
+- **Journal: inline delete button** — ✕ button on every row in the list and in the detail panel's entry table
+- **Tasks: new entry via popup modal** — "＋ Neue Aufgabe" button replaces the old inline form; fields: contact, project, title, date, reminder, interval, tag
+- **Tasks: always-visible delete button** — ✕ shown on every task row (subtle colour, red on hover); auto-tasks (🎂/🔄) have no delete button
+- **Todoist: delete on Gravinet side removes task from Todoist** — `DELETE /tasks/{id}` called before local removal; 404 ignored
+- **Todoist: dirty indicator** — sync dot turns yellow on any local task change (add / edit / toggle / delete); turns green after successful sync; only active when sync mode is not "None"
+- **Tab order** — Dashboard → Stakeholder → Matrix → N-Jahres-Plan → Aufgaben → Journal
+- **Contact interval "None"** — new option in all three assignment modals; disables overdue highlighting, dashboard entry, notifications and PDF report for that contact
+- **Section label fix** — "Weitere Aufgaben von Name" / "Einträge von Name" (was "Name Weitere Aufgaben")
+- **Selected item excluded from lower list** — the open task / journal entry is no longer repeated in the "further entries" table below
+- **Bug fixes** — project IDs are strings (`proj1`), not integers; `parseInt('proj1')` caused silent failures in save, delete and toggle; fixed throughout; `p.items` null-guard added
+
 ### v2.3.6 — Todoist Sync, Task UX & Settings Redesign
 - **Todoist bidirectional sync** — tasks pushed to and pulled from Todoist (API v1); conflict resolution: Todoist wins for title/date, Gravinet wins for done-status; auto-generated tasks (🎂 birthday, 🔄 contact) are included with emoji prefix; stakeholder name prepended to Todoist task title
 - **Secure token storage** — API token encrypted via Electron `safeStorage`, never stored in workspace.json
 - **Sync modes** — None / On Start / Every 30 min / Every Hour, configurable in Settings → Todoist
 - **Todoist project selection** — filter sync to a specific Todoist project; set an import target (Gravinet project + contact) for new Todoist tasks
 - **Nav sync status** — clickable dot indicator (grey = idle, yellow = syncing, green = synced, red = error) next to save status; click to trigger manual sync
-- **Tasks: popup for new entries** — "Neue Aufgabe" button in toolbar opens a modal form; old inline form removed; Escape closes the modal
-- **Tasks: inline delete buttons** — each row in the task list shows a ✕ button on hover; auto-generated tasks cannot be deleted this way
 - **Tasks: split-panel detail view** — left list + right detail panel with all task fields and per-contact task table; blue highlight on selected row
 - **Settings page redesign** — full-page overlay with vertical left menu (Appearance / Contacts / Language / Todoist); replaces the old dropdown
-- **Validation feedback** — required fields (contact, project, title) are highlighted with a red border when saving with missing data
 
 ### v2.2.0 — Tasks, Global Views & Code Quality
 - **Tasks per stakeholder** — title, date, reminder, recurrence interval, tag; checkable; auto-generated contact and birthday tasks
@@ -217,98 +231,24 @@ All data is stored as JSON files in the Electron user-data directory:
 - **Auto contact tasks** — updated on every journal entry and on detail-panel open
 - **Task notifications** — reminder-date based desktop notifications (separate from overdue-contact notifications)
 - **Done tasks toggle** — show/hide completed tasks in the detail-panel task tab
-- **Simplified contact-interval display** — "Kontaktintervall: 30 Tage (Vorgabe)"
-- **Wider/taller detail panel** — max-width 1100 px, max-height 96 vh
 - **Journal redesigned as table** — matches task-tab style (Date / Type / Note columns)
-- **Slider fix** — range inputs now reach both ends correctly (custom `-webkit-` / `-moz-` thumb styles)
-- **i18n** — all hardcoded German strings replaced with `t()` calls; new keys for auto-task titles, interval label, dashboard columns, delete button
-- **Code quality** — German comments translated to English; `proj_stakeholder_count` i18n key; dashboard column-3 title key corrected
-
-### v2.0.6 — Code Quality
-- All confirm/alert dialogs in the plan view are now fully translated (DE/EN)
-- `fmtDate()` handles malformed date strings gracefully instead of returning `undefined.undefined.`
-- Inline journal entries (added from the table) now include a `type` field (defaults to `other`) for consistency with detail-panel entries
-- `beziehung` (relationship strength) is now clamped to the valid range 1–5 in all three modals
-- `Math.max` on stakeholder IDs is now safe when the stakeholder list is empty
-
-### v2.0.5
-- Project selector in header now shows "Alle Projekte" on the Dashboard and "Projekt: [Name]" on project-specific tabs (Stakeholder, Matrix, Journal, Plan)
-- Project label highlighted with light-blue background and rounded corners
-- Journal search restricted to stakeholders of the active project
-
-### v2.0.4
-- Journal search restricted to stakeholders of the active project (previously searched across all projects)
-- Header project label text changed to "Alle Projekte" / "All Projects"
-
-### v2.0.3
-- Project name moved to header centre below pill buttons, centred under the menu bar
-- Dashboard overdue cards: attitude colour as subtle background, left border removed
-- Print menu entry renamed to "Dashboard"
-- Settings section renamed to "Standard Kontakt-Intervall"
-- Data menu sections renamed to "Daten json" / "Stakeholder csv" with smaller suffix
-- CSV import/export entries shortened (prefix "Stakeholder" removed)
-
-### v2.0.2
-- Project selector moved to header-centre, centred below the pill-button bar
-- Dashboard overdue contacts: attitude colour as background (reduced opacity), left border removed
-- Build targets added: Windows (.exe via NSIS) and macOS (.dmg); icons generated for both platforms
+- **i18n** — all hardcoded German strings replaced with `t()` calls
 
 ### v2.0.0
 - Relationship strength and notes columns added to the printed project report
-- Dashboard PDF export (Print → Export dashboard): overdue contacts, due-soon contacts, birthdays
-- Keyboard shortcuts: `Esc` closes any open modal/panel, `Ctrl+F` focuses the search box of the active view
-- Undo toast for stakeholder deletion and project removal — 5-second window with "Undo" button
-- Onboarding screen for empty projects: welcome message with 3 guided steps
-- Journal types per entry: Meeting, E-Mail, Call, Conversation, Other — colour-coded badge per entry
-- Global journal search tab (🔍 Journal): full-text search across all entries, filterable by type, search terms highlighted
-- Dashboard stakeholder search: real-time search across all projects with contact-age colour coding
-- Desktop notifications for overdue contacts: on startup + every 4 hours
-- CSV import/export for stakeholders (Data → CSV)
-
-### v1.8.1
-- "Liste" tab renamed to "Stakeholder" (DE: Stakeholder, EN: Stakeholders)
-- Dashboard column headers coloured by category (red, amber, blue, green); coloured top border removed
-- Light theme surfaces changed to very light grey for dashboard cards and menus
-- App starts on the Dashboard tab
+- Dashboard PDF export; keyboard shortcuts (`Esc`, `Ctrl+F`); undo toast; onboarding screen
+- Journal types per entry: Meeting, E-Mail, Call, Conversation, Other — colour-coded badge
+- Global journal search tab; dashboard stakeholder search; desktop notifications; CSV import/export
 
 ### v1.8.0
-- Inline editing in the stakeholder table: Group (dropdown), Influence/Interest (range slider), Attitude (coloured dropdown), Relationship strength (clickable stars)
-- Journal column: clickable 📄 icon opens journal tab directly; ✎ button opens inline entry form for first journal entry
-- Dashboard columns styled as cards; app starts on the Dashboard tab
-
-### v1.7.0
-- Stakeholder notes field — free-text area per stakeholder for permanent information (interests, red lines, personal details); shown in detail panel and printed in contact sheets
-- Row background colour in the stakeholder table reflects attitude (red tint for critical, green for supportive)
-- Version number in header now uses theme-aware colour (visible in both dark and light mode)
-- Notes section background adapts to current theme
+- Inline editing in the stakeholder table (group, influence, interest, attitude, relationship strength)
+- Journal column: clickable 📄 icon; dashboard columns as cards
 
 ### v1.6.0
-- **Activity Dashboard** — new tab with four columns: overdue contacts, contacts due soon, upcoming birthdays (30 days), recent journal activity across all projects
-- **Per-stakeholder contact interval** — each stakeholder can have its own contact interval; falls back to global setting
-- **Relationship strength (Beziehungsstärke)** — 1–5 rating stored per project assignment; shown as ★ stars in the detail panel, as a sortable column in the table, and as variable dot size/glow in the matrix
+- Activity Dashboard; per-stakeholder contact interval; relationship strength (★ stars, matrix dot size)
 
 ### v1.5.0
-- Full German / English UI with live language switcher in Settings
-- All translatable strings use `data-i18n` attributes and a central `TRANSLATIONS` object
-- Strategy labels, badges, and PDF output are fully translated
-- App version number displayed top-left next to the logo
-- Data persistence fixed: `userData` path pinned to `~/.config/Gravinet/` so data survives AppImage updates
-- Version retrieved via IPC (`app.getVersion()`) for reliable display in packaged builds
-- README rewritten in English
+- Full German / English UI; live language switcher; data persistence pinned to `~/.config/Gravinet/`
 
-### v1.4.0
-- Language switcher introduced (DE/EN) in the Settings menu
-- i18n architecture: `i18n.js` loaded first, `t(key)` function, `applyTranslations()` on every render
-
-### v1.3.0
-- Settings menu restructured into sub-sections (Theme, Contact Interval, Language)
-- Contact interval warning: stakeholders whose last contact exceeds the configured interval are highlighted in the table and on the dashboard
-
-### v1.2.0
-- Sortable table columns (Name, Group, Influence, Interest, Attitude, Strategy, Journal, Last Contact)
-- Sort direction indicator (▲/▼) in column headers
-
-### v1.1.0
-- Codebase split from a single HTML file into separate JS and CSS modules
-- File-based storage via Electron IPC (one JSON file per project + `contacts.json` + `workspace.json`)
-- Multiple projects with independent stakeholder assignments
+### v1.1.0 – v1.4.0
+- Codebase split into JS/CSS modules; file-based IPC storage; multiple projects; sortable table; language switcher; settings sub-sections

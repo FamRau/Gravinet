@@ -17,7 +17,9 @@ function getStrategie(s) {
 
 // Returns the effective contact interval for a stakeholder item.
 // Uses item-level override if set, otherwise the global setting.
+// Returns effective contact interval. -1 means "none" (disabled). 0/null falls back to global.
 function getContactInterval(s) {
+  if (s.contactInterval === -1) return -1;
   return s.contactInterval || contactWarningDays;
 }
 

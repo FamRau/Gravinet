@@ -75,7 +75,7 @@ const TRANSLATIONS = {
     btn_edit_full: '✏ Bearbeiten',
     // Journal
     journal_empty: 'Noch keine Einträge.<br>Dokumentiere deine erste Interaktion!',
-    journal_entries: 'Einträge', journal_new_entry: 'Neuer Eintrag',
+    journal_entries: 'Einträge', journal_new_entry: 'Neuer Eintrag', js_detail_select: '← Eintrag auswählen',
     journal_placeholder: 'Beschreibe die Interaktion, Themen, Stimmung, nächste Schritte…',
     btn_save_entry: 'Speichern', btn_cancel: 'Abbrechen', btn_new_task: 'Neue Aufgabe',
     sync_idle: '—', sync_ok: 'Synchronisiert', sync_pending: 'Synchronisiert…', sync_error: 'Sync-Fehler',
@@ -93,7 +93,7 @@ const TRANSLATIONS = {
     btn_delete: '🗑 Löschen', btn_delete_short: 'Löschen',
     th_date: 'Datum', th_type: 'Typ', th_note: 'Notiz',
     auto_contact_title: 'Nächstes Treffen / Kontaktnahme', auto_contact_tag: 'Kontaktaufnahme',
-    detail_contact_interval_label: 'Kontaktintervall', interval_default_suffix: ' (Vorgabe)',
+    detail_contact_interval_label: 'Kontaktintervall', interval_default_suffix: ' (Vorgabe)', interval_none: 'Keine',
     days_label: 'Tage',
     org_edit_title: 'Bezeichnung bearbeiten',
     dash_all_tasks: 'Alle Aufgaben',
@@ -102,7 +102,7 @@ const TRANSLATIONS = {
     av_search_placeholder: 'Aufgaben durchsuchen…',
     av_status_open: 'Offen', av_status_done: 'Erledigt', av_status_all: 'Alle',
     av_sort_date: '↕ Datum', av_sort_title: '↕ Bezeichnung', av_sort_name: '↕ Name',
-    av_weitere_aufgaben: 'Weitere Aufgaben',
+    av_weitere_aufgaben: 'Weitere Aufgaben', av_von: 'von',
     av_all_projects: 'Alle Projekte', av_all_tags: 'Alle Tags', av_empty: 'Keine Aufgaben gefunden.',
     av_detail_select: '← Aufgabe auswählen',
     // Edit modal
@@ -289,7 +289,7 @@ const TRANSLATIONS = {
     btn_edit_full: '✏ Edit',
     // Journal
     journal_empty: 'No entries yet.<br>Document your first interaction!',
-    journal_entries: 'entries', journal_new_entry: 'New Entry',
+    journal_entries: 'entries', journal_new_entry: 'New Entry', js_detail_select: '← Select entry',
     journal_placeholder: 'Describe the interaction, topics, mood, next steps…',
     btn_save_entry: 'Save', btn_cancel: 'Cancel', btn_new_task: 'New Task',
     sync_idle: '—', sync_ok: 'Synced', sync_pending: 'Syncing…', sync_error: 'Sync error',
@@ -307,7 +307,7 @@ const TRANSLATIONS = {
     btn_delete: '🗑 Delete', btn_delete_short: 'Delete',
     th_date: 'Date', th_type: 'Type', th_note: 'Note',
     auto_contact_title: 'Next meeting / contact', auto_contact_tag: 'Contact',
-    detail_contact_interval_label: 'Contact interval', interval_default_suffix: ' (Default)',
+    detail_contact_interval_label: 'Contact interval', interval_default_suffix: ' (Default)', interval_none: 'None',
     days_label: 'days',
     org_edit_title: 'Edit name',
     dash_all_tasks: 'All Tasks',
@@ -316,7 +316,7 @@ const TRANSLATIONS = {
     av_search_placeholder: 'Search tasks…',
     av_status_open: 'Open', av_status_done: 'Done', av_status_all: 'All',
     av_sort_date: '↕ Date', av_sort_title: '↕ Title', av_sort_name: '↕ Name',
-    av_weitere_aufgaben: 'More Tasks',
+    av_weitere_aufgaben: 'More Tasks', av_von: 'by',
     av_all_projects: 'All Projects', av_all_tags: 'All Tags', av_empty: 'No tasks found.',
     av_detail_select: '← Select a task',
     // Edit modal

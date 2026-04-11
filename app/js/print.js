@@ -290,6 +290,7 @@ async function printDashboard() {
       const sh = stakeholders.find(s => s.id === item.shId); if (!sh) return;
       const s = { ...sh, ...item, id: sh.id, projName: proj.name };
       const interval = getContactInterval(s);
+      if (interval === -1) return; // no interval tracking
       const j = sh.journal || [];
       const lastEntry = j.length ? j.reduce((a, b) => a.date > b.date ? a : b) : null;
       const daysSince = lastEntry ? Math.floor((now - new Date(lastEntry.date).getTime()) / 86400000) : null;

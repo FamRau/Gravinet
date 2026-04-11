@@ -167,6 +167,7 @@ function renderTable() {
           const locale = appLang === 'en' ? 'en-US' : 'de-AT';
           const label = d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
           const interval = getContactInterval(s);
+          if (interval === -1) return `<td><span class="contact-date">${label}</span></td>`;
           const cls = daysSince > interval        ? 'overdue'
                     : daysSince > interval * 0.6  ? 'warn'
                     :                               'ok';
@@ -356,6 +357,7 @@ function renderDashboard() {
       const sh = stakeholders.find(s => s.id === item.shId); if (!sh) return;
       const s = { ...sh, ...item, id: sh.id, projName: proj.name, projId: proj.id };
       const interval = getContactInterval(s);
+      if (interval === -1) return; // no interval tracking
       const j = sh.journal || [];
       const lastEntry = j.length ? j.reduce((a, b) => a.date > b.date ? a : b) : null;
       const daysSince = lastEntry ? Math.floor((now - new Date(lastEntry.date).getTime()) / 86400000) : null;
@@ -488,6 +490,7 @@ function renderDashboardSearch(q) {
       const item = p.items.find(i => i.shId === sh.id); if (!item) return null;
       const s = { ...sh, ...item };
       const interval = getContactInterval(s);
+      if (interval === -1) return null; // no interval tracking
       const j = sh.journal || [];
       const lastEntry = j.length ? j.reduce((a, b) => a.date > b.date ? a : b) : null;
       const daysSince = lastEntry ? Math.floor((now - new Date(lastEntry.date).getTime()) / 86400000) : null;
@@ -526,6 +529,8 @@ function renderDashboardSearch(q) {
 
 // ── Journal Search ────────────────────────────────────────────────────────────
 
+let _jsDetailCtx = null; // { shId, entryIdx }
+
 function renderJsNewContactSelect() {
   const sel = document.getElementById('js-new-contact'); if (!sel) return;
   const cur = sel.value;
@@ -534,12 +539,33 @@ function renderJsNewContactSelect() {
     + sorted.map(sh => `<option value="${sh.id}"${sh.id == cur ? ' selected' : ''}>${esc(shFullName(sh))}</option>`).join('');
 }
 
+function openJsNewModal() {
+  renderJsNewContactSelect();
+  ['js-new-contact','js-new-text'].forEach(id => document.getElementById(id)?.classList.remove('input-error'));
+  document.getElementById('js-new-type').value = '';
+  document.getElementById('js-new-modal').classList.add('open');
+  setTimeout(() => document.getElementById('js-new-text')?.focus(), 80);
+}
+
+function closeJsNewModal() {
+  document.getElementById('js-new-modal').classList.remove('open');
+}
+
 function addJournalFromSearch() {
   const shId   = parseInt(document.getElementById('js-new-contact')?.value);
   const type   = document.getElementById('js-new-type')?.value || null;
   const textEl = document.getElementById('js-new-text');
   const text   = textEl?.value.trim();
-  if (!shId || !text) return;
+  if (!shId || !text) {
+    if (!shId) document.getElementById('js-new-contact')?.classList.add('input-error');
+    if (!text) textEl?.classList.add('input-error');
+    ['js-new-contact','js-new-text'].forEach(id => {
+      const el = document.getElementById(id);
+      el?.addEventListener('input',  () => el.classList.remove('input-error'), { once: true });
+      el?.addEventListener('change', () => el.classList.remove('input-error'), { once: true });
+    });
+    return;
+  }
   const sh = stakeholders.find(s => s.id === shId); if (!sh) return;
   if (!sh.journal) sh.journal = [];
   sh.journal.push({ date: new Date().toISOString(), text, type: type || null });
@@ -547,7 +573,83 @@ function addJournalFromSearch() {
   _syncBirthdayTask(shId);
   saveNow();
   textEl.value = '';
+  closeJsNewModal();
+  // Select the newly added entry
+  const newIdx = sh.journal.length - 1;
   renderJournalSearch();
+  selectJsDetail(shId, newIdx);
+  renderTable();
+}
+
+function selectJsDetail(shId, entryIdx) {
+  _jsDetailCtx = { shId, entryIdx };
+  renderJournalSearch();
+  renderJsDetailIfOpen();
+}
+
+function renderJsDetailIfOpen() {
+  const el = document.getElementById('js-detail'); if (!el) return;
+  if (!_jsDetailCtx) { el.innerHTML = `<div class="av-detail-empty">${t('js_detail_select')}</div>`; return; }
+  const { shId, entryIdx } = _jsDetailCtx;
+  const sh = stakeholders.find(s => s.id === shId);
+  if (!sh) { el.innerHTML = `<div class="av-detail-empty">${t('js_detail_select')}</div>`; return; }
+  const journal = sh.journal || [];
+  // entryIdx is the real index in sh.journal; find it safely
+  const e = journal[entryIdx];
+  if (!e) { el.innerHTML = `<div class="av-detail-empty">${t('js_detail_select')}</div>`; return; }
+
+  const typeBadge = e.type ? `<span class="journal-type-badge jtype-${e.type}">${t('jtype_' + e.type)}</span>` : '';
+
+  // All entries for this contact except the selected one, sorted newest first
+  const sorted = journal.map((je, i) => ({ je, i })).filter(({ i }) => i !== entryIdx).sort((a, b) => new Date(b.je.date) - new Date(a.je.date));
+
+  const rows = sorted.map(({ je, i }) => {
+    const isSel = i === entryIdx;
+    return `<tr class="${isSel ? 'av-task-sel av-task-clickable' : 'av-task-clickable'}" onclick="selectJsDetail(${shId},${i})">
+      <td style="white-space:nowrap;font-family:var(--font-mono);font-size:.72rem;color:var(--muted);padding:6px 8px">${fmtDateTime(je.date)}</td>
+      <td style="padding:6px 4px">${je.type ? `<span class="journal-type-badge jtype-${je.type}">${t('jtype_' + je.type)}</span>` : ''}</td>
+      <td style="font-size:.84rem;padding:6px 8px;${isSel ? 'font-weight:600' : ''}">${esc(je.text)}</td>
+      <td style="padding:6px 4px" onclick="event.stopPropagation()"><button class="av-row-del" onclick="deleteJsEntry(${shId},${i})" title="${t('btn_delete_short')}">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="av-detail-task-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span class="av-detail-task-title" style="flex:1">${esc(shFullName(sh))}</span>
+        ${typeBadge}
+      </div>
+      <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-bottom:10px">${fmtDateTime(e.date)}</div>
+      <textarea class="journal-textarea" rows="5" style="width:100%;box-sizing:border-box;margin:0"
+        onchange="saveJsEntryText(${shId},${entryIdx},this.value)">${esc(e.text)}</textarea>
+    </div>
+    <div class="av-detail-section-sep">
+      <span class="av-detail-section-sep-label">${t('journal_entries')} ${t('av_von')}</span>
+      <span class="av-detail-section-sep-name">${esc(shFullName(sh))}</span>
+    </div>
+    <div class="aufgaben-table-wrap">
+      <table class="aufgaben-table"><tbody>${rows}</tbody></table>
+    </div>`;
+}
+
+function saveJsEntryText(shId, idx, text) {
+  const sh = stakeholders.find(s => s.id === shId); if (!sh || !sh.journal[idx]) return;
+  sh.journal[idx].text = text;
+  saveNow();
+  renderJournalSearch();
+}
+
+function deleteJsEntry(shId, idx) {
+  if (!confirm(t('confirm_delete_journal'))) return;
+  const sh = stakeholders.find(s => s.id === shId); if (!sh) return;
+  sh.journal.splice(idx, 1);
+  if (_jsDetailCtx?.shId === shId) {
+    const newIdx = Math.min(idx, sh.journal.length - 1);
+    _jsDetailCtx = sh.journal.length > 0 ? { shId, entryIdx: newIdx } : null;
+  }
+  saveNow();
+  renderJournalSearch();
+  renderJsDetailIfOpen();
   renderTable();
 }
 
@@ -569,21 +671,36 @@ function renderJournalSearch() {
 
   if (all.length === 0) {
     el.innerHTML = `<div style="color:var(--muted);padding:30px 0;text-align:center">${t('journal_search_empty')}</div>`;
+    if (!_jsDetailCtx) return;
+    _jsDetailCtx = null;
+    renderJsDetailIfOpen();
     return;
   }
 
+  const hi = s => q ? s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), m => `<mark class="js-hi">${m}</mark>`) : s;
+
   el.innerHTML = all.map(({ sh, e, idx }) => {
-    const hi = s => q ? s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'), m => `<mark class="js-hi">${m}</mark>`) : s;
-    return `<div class="js-row" onclick="openDetailJournal(${sh.id})">
-      <div class="js-row-head">
-        <span class="js-row-name">${esc(shFullName(sh))}</span>
-        <span class="js-row-date">${fmtDateTime(e.date)}</span>
-        ${e.type ? `<span class="journal-type-badge jtype-${e.type}">${t('jtype_' + e.type)}</span>` : ''}
+    const isSel = _jsDetailCtx && _jsDetailCtx.shId === sh.id && _jsDetailCtx.entryIdx === idx;
+    return `<div class="js-row${isSel ? ' av-selected' : ''}" onclick="selectJsDetail(${sh.id},${idx})">
+      <div class="js-row-body">
+        <div class="js-row-head">
+          <span class="js-row-name">${hi(esc(shFullName(sh)))}</span>
+          <span class="js-row-date">${fmtDateTime(e.date)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          ${e.type ? `<span class="journal-type-badge jtype-${e.type}">${t('jtype_' + e.type)}</span>` : ''}
+          <span class="js-row-text" style="font-size:.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${hi(esc(e.text))}</span>
+        </div>
       </div>
-      <div class="js-row-rolle">${esc(sh.rolle)}</div>
-      <div class="js-row-text">${hi(esc(e.text))}</div>
+      <button class="av-row-del" onclick="event.stopPropagation();deleteJsEntry(${sh.id},${idx})" title="${t('btn_delete_short')}">✕</button>
     </div>`;
   }).join('');
+
+  // Auto-select first if nothing selected
+  if (!_jsDetailCtx && all.length > 0) {
+    const first = all[0];
+    selectJsDetail(first.sh.id, first.idx);
+  }
 }
 
 // ── Aufgaben View ─────────────────────────────────────────────────────────────
@@ -603,16 +720,21 @@ function renderAvNewProjSelect() {
   const projSel = document.getElementById('av-new-proj'); if (!projSel) return;
   const shId = parseInt(contSel?.value);
   const cur  = projSel.value;
-  const shProjects = isNaN(shId) ? [] : projects.filter(p => p.items.some(i => i.shId == shId));
+  const shProjects = isNaN(shId) ? [] : projects.filter(p => (p.items || []).some(i => String(i.shId) === String(shId)));
   projSel.innerHTML = `<option value="">${t('js_select_project')}</option>`
-    + shProjects.map(p => `<option value="${p.id}"${p.id == cur ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
-  projSel.value = shProjects.find(p => p.id == cur) ? cur : (shProjects.length === 1 ? String(shProjects[0].id) : '');
+    + shProjects.map(p => `<option value="${p.id}"${String(p.id) === cur ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  projSel.value = shProjects.find(p => String(p.id) === cur) ? cur : (shProjects.length === 1 ? String(shProjects[0].id) : '');
+  // Clear error state when projects are populated after contact selection
+  if (shProjects.length > 0) projSel.classList.remove('input-error');
 }
 
 function openAvNewModal() {
   renderAvNewContactSelect();
   const intSel = document.getElementById('av-new-interval');
   if (intSel && !intSel.options.length) intSel.innerHTML = _intervalOptions('');
+  // Clear any leftover error states from previous open
+  ['av-new-contact','av-new-proj','av-new-title'].forEach(id =>
+    document.getElementById(id)?.classList.remove('input-error'));
   document.getElementById('av-new-modal').classList.add('open');
   setTimeout(() => document.getElementById('av-new-title')?.focus(), 80);
 }
@@ -623,7 +745,7 @@ function closeAvNewModal() {
 
 function addAufgabeFromView() {
   const shId  = parseInt(document.getElementById('av-new-contact')?.value);
-  const projId = parseInt(document.getElementById('av-new-proj')?.value);
+  const projId = document.getElementById('av-new-proj')?.value;   // string ID like 'proj1'
   const title  = document.getElementById('av-new-title')?.value.trim();
   if (!shId || !projId || !title) {
     const fields = [
@@ -650,7 +772,7 @@ function addAufgabeFromView() {
   const interval = parseInt(document.getElementById('av-new-interval')?.value) || null;
   const tag      = document.getElementById('av-new-tag')?.value.trim() || '';
   item.aufgaben.push({ id: nextAufgabeId++, title, date, reminder, interval, tag, done: false });
-  saveNow();
+  _markTasksDirty(); saveNow();
   closeAvNewModal();
   // Reset fields
   ['av-new-title','av-new-date','av-new-reminder','av-new-tag'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -738,7 +860,7 @@ function renderAufgabenView() {
         </div>
         <div class="av-row-sh-name">${hi(esc(a.shName))}</div>
       </div>
-      ${autoRow ? '' : `<button class="av-row-del" onclick="event.stopPropagation();deleteAufgabeGlobal(${a.projId},${a.shId},${a.id})" title="${t('btn_delete')}">✕</button>`}
+      ${autoRow ? '' : `<button class="av-row-del" onclick="event.stopPropagation();deleteAufgabeGlobal('${a.projId}',${a.shId},${a.id})" title="${t('btn_delete')}">✕</button>`}
     </div>`;
   }).join('');
 
@@ -754,7 +876,7 @@ function renderAufgabenView() {
 let _avDetailCtx = null;
 
 function selectAvDetail(shId, projId, aufgabeId) {
-  _avDetailCtx = { shId, projId: parseInt(projId), aufgabeId };
+  _avDetailCtx = { shId, projId: projId, aufgabeId };
   renderAufgabenView();
   // Ensure the row is highlighted even if isSelected check missed it (e.g. type mismatch)
   document.querySelectorAll('#av-body .js-row').forEach(r => r.classList.remove('av-selected'));
@@ -810,7 +932,7 @@ function renderAvDetailIfOpen() {
     </div>`;
 
   // ── Bottom: all tasks of this contact ──
-  const allTasks = (item.aufgaben || []).slice().sort((a, b) => (a.date||'9999') < (b.date||'9999') ? -1 : 1);
+  const allTasks = (item.aufgaben || []).filter(a => a.id !== aufgabeId).slice().sort((a, b) => (a.date||'9999') < (b.date||'9999') ? -1 : 1);
   const doneCount = allTasks.filter(a => a.done).length;
   const visibleTasks = _showDoneAufgaben ? allTasks : allTasks.filter(a => !a.done);
   const taskRows = visibleTasks.map(tk => {
@@ -828,8 +950,8 @@ function renderAvDetailIfOpen() {
   el.innerHTML = `
     ${topCard}
     <div class="av-detail-section-sep">
+      <span class="av-detail-section-sep-label">${t('av_weitere_aufgaben')} ${t('av_von')}</span>
       <span class="av-detail-section-sep-name">${esc(shFullName(sh))}</span>
-      <span class="av-detail-section-sep-label">${t('av_weitere_aufgaben')}</span>
       ${doneCount > 0 ? `<button class="aufgabe-toggle-done${_showDoneAufgaben?' active':''}" style="margin-left:auto" onclick="toggleShowDoneAufgaben(${shId})">
         ${_showDoneAufgaben?(appLang==='en'?'Hide done':'Erledigte ausblenden'):(appLang==='en'?`Done (${doneCount})`:`Erledigt (${doneCount})`)}
       </button>` : ''}
@@ -850,7 +972,7 @@ function renderAvDetailIfOpen() {
 
 function saveAufgabeFieldGlobal(projId, shId, aufgabeId, field, value) {
   const savedProj = activeProjectId;
-  activeProjectId = parseInt(projId);
+  activeProjectId = projId;
   saveAufgabeField(shId, aufgabeId, field, value);
   activeProjectId = savedProj;
   renderAufgabenView();
@@ -858,7 +980,7 @@ function saveAufgabeFieldGlobal(projId, shId, aufgabeId, field, value) {
 
 function deleteAufgabeGlobal(projId, shId, aufgabeId) {
   const savedProj = activeProjectId;
-  activeProjectId = parseInt(projId);
+  activeProjectId = projId;
   deleteAufgabe(shId, aufgabeId);
   activeProjectId = savedProj;
 }
@@ -867,12 +989,12 @@ function addAufgabeGlobal(projId, shId) {
   const title = document.getElementById(`aufgabe-new-title-avd-${shId}`)?.value.trim();
   if (!title) return;
   const savedProj = activeProjectId;
-  activeProjectId = parseInt(projId);
+  activeProjectId = projId;
   const proj = getActiveProject();
   const item = proj?.items.find(i => i.shId === shId); if (!item) { activeProjectId = savedProj; return; }
   if (!item.aufgaben) item.aufgaben = [];
   item.aufgaben.push({ id: nextAufgabeId++, title, date: '', reminder: '', interval: null, tag: '', done: false });
-  saveNow();
+  _markTasksDirty(); saveNow();
   activeProjectId = savedProj;
   renderAvDetailIfOpen();
   renderAufgabenView();
@@ -880,7 +1002,7 @@ function addAufgabeGlobal(projId, shId) {
 
 function toggleAufgabeGlobal(projId, shId, aufgabeId, done) {
   const savedProj = activeProjectId;
-  activeProjectId = parseInt(projId);
+  activeProjectId = projId;
   toggleAufgabe(shId, aufgabeId, done);
   activeProjectId = savedProj;
 }
